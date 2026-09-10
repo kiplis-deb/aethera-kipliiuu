@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aethera — Free AI for Daily Work, Students & Programmers</title>
+  <meta name="description" content="100% Free decentralized cognitive AI suite for daily life, workplace productivity, calculus & academic research, and software development.">
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/auth-modal.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+  <!-- KaTeX Math Rendering Engine -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <!-- Firebase Official Web SDK (Compat CDN for cross-device cloud auth & Firestore sync) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <!-- ==========================================================================
+       SCROLL & CLICK-DRIVEN 3D QUANTUM UNIVERSE BACKGROUND
+       ========================================================================== -->
+  <div id="bg-universe" aria-hidden="true">
+    <canvas id="bg-canvas"></canvas>
+    <div class="bg-overlay-gradient"></div>
+  </div>
+
+  <!-- ==========================================================================
+       FLOATING NAVIGATION BAR
+       ========================================================================== -->
+  <header class="header-nav">
+    <nav class="nav-container">
+      <a href="index.html" class="nav-brand">
+        <div class="brand-symbol">
+          <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 2" opacity="0.4"/>
+            <polygon points="16,6 26,22 6,22" stroke="currentColor" stroke-width="2" fill="none"/>
+            <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          </svg>
+        </div>
+        <span>Aethera</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="ai.html" class="nav-link">AI Tools</a></li>
+        <li><a href="#tools" class="nav-link">Tool Suite</a></li>
+        <li><a href="ai.html?tool=vuln-scanner" class="nav-link">Cyber SecOps</a></li>
+        <li><a href="#benchmarks" class="nav-link">Benchmarks</a></li>
+        <li><a href="#faq" class="nav-link">FAQ</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- User Account & Database HUD Slot -->
+        <div id="navbar-auth-slot" class="navbar-auth-slot"></div>
+
+        <!-- Dark / Light Mode Toggle Button -->
+        <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Dark and Light Theme" title="Toggle Theme">
+          <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
+        <a href="ai.html" class="btn btn-primary nav-desktop-cta">
+          <span>Launch AI Studio</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+
+        <!-- Mobile Menu Hamburger Button -->
+        <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle Navigation Menu" aria-expanded="false" aria-controls="mobile-nav-drawer">
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Navigation Drawer Overlay -->
+    <div id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
+      <div class="mobile-nav-backdrop" id="mobile-nav-backdrop"></div>
+      <div class="mobile-nav-panel">
+        <div class="mobile-nav-top">
+          <span class="mobile-nav-title">Navigation</span>
+          <button id="mobile-nav-close" class="mobile-nav-close" aria-label="Close menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <ul class="mobile-nav-menu">
+          <li><a href="ai.html" class="mobile-nav-item highlight">⚡ AI Tools Suite</a></li>
+          <li><a href="#tools" class="mobile-nav-item">🛠️ Tool Suite Catalog</a></li>
+          <li><a href="ai.html?tool=vuln-scanner" class="mobile-nav-item">🛡️ Cyber SecOps Suite</a></li>
+          <li><a href="#benchmarks" class="mobile-nav-item">📊 AI Benchmarks</a></li>
+          <li><a href="#faq" class="mobile-nav-item">❓ FAQ &amp; Guides</a></li>
+        </ul>
+        <div class="mobile-nav-actions">
+          <a href="ai.html" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem 1.25rem;">
+            <span>Launch AI Studio</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==========================================================================
+         HERO SECTION (HIGH-OCTANE INTERACTIVE PLAYGROUND)
+         ========================================================================== -->
+    <section class="section hero-section" id="hero">
+      <div class="container">
+        <div class="hero-grid">
+          
+          <!-- Hero Left Column: Narrative & Instant Prompt Launcher -->
+          <div class="hero-content">
+            <h1 class="heading-display hero-title">
+              Cognitive AI, <br>
+              <span class="text-gradient">
+                <span id="hero-rotator" class="typewriter-text">For Daily Productivity.</span><span class="typewriter-cursor">|</span>
+              </span>
+            </h1>
+
+            <p class="hero-subtitle">
+              20+ high-performance AI tools engineered for everyday workers, students, developers, and cybersecurity analysts. Polish emails, solve calculus, audit smart contracts, scan CVEs, and architect cloud systems.
+            </p>
+
+            <div class="hero-actions" style="margin-top: 0.5rem;">
+              <a href="ai.html" class="btn btn-primary">Open All 20+ Free Tools &#8594;</a>
+              <a href="#tools" class="btn btn-secondary">Explore Catalog</a>
+            </div>
+          </div>
+
+          <!-- Massive macOS AI Studio Live Showcase Glass Window (Interactive Feature Preview) -->
+          <div class="mac-ai-test-window mac-window-showcase" id="hero-ai-showcase" aria-label="Interactive AI Feature Demo">
+            <!-- macOS Top Titlebar with Tabs -->
+            <div class="mac-test-titlebar">
+              <div class="macos-traffic-lights">
+                <span class="traffic-light close"></span>
+                <span class="traffic-light minimize"></span>
+                <span class="traffic-light zoom"></span>
+              </div>
+
+              <!-- macOS AI Feature Tabs -->
+              <div class="mac-test-tabs">
+                <button class="mac-tab active" data-showcase-tab="chatbot" type="button">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  <span>AI Chatbot</span>
+                </button>
+                <button class="mac-tab" data-showcase-tab="email" type="button">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <span>Email Drafter</span>
+                </button>
+                <button class="mac-tab" data-showcase-tab="code" type="button">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  <span>Bug Hunter</span>
+                </button>
+                <button class="mac-tab" data-showcase-tab="math" type="button">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                  <span>Calculus Solver</span>
+                </button>
+              </div>
+
+              <div class="mac-test-badge">
+                <span class="pulse-dot"></span>
+                <span id="showcase-status-badge">AI LIVE // GEMINI 3.6 FLASH</span>
+              </div>
+            </div>
+
+            <!-- macOS Window Body -->
+            <div class="mac-test-body">
+              <!-- Left Sidebar: AI Tools Suite Menu -->
+              <div class="mac-test-sidebar">
+                <div class="mac-test-nav-title">POPULAR AI SUITE</div>
+                <button class="mac-test-nav-item active" data-showcase-tab="chatbot" type="button">
+                  <span class="status-icon">●</span>
+                  <span>AI Chatbot</span>
+                </button>
+                <button class="mac-test-nav-item" data-showcase-tab="email" type="button">
+                  <span class="status-icon">●</span>
+                  <span>Email Drafter</span>
+                </button>
+                <button class="mac-test-nav-item" data-showcase-tab="code" type="button">
+                  <span class="status-icon">●</span>
+                  <span>Smart Bug Hunter</span>
+                </button>
+                <button class="mac-test-nav-item" data-showcase-tab="math" type="button">
+                  <span class="status-icon">●</span>
+                  <span>Math &amp; LaTeX</span>
+                </button>
+                <button class="mac-test-nav-item" data-showcase-tab="cve" type="button">
+                  <span class="status-icon">●</span>
+                  <span>CVE &amp; SecOps</span>
+                </button>
+                <button class="mac-test-nav-item" data-showcase-tab="resume" type="button">
+                  <span class="status-icon">●</span>
+                  <span>Resume Builder</span>
+                </button>
+
+                <div style="margin-top: auto; padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06);">
+                  <a href="ai.html" class="mac-launch-studio-btn">
+                    <span>Open AI Studio &#8599;</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Main Simulated AI Studio Session -->
+              <div class="mac-showcase-workspace">
+                <div class="mac-showcase-stream" id="showcase-stream">
+                  <!-- User Message Bubble -->
+                  <div class="showcase-bubble user-bubble">
+                    <div class="bubble-header-mini">
+                      <span class="bubble-role">You</span>
+                      <span class="bubble-timestamp">Just now</span>
+                    </div>
+                    <div class="bubble-text-mini" id="showcase-user-prompt">
+                      How does an LLM generate tokens autoregressively, and how does KV-caching speed up inference?
+                    </div>
+                  </div>
+
+                  <!-- AI Message Bubble -->
+                  <div class="showcase-bubble ai-bubble">
+                    <div class="bubble-header-mini">
+                      <div class="ai-avatar-mini">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                      </div>
+                      <span class="bubble-role-ai">Aethera Cortex</span>
+                      <span class="bubble-model-pill">Gemini 3.6 Flash</span>
+                      <span class="bubble-latency-metric">12.4ms • 142 T/s</span>
+                    </div>
+                    <div class="bubble-text-mini" id="showcase-ai-response">
+                      <p>In autoregressive generation, each token is sampled sequentially by projecting hidden states through the LM head: <code>P(x_t | x_&lt;t) = softmax(W &middot; h_t)</code>.</p>
+                      
+                      <div class="showcase-code-snippet">
+                        <div class="snippet-header">
+                          <span>kv_cache_attention.py</span>
+                          <span class="snippet-tag">O(1) Attention Cache</span>
+                        </div>
+                        <pre><code># KV Cache eliminates redundant computation:
+K_cached = torch.cat([K_prev, K_new], dim=-2)
+V_cached = torch.cat([V_prev, V_new], dim=-2)
+scores = (Q_curr @ K_cached.transpose(-1, -2)) / math.sqrt(d_k)
+out = softmax(scores) @ V_cached</code></pre>
+                      </div>
+
+                      <div class="showcase-followups">
+                        <span class="followup-chip">Explain FlashAttention-2</span>
+                        <span class="followup-chip">Compare PagedAttention</span>
+                        <span class="followup-chip">Quantization to INT4</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Simulated Bottom Input Console (Clicking opens AI Studio) -->
+                <a href="ai.html" class="mac-showcase-input-bar" title="Click to launch interactive session in AI Studio">
+                  <div class="showcase-input-field">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <span id="showcase-input-placeholder">Ask AI Chatbot anything, paste code, or drop an image...</span>
+                  </div>
+                  <div class="showcase-input-actions">
+                    <span class="showcase-action-tag">VISION AI</span>
+                    <span class="showcase-action-tag">100% FREE</span>
+                    <span class="showcase-send-btn">
+                      <span>Launch AI</span>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    </span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         LIVE CYBER TELEMETRY MARQUEE (CONTINUOUS SEAMLESS MOTION)
+         ========================================================================== -->
+    <div class="cyber-marquee" id="cyber-marquee" aria-hidden="true">
+      <div class="marquee-track" id="marquee-track">
+        <div class="marquee-group">
+          <div class="marquee-item"><span>LIVE TELEMETRY</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>GEMINI 3.6 FLASH LIVE</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>100% FREE COMMUNITY ACCESS</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>20+ SPECIALIZED TOOLS</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>STEP-BY-STEP LATEX MATH</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>96.8% HUMANEVAL SCORE</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>SUB-10MS API LATENCY</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>ZERO DATA RETENTION</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>AUDIO OVERVIEW &amp; SLIDE DECK</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>CYBER SECOPS &amp; CVE AUDIT</span><span class="marquee-divider"></span></div>
+        </div>
+        <div class="marquee-group" aria-hidden="true">
+          <div class="marquee-item"><span>LIVE TELEMETRY</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>GEMINI 3.6 FLASH LIVE</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>100% FREE COMMUNITY ACCESS</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>20+ SPECIALIZED TOOLS</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>STEP-BY-STEP LATEX MATH</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>96.8% HUMANEVAL SCORE</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>SUB-10MS API LATENCY</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>ZERO DATA RETENTION</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>AUDIO OVERVIEW &amp; SLIDE DECK</span><span class="marquee-divider"></span></div>
+          <div class="marquee-item"><span>CYBER SECOPS &amp; CVE AUDIT</span><span class="marquee-divider"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         CHAOS TO CLARITY: INTERACTIVE TRANSFORMATION SHOWCASE
+         ========================================================================== -->
+    <section class="section transformation-section" id="showcase">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Raw Chaos ➔ Structured Intelligence</h2>
+          <p class="section-desc">Experience how Aethera transforms messy inputs into crisp, formatted, publication-ready outputs in milliseconds.</p>
+        </div>
+
+        <!-- Interactive Scenario Selector -->
+        <div class="scenario-tabs">
+          <button class="scenario-tab-btn active" data-scenario="notes">1. Meeting Notes ➔ Executive Memo</button>
+          <button class="scenario-tab-btn" data-scenario="math">2. Calculus Problem ➔ KaTeX Proof</button>
+          <button class="scenario-tab-btn" data-scenario="code">3. Spaghetti Code ➔ Type-Safe Patch</button>
+          <button class="scenario-tab-btn" data-scenario="cyber" style="border-color: rgba(0, 255, 204, 0.3); color: #00FFCC;">4. Vulnerability ➔ SecOps Patch</button>
+        </div>
+
+        <!-- Split Comparison Card -->
+        <div class="comparison-split-card">
+          <!-- Left Column: Raw Input -->
+          <div class="comparison-column">
+            <div class="comparison-header">
+              <span style="font-family: var(--font-display); font-weight: 700; font-size: 0.95rem;">RAW USER INPUT</span>
+              <span class="comparison-tag">UNSTRUCTURED</span>
+            </div>
+            <div id="scenario-before-content" class="comparison-body">
+              met with dev team. talked about q3 goals. mark said database is slow we need caching redis maybe. sarah wants deadline pushed 2 weeks for frontend auth. budget approved for 3 new engineers next month.
+            </div>
+          </div>
+
+          <!-- Right Column: Aethera AI Output -->
+          <div class="comparison-column">
+            <div class="comparison-header">
+              <span style="font-family: var(--font-display); font-weight: 700; font-size: 0.95rem;">AETHERA STRUCTURED COGNITION</span>
+              <span class="comparison-tag aethera-tag">PUBLICATION READY</span>
+            </div>
+            <div id="scenario-after-content" class="comparison-body highlight-box">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+          <a id="scenario-launch-btn" href="ai.html" class="btn btn-primary" style="padding: 0.75rem 2rem;">
+            <span>Try This Live in AI Studio</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         20+ COMPREHENSIVE DAILY TOOLS SUITE (DAILY LIFE, STUDENTS, DEVS & CYBER)
+         ========================================================================== -->
+    <section class="section" id="tools">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Built for Daily Work, Learning &amp; Cyber SecOps</h2>
+          <p class="section-desc">Designed to automate workplace tasks, study workflows, complex problem-solving, and cybersecurity threat analysis.</p>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Box 1: Tall Left Card (Rows 1 & 2) -->
+          <div class="bento-card bento-card-tall-left">
+            <div class="bento-card-body">
+              <div class="bento-card-header">
+                <div class="bento-header-meta">
+                  <div class="bento-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  </div>
+                  <span class="bento-card-idx">01</span>
+                </div>
+                <span class="badge">WORK &amp; LIFE</span>
+              </div>
+              <h3 class="bento-card-title">Professional Email Drafter</h3>
+              <p class="bento-card-desc">Turn rough bullet points into polished, persuasive executive emails, salary negotiations, client proposals, and polite professor follow-ups.</p>
+              
+              <!-- Email Preview Mockup -->
+              <div class="bento-email-mockup">
+                <div class="email-mockup-header">
+                  <div class="email-mockup-field"><span>To:</span> <strong>board@venture.corp</strong></div>
+                  <div class="email-mockup-field"><span>Subject:</span> <strong>Q3 Strategic Expansion &amp; Capital Allocation</strong></div>
+                </div>
+                <div class="email-mockup-body">
+                  "Attached is our executive synthesis outlining 142% MoM infrastructure scaling with zero unplanned downtime..."
+                </div>
+              </div>
+
+              <div class="bento-feature-tags">
+                <span class="bento-tag">Executive Tone</span>
+                <span class="bento-tag">Salary Negotiator</span>
+                <span class="bento-tag">Client Proposals</span>
+                <span class="bento-tag">Polite Follow-ups</span>
+              </div>
+            </div>
+            <div class="bento-card-footer">
+              <a href="ai.html?tool=email-drafter" class="bento-action-btn">
+                <span class="action-btn-text">Open Email Drafter</span>
+                <span class="action-btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Box 2: Wide Top-Middle Card (Row 1, Cols 2-3) -->
+          <div class="bento-card bento-card-wide-top">
+            <div class="bento-card-body">
+              <div class="bento-card-header">
+                <div class="bento-header-meta">
+                  <div class="bento-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19L9 4l4 16 7-14"/></svg>
+                  </div>
+                  <span class="bento-card-idx">02</span>
+                </div>
+                <span class="badge">ACADEMIC &amp; MATH</span>
+              </div>
+              <h3 class="bento-card-title">Math &amp; Algorithm Solver</h3>
+              <p class="bento-card-desc">Step-by-step solutions for calculus integrals, matrices, discrete proofs, and algebraic equations rendered in textbook-grade KaTeX LaTeX math.</p>
+              
+              <!-- Math Formula Preview Box -->
+              <div class="bento-math-formula-box">
+                <div class="math-formula-rendered">
+                  &int;<sub>0</sub><sup>&infin;</sup> e<sup>-x<sup>2</sup></sup> dx = &radic;&pi; / 2
+                </div>
+                <span class="math-formula-badge">Gaussian Integral (Exact Proof)</span>
+              </div>
+
+              <div class="bento-feature-tags">
+                <span class="bento-tag">Calculus Integrals</span>
+                <span class="bento-tag">KaTeX LaTeX Proofs</span>
+                <span class="bento-tag">Matrix Algebra</span>
+                <span class="bento-tag">Discrete Math</span>
+              </div>
+            </div>
+            <div class="bento-card-footer">
+              <a href="ai.html?tool=math-solver" class="bento-action-btn">
+                <span class="action-btn-text">Open Math Solver</span>
+                <span class="action-btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Box 3: Mid-Left Card (Row 2, Col 2) -->
+          <div class="bento-card bento-card-mid-left">
+            <div class="bento-card-body">
+              <div class="bento-card-header">
+                <div class="bento-header-meta">
+                  <div class="bento-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  </div>
+                  <span class="bento-card-idx">03</span>
+                </div>
+                <span class="badge">WORK &amp; STUDY</span>
+              </div>
+              <h3 class="bento-card-title">Document &amp; Notes Summarizer</h3>
+              <p class="bento-card-desc">Condense lengthy reports, meeting recordings, PDFs, contracts, or study lectures into executive action items and core takeaways.</p>
+              
+              <div class="bento-feature-tags">
+                <span class="bento-tag">Action Items</span>
+                <span class="bento-tag">PDF Briefs</span>
+                <span class="bento-tag">Meeting Notes</span>
+                <span class="bento-tag">Key Quotes</span>
+              </div>
+            </div>
+            <div class="bento-card-footer">
+              <a href="ai.html?tool=doc-summarizer" class="bento-action-btn">
+                <span class="action-btn-text">Open Summarizer</span>
+                <span class="action-btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Box 4: Mid-Right Card (Row 2, Col 3) -->
+          <div class="bento-card bento-card-mid-right">
+            <div class="bento-card-body">
+              <div class="bento-card-header">
+                <div class="bento-header-meta">
+                  <div class="bento-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </div>
+                  <span class="bento-card-idx">04</span>
+                </div>
+                <span class="badge">PRODUCTIVITY</span>
+              </div>
+              <h3 class="bento-card-title">Schedule &amp; Task Planner</h3>
+              <p class="bento-card-desc">Organize chaotic to-dos into Eisenhower priority matrices, time-blocked daily schedules, and Pomodoro study routines.</p>
+              
+              <!-- Mini Priority Matrix Indicator -->
+              <div class="bento-matrix-pills">
+                <div class="matrix-mini-pill urgent">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>Q1: Urgent &amp; Important</span>
+                </div>
+                <div class="matrix-mini-pill schedule">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>Q2: Schedule Deep Work</span>
+                </div>
+              </div>
+
+              <div class="bento-feature-tags">
+                <span class="bento-tag">Eisenhower Matrix</span>
+                <span class="bento-tag">Pomodoro</span>
+                <span class="bento-tag">Time Blocking</span>
+              </div>
+            </div>
+            <div class="bento-card-footer">
+              <a href="ai.html?tool=task-planner" class="bento-action-btn">
+                <span class="action-btn-text">Open Planner</span>
+                <span class="action-btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Box 5: Wide Bottom Card (Row 3, Spanning Cols 1-3) -->
+          <div class="bento-card bento-card-wide-bottom">
+            <div class="bento-card-body">
+              <div class="bento-card-header">
+                <div class="bento-header-meta">
+                  <div class="bento-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                  </div>
+                  <span class="bento-card-idx">05</span>
+                </div>
+                <span class="badge">DEVS &amp; CLOUD ARCHITECTURE</span>
+              </div>
+              <h3 class="bento-card-title">Code Explainer &amp; System Architecture Designer</h3>
+              <p class="bento-card-desc">Break down complex codebases line-by-line, calculate Big-O time and space complexity, and architect high-availability distributed cloud systems with auto-generated Mermaid.js architecture diagrams.</p>
+              
+              <!-- Code & Topology Box -->
+              <div class="bento-code-topology-box">
+                <div class="topology-flow">
+                  <span class="topology-node">Client</span>
+                  <span class="topology-arrow">&rarr;</span>
+                  <span class="topology-node">API Gateway</span>
+                  <span class="topology-arrow">&rarr;</span>
+                  <span class="topology-node">Redis Cluster</span>
+                  <span class="topology-arrow">&rarr;</span>
+                  <span class="topology-node">PostgreSQL Raft</span>
+                </div>
+                <span class="complexity-tag">Time: O(log N) &bull; Space: O(1)</span>
+              </div>
+
+              <div class="bento-feature-tags">
+                <span class="bento-tag">Big-O Complexity</span>
+                <span class="bento-tag">Bug Hunter</span>
+                <span class="bento-tag">Distributed Systems</span>
+                <span class="bento-tag">Mermaid.js Flowcharts</span>
+                <span class="bento-tag">Capacity Planning</span>
+              </div>
+            </div>
+            <div class="bento-card-footer">
+              <a href="ai.html?tool=code-explainer" class="bento-action-btn">
+                <span class="action-btn-text">Open Developer &amp; Architecture Tools</span>
+                <span class="action-btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Box 6: Top-Right Card (Rows 1 & 2, Col 4) -->
+          <div class="bento-card bento-card-cyber bento-card-top-right">
+            <div class="bento-card-body">
+              <div class="bento-card-header">
+                <div class="bento-header-meta">
+                  <div class="bento-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                  </div>
+                  <span class="bento-card-idx">06</span>
+                </div>
+                <span class="badge badge-cyber">CYBER SECOPS</span>
+              </div>
+              <h3 class="bento-card-title">Cyber SecOps &amp; Threat Intel</h3>
+              <p class="bento-card-desc">Zero-day vulnerability scanning, CVSS 3.1 exploit scoring, automated mitigation patch generation, and MITRE ATT&amp;CK triage.</p>
+
+              <!-- Cyber Key Stats 2-Column Grid -->
+              <div class="bento-cyber-stats">
+                <div class="cyber-stat-card">
+                  <span class="cyber-stat-num">248K+</span>
+                  <span class="cyber-stat-lbl">CVEs Indexed</span>
+                </div>
+                <div class="cyber-stat-card">
+                  <span class="cyber-stat-num">0.04ms</span>
+                  <span class="cyber-stat-lbl">Scan Latency</span>
+                </div>
+              </div>
+
+              <!-- Cyber Terminal Preview Window -->
+              <div class="bento-cyber-terminal">
+                <div class="cyber-terminal-bar">
+                  <div class="cyber-terminal-dots">
+                    <span class="cyber-terminal-dot red"></span>
+                    <span class="cyber-terminal-dot yellow"></span>
+                    <span class="cyber-terminal-dot green"></span>
+                  </div>
+                  <div class="cyber-terminal-status">
+                    <span class="cyber-pulse-dot"></span>
+                    <span class="cyber-terminal-title">secops.daemon // ACTIVE</span>
+                  </div>
+                </div>
+                <div class="cyber-terminal-logs">
+                  <div class="terminal-log-line success">
+                    <span class="terminal-log-tag">[INIT]</span>
+                    <span>Zero-day heuristics pipeline active</span>
+                  </div>
+                  <div class="terminal-log-line warn">
+                    <span class="terminal-log-tag">[WARN]</span>
+                    <span>CVE-2024-3094 signature matched</span>
+                  </div>
+                  <div class="terminal-log-line success">
+                    <span class="terminal-log-tag">[PATCH]</span>
+                    <span>Auto-mitigation generated &amp; isolated</span>
+                  </div>
+                  <div class="terminal-log-line">
+                    <span class="terminal-log-tag">[STATUS]</span>
+                    <span>0 active zero-day exploits detected</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bento-feature-tags">
+                <span class="bento-tag" style="border-color: rgba(0, 255, 204, 0.25); color: #00FFCC;">CVE Zero-Day</span>
+                <span class="bento-tag" style="border-color: rgba(0, 255, 204, 0.25); color: #00FFCC;">Auto-Patch</span>
+                <span class="bento-tag" style="border-color: rgba(0, 255, 204, 0.25); color: #00FFCC;">MITRE Matrix</span>
+              </div>
+            </div>
+            <div class="bento-card-footer">
+              <a href="ai.html?tool=vuln-scanner" class="bento-action-btn">
+                <span class="action-btn-text">Open Security Suite</span>
+                <span class="action-btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Box 7: Bottom-Right Card (Row 3, Col 4) -->
+          <div class="bento-card bento-card-bottom-right">
+            <div class="bento-card-body">
+              <div class="bento-card-header">
+                <div class="bento-header-meta">
+                  <div class="bento-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                  </div>
+                  <span class="bento-card-idx">07</span>
+                </div>
+                <span class="badge">SMART CONTRACTS</span>
+              </div>
+              <h3 class="bento-card-title">Solidity &amp; Web3 Auditor</h3>
+              <p class="bento-card-desc">Audit smart contracts for reentrancy vectors, EVM bytecode defects, flash-loan vulnerabilities, and OWASP Web3 protocols.</p>
+
+              <div class="bento-feature-tags">
+                <span class="bento-tag">Reentrancy Shield</span>
+                <span class="bento-tag">EVM Decompiler</span>
+                <span class="bento-tag">Flash-Loan Guard</span>
+              </div>
+            </div>
+            <div class="bento-card-footer">
+              <a href="ai.html?tool=payload-generator" class="bento-action-btn">
+                <span class="action-btn-text">Audit Smart Contracts</span>
+                <span class="action-btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Catalog Explorer Strip -->
+        <div class="bento-catalog-strip">
+          <span class="catalog-strip-title">EXPLORE MORE CATEGORIES:</span>
+          <div class="catalog-strip-pills">
+            <a href="ai.html?tool=resume-builder" class="catalog-pill">Resume Polish</a>
+            <a href="ai.html?tool=research-lab" class="catalog-pill">Deep Research Lab</a>
+            <a href="ai.html?tool=payload-generator" class="catalog-pill">Payload Generator</a>
+            <a href="ai.html?tool=system-architect" class="catalog-pill">System Architect</a>
+            <a href="ai.html" class="catalog-pill highlight">+14 More in Studio</a>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+          <a href="ai.html" class="btn btn-primary" style="padding: 0.9rem 2.5rem; font-size: 1.05rem;">
+            <span>Explore All 20+ Free AI Tools</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         MODEL BENCHMARK MATRIX
+         ========================================================================== -->
+    <section class="section" id="benchmarks">
+      <div class="container">
+        <div class="benchmark-container">
+          <div>
+            <h2 class="section-title" style="text-align: left; margin-bottom: 1.25rem;">State-of-the-Art Accuracy For Academic &amp; Dev Tasks</h2>
+            <p class="section-desc" style="text-align: left; margin-bottom: 2rem;">
+              Powered by Google Gemini 3.6 Flash, Aethera sets industry-leading benchmark scores in programming synthesis, competitive math, and doctoral-level reasoning.
+            </p>
+            <div style="display: flex; gap: 2rem; font-family: var(--font-mono); font-size: 0.82rem;">
+              <div>
+                <span style="color: var(--text-primary); font-size: 1.75rem; font-weight: 700; display: block; font-family: var(--font-display);">96.8%</span>
+                <span style="color: var(--text-muted);">HumanEval-X Code</span>
+              </div>
+              <div>
+                <span style="color: var(--text-primary); font-size: 1.75rem; font-weight: 700; display: block; font-family: var(--font-display);">92.4%</span>
+                <span style="color: var(--text-muted);">MATH-500 Calculus</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="benchmark-card">
+            <div id="benchmarks-wrapper">
+              <!-- Loaded dynamically from data.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         INTERACTIVE FAQ ACCORDION
+         ========================================================================== -->
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Everything You Need to Know</h2>
+          <p class="section-desc">Clear answers about free access, privacy, LaTeX math rendering, and daily productivity tools.</p>
+        </div>
+
+        <div class="faq-grid">
+          <div class="faq-item active">
+            <button class="faq-question">
+              <span>Is Aethera really 100% free with no hidden charges?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              Yes, absolutely. All 13+ specialized daily tools and the conversational chatbot are 100% free and open access for students, everyday workers, and programmers with zero subscriptions, paywalls, or token fees.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>How does the LaTeX math equation rendering work?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              Aethera uses an integrated KaTeX rendering engine. When the AI solves calculus integrals, matrices, or physics formulas, it automatically formats display math ($$...$$) and inline math ($...$) into crisp, textbook-grade equations.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>Can I use Aethera for daily workplace emails and document summaries?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              Yes! Our dedicated workplace tools include the Professional Email Drafter, Document &amp; Notes Summarizer, Daily Schedule &amp; Task Planner, and Resume &amp; Cover Letter Polish for corporate and personal workflows.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question">
+              <span>What AI model powers Aethera?</span>
+              <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              Aethera is connected directly to Google Gemini 3.6 Flash, delivering high-speed responses (sub-10ms latency) and top-tier multi-modal reasoning.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       FUTURISTIC TERMINAL FOOTER
+       ========================================================================== -->
+  <footer class="footer-terminal">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col-brand">
+          <div class="nav-brand">
+            <div class="brand-symbol">
+              <svg viewBox="0 0 32 32" fill="none">
+                <polygon points="16,6 26,22 6,22" stroke="currentColor" stroke-width="2" fill="none"/>
+                <circle cx="16" cy="16" r="3" fill="currentColor"/>
+              </svg>
+            </div>
+            <span>Aethera</span>
+          </div>
+          <p style="font-size: 0.88rem; color: var(--text-secondary); max-width: 320px; line-height: 1.6;">
+            100% Free decentralized cognitive intelligence and daily tools for students, workers, and programmers.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Daily Life &amp; Work</h4>
+          <ul class="footer-links">
+            <li><a href="ai.html?tool=email-drafter" class="footer-link">Email &amp; Message Drafter</a></li>
+            <li><a href="ai.html?tool=doc-summarizer" class="footer-link">Document &amp; Notes Summarizer</a></li>
+            <li><a href="ai.html?tool=task-planner" class="footer-link">Schedule &amp; Task Planner</a></li>
+            <li><a href="ai.html?tool=resume-builder" class="footer-link">Resume &amp; Cover Letter</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Student &amp; Dev Tools</h4>
+          <ul class="footer-links">
+            <li><a href="ai.html?tool=math-solver" class="footer-link">Math &amp; Calculus Solver</a></li>
+            <li><a href="ai.html?tool=code-explainer" class="footer-link">Code Explainer &amp; Big-O</a></li>
+            <li><a href="ai.html?tool=bug-hunter" class="footer-link">Smart Bug Hunter</a></li>
+            <li><a href="ai.html?tool=sql-architect" class="footer-link">SQL &amp; Database Architect</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Cyber SecOps</h4>
+          <ul class="footer-links">
+            <li><a href="ai.html?tool=vuln-scanner" class="footer-link">Vulnerability &amp; CVE Scanner</a></li>
+            <li><a href="ai.html?tool=threat-intel" class="footer-link">Threat Intel &amp; IR</a></li>
+            <li><a href="ai.html?tool=payload-generator" class="footer-link">Smart Contract Auditor</a></li>
+            <li><a href="ai.html?tool=network-forensics" class="footer-link">Network &amp; PCAP Forensics</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Community Status</h4>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div class="footer-status-pill">
+              <span>100% FREE ACCESS // LIVE</span>
+            </div>
+            <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);">
+              MODEL: GEMINI-3.6-FLASH
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>&copy; 2026 AETHERA OPEN LABS. FREE &amp; OPEN ACCESS.</span>
+        <div style="display: flex; gap: 1.5rem;">
+          <a href="ai.html" class="footer-link">FREE AI STUDIO</a>
+          <a href="login.html" class="footer-link">CLOUD ACCOUNT &amp; DB</a>
+          <a href="#" class="footer-link">PRIVACY</a>
+          <a href="#" class="footer-link">TERMS</a>
+          <span style="color: var(--text-primary); font-weight: 600;">BUILD v3.9.0-LIVE</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/background-engine.js"></script>
+  <script src="js/user-db.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

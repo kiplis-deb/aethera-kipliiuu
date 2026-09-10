@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aethera Cortex // Free AI Tools for Daily Life, Students & Programmers</title>
+  <meta name="description" content="100% Free AI suite for daily life, students, and workers. Email drafter, schedule planner, resume builder, math solver, code debugger, and exam prep.">
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap">
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/ai-studio.css">
+  <link rel="stylesheet" href="css/auth-modal.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
+  <!-- KaTeX Math Rendering Engine -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <!-- Firebase Official Web SDK (Compat CDN for cross-device cloud auth & Firestore sync) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="studio-body">
+
+  <!-- Background Universe Canvas (Minimalist Studio) -->
+  <div id="bg-universe" aria-hidden="true">
+    <canvas id="bg-canvas"></canvas>
+    <div class="bg-overlay-gradient"></div>
+  </div>
+
+  <!-- Animated Cyber SecOps CRT Scanlines & Laser Sweep Beam -->
+  <div class="cyber-scanline-overlay" aria-hidden="true"></div>
+  <div id="cyber-laser-sweep" class="cyber-laser-sweep" aria-hidden="true"></div>
+
+  <!-- Studio Top Navigation Bar -->
+  <header class="studio-header">
+    <div class="studio-header-left">
+      <a href="index.html" class="studio-back-link" title="Return to Homepage">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span>Overview</span>
+      </a>
+      <div class="header-divider"></div>
+      <div class="nav-brand">
+        <div class="brand-symbol">
+          <svg viewBox="0 0 32 32" fill="none">
+            <polygon points="16,6 26,22 6,22" stroke="currentColor" stroke-width="2" fill="none"/>
+            <circle cx="16" cy="16" r="3" fill="currentColor"/>
+          </svg>
+        </div>
+        <span>Aethera Cortex</span>
+      </div>
+      <span class="studio-free-badge">100% FREE ACCESS</span>
+
+      <!-- Mobile Tool Selector Drawer Trigger -->
+      <button id="mobile-tool-btn" class="mobile-tool-btn" aria-label="Open Tool Selector" aria-expanded="false" title="Switch AI Tool">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Tools</span>
+      </button>
+    </div>
+
+    <div class="studio-header-center">
+      <div class="model-selector-pill" title="Live Model Engine">
+        <span id="active-tool-display">TOOL: EMAIL DRAFTER</span>
+      </div>
+    </div>
+
+    <div class="studio-header-right">
+      <!-- User Account & Database HUD Slot -->
+      <div id="navbar-auth-slot" class="navbar-auth-slot"></div>
+
+      <div class="studio-status-item">
+        <span style="color: var(--text-muted);">API STATUS:</span>
+        <span class="hud-value" style="color: var(--text-primary);">CONNECTED // LIVE</span>
+      </div>
+      <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Theme">
+        <svg class="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+      <button id="clear-chat-btn" class="btn btn-secondary" style="padding: 0.4rem 0.9rem; font-size: 0.78rem;">
+        <span>Clear Session</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Backdrop Overlay -->
+  <div id="studio-drawer-backdrop" class="studio-drawer-backdrop" aria-hidden="true"></div>
+
+  <!-- Main AI Studio Layout (Sidebar + Chat / Execution Area + Inspector Panel) -->
+  <div class="studio-layout">
+    
+    <!-- Left Panel: Categorized Tools for Daily Life, Students & Developers -->
+    <aside class="studio-sidebar-left" id="studio-sidebar-left">
+      
+      <!-- Mobile Drawer Header -->
+      <div class="mobile-sidebar-header">
+        <span class="mobile-sidebar-title">Select AI Tool (14+)</span>
+        <button id="mobile-sidebar-close" class="mobile-sidebar-close-btn" aria-label="Close tools menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Section 1: General Assistant -->
+      <div class="sidebar-category-accordion is-open" data-category="chatbot">
+        <button class="sidebar-category-header" type="button" aria-expanded="true">
+          <span class="category-header-title">CONVERSATIONAL AI</span>
+          <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="studio-mode-list" data-category="chatbot">
+          <button class="studio-mode-btn active" data-tool="chatbot" data-category="chatbot">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">AI Chatbot</span>
+              <span class="mode-sub">Free conversational assistant</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 2: Daily Life & Workers -->
+      <div class="sidebar-category-accordion" data-category="daily">
+        <button class="sidebar-category-header" type="button" aria-expanded="false">
+          <span class="category-header-title">DAILY LIFE &amp; WORKERS</span>
+          <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="studio-mode-list" data-category="daily">
+          <button class="studio-mode-btn" data-tool="email-drafter" data-category="daily">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Email &amp; Message Drafter</span>
+              <span class="mode-sub">Professional &amp; polite letters</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="doc-summarizer" data-category="daily">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Doc &amp; Notes Summarizer</span>
+              <span class="mode-sub">Key takeaways &amp; meeting notes</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="task-planner" data-category="daily">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Schedule &amp; Task Planner</span>
+              <span class="mode-sub">Time blocking &amp; Eisenhower win</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="resume-builder" data-category="daily">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Resume &amp; Cover Letter</span>
+              <span class="mode-sub">Google XYZ bullets &amp; interview</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="translator-pro" data-category="daily">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Translator &amp; Grammar Pro</span>
+              <span class="mode-sub">Natural idioms &amp; multi-lingual</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 3: Students & Academic -->
+      <div class="sidebar-category-accordion" data-category="student">
+        <button class="sidebar-category-header" type="button" aria-expanded="false">
+          <span class="category-header-title">STUDENTS &amp; ACADEMICS</span>
+          <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="studio-mode-list" data-category="student">
+          <button class="studio-mode-btn" data-tool="math-solver" data-category="student">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19L9 4l4 16 7-14"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Math &amp; Algorithm Solver</span>
+              <span class="mode-sub">Step-by-step calculus &amp; LaTeX</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="essay-assistant" data-category="student">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Essay &amp; Paper Writer</span>
+              <span class="mode-sub">Academic outline &amp; citations</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="exam-prep" data-category="student">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Exam &amp; Flashcard Prep</span>
+              <span class="mode-sub">Generate quizzes &amp; study cards</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="research-lab" data-category="student">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/><path d="M12 6v12"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Deep Research Lab</span>
+              <span class="mode-sub">SOTA synthesis &amp; citations</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 4: Developers & Programmers -->
+      <div class="sidebar-category-accordion" data-category="developer">
+        <button class="sidebar-category-header" type="button" aria-expanded="false">
+          <span class="category-header-title">DEVELOPERS &amp; CODE</span>
+          <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="studio-mode-list" data-category="developer">
+          <button class="studio-mode-btn" data-tool="code-explainer" data-category="developer">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Code Explainer</span>
+              <span class="mode-sub">Line breakdown &amp; Big-O</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="bug-hunter" data-category="developer">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M12 6v14M8 10h8M6 14h12M7 18h10"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Bug Hunter &amp; Fixer</span>
+              <span class="mode-sub">Detect errors &amp; patch</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="code-converter" data-category="developer">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Code Converter</span>
+              <span class="mode-sub">Translate languages &amp; clean</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="sql-architect" data-category="developer">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">SQL &amp; DB Architect</span>
+              <span class="mode-sub">Query optimizer &amp; ERD schemas</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="regex-tester" data-category="developer">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Regex &amp; API Tester</span>
+              <span class="mode-sub">Pattern builder &amp; cURL scripts</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="system-architect" data-category="developer">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">System &amp; Cloud Architect</span>
+              <span class="mode-sub">Distributed design &amp; Mermaid</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 5: Cybersecurity & SecOps -->
+      <div class="sidebar-category-accordion" data-category="cybersecurity">
+        <button class="sidebar-category-header" id="cyber-category-header" type="button" aria-expanded="false">
+          <span class="category-header-title">CYBERSECURITY &amp; SECOPS</span>
+          <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+        <div class="studio-mode-list" data-category="cybersecurity">
+          <button class="studio-mode-btn" data-tool="vuln-scanner" data-category="cybersecurity">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Vulnerability &amp; CVE</span>
+              <span class="mode-sub">CVSS scores, zero-day &amp; patch</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="threat-intel" data-category="cybersecurity">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 0 1 9-9"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Threat Intel &amp; IR</span>
+              <span class="mode-sub">MITRE ATT&amp;CK &amp; IOC triage</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="payload-generator" data-category="cybersecurity">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Security &amp; Smart Contract</span>
+              <span class="mode-sub">OWASP Top 10 &amp; Reentrancy</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="network-forensics" data-category="cybersecurity">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Network &amp; PCAP Forensics</span>
+              <span class="mode-sub">Packet triage &amp; firewall rules</span>
+            </div>
+          </button>
+
+          <button class="studio-mode-btn" data-tool="crypto-vault" data-category="cybersecurity">
+            <div class="mode-btn-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="mode-btn-text">
+              <span class="mode-title">Cryptography &amp; Ciphers</span>
+              <span class="mode-sub">Hash ID, AES, RSA &amp; ZK proofs</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-section-title" style="margin-top: 1.25rem;">QUICK TEMPLATES</div>
+      <div id="studio-presets-container" class="studio-presets-list">
+        <!-- Injected dynamically based on active tool -->
+      </div>
+    </aside>
+
+    <!-- Center Workspace: Message Stream & Prompt Runner -->
+    <main class="studio-workspace">
+      <div id="chat-messages-container" class="chat-messages-stream">
+        <!-- System greeting card -->
+        <div class="chat-bubble system-message">
+          <div class="bubble-header">
+            <div class="bubble-avatar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            </div>
+            <span class="bubble-author">Aethera Cortex // Live Daily Assistant</span>
+            <span class="bubble-time">100% FREE // ONLINE</span>
+          </div>
+          <div class="bubble-content">
+            <p>Welcome to <strong>Aethera Cortex Free AI Studio</strong>. Choose any specialized AI tool on the left for <strong>Daily Life &amp; Work</strong> (emails, schedule, resume, translation), <strong>Academics</strong> (math solver with LaTeX, essays, exam prep), <strong>Coding</strong>, or <strong>Cybersecurity &amp; SecOps</strong> (CVE scanner, Threat Intel, Smart Contract audits, packet forensics &amp; crypto analyzer with animated Matrix Cyber Theme).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Studio Input Bar -->
+      <div class="studio-input-wrapper">
+        <div class="studio-input-box" id="studio-drop-zone">
+          <!-- Image Attachment Preview Bar -->
+          <div id="studio-image-preview-bar" class="image-preview-bar" style="display: none;">
+            <div class="image-preview-content">
+              <img id="studio-image-preview-thumb" class="preview-thumb" src="" alt="Attachment preview">
+              <div class="preview-details">
+                <span id="studio-image-name" class="preview-filename">image.png</span>
+                <span id="studio-image-size" class="preview-filesize">0 KB</span>
+              </div>
+            </div>
+            <button id="studio-image-remove-btn" class="preview-remove-btn" title="Remove Image" aria-label="Remove Image">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+
+          <textarea id="studio-prompt-input" placeholder="Type your request, paste notes, or attach/paste an image (diagrams, math formulas, screenshots, homework)..." rows="2"></textarea>
+          
+          <div class="studio-input-footer">
+            <div class="input-telemetry-tags">
+              <button id="studio-attach-btn" class="studio-attach-btn" title="Attach Image or Screenshot (or paste with Ctrl+V)" type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <span>Attach Image</span>
+              </button>
+              <input type="file" id="studio-image-input" accept="image/*" style="display: none;">
+
+              <span class="input-tag" id="current-tool-tag">EMAIL DRAFTER</span>
+              <span class="input-tag">VISION AI</span>
+              <span class="input-tag">100% FREE</span>
+            </div>
+
+            <div style="display: flex; gap: 0.5rem; align-items: center;">
+              <button id="studio-copy-btn" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.78rem;" title="Copy Latest Output">
+                <span>Copy</span>
+              </button>
+              <button id="studio-run-btn" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.82rem;">
+                <span id="run-btn-text">Run AI</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/background-engine.js"></script>
+  <script src="js/user-db.js"></script>
+  <script src="js/ai-studio.js"></script>
+</body>
+</html>
