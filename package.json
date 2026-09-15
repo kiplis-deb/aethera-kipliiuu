@@ -1,0 +1,18 @@
+{
+  "name": "aethera",
+  "version": "4.0.0",
+  "description": "Aethera AI Studio & Secure AI Proxy Server",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js",
+    "server": "node server/server.js"
+  },
+  "keywords": [
+    "aethera",
+    "ai-studio",
+    "gemini-proxy"
+  ],
+  "author": "Aethera",
+  "license": "MIT"
+}

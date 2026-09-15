@@ -1,19 +1,99 @@
 /**
  * AETHERA - LIVE MULTI-TURN AI CHATBOT CONTROLLER (INSTA DM / WHATSAPP STYLE)
- * Powered by Google Gemini API (gemini-3.6-flash) & KaTeX LaTeX Math Engine
+ * Powered by Google Gemini API (gemini-2.5-flash / gemini-2.0-flash / gemini-1.5-flash) & KaTeX LaTeX Math Engine
+ * Supports dynamic API keys, image attachments (vision), in-chat 401 recovery, and built-in simulation fallback.
  */
 
 class AetheraChatbot {
   constructor() {
-    this.apiKey = "AQ.Ab8RN6I4ikfVVJKKEbTRKqzUH7v1CPlCebqK6hpat_ZFGPbS0w";
-    this.endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent";
+    this.fallbackKey = "";
+    this.isServerProxyActive = true;
+
     this.isOpen = false;
     this.isGenerating = false;
-    this.history = [];
+    this.history = []; // [{ role: 'user'|'model', parts: [...] }]
     this.currentImage = null; // { mimeType, base64, url, fileName, fileSize }
-    this.systemInstruction = "You are Aethera AI, an intelligent, conversational multimodal companion and tutor for students, workers, and developers. Answer questions directly, format code with language tags, format all mathematical formulas in standard LaTeX ($$...$$ for display math and $...$ for inline math). If an image is provided (photo, screenshot, math problem, document, chart, diagram), analyze and extract all details with high visual accuracy.";
-    
+    this.lastUserQuery = "";
+    this.systemInstruction = "You are Aethera, a warm, friendly, empathetic, and down-to-earth conversational companion—just like talking to a good friend. Talk in a relaxed, casual, everyday conversational tone. Be helpful and supportive without sounding stiff, corporate, robotic, or overly academic. CRITICAL RULE: NEVER bring up unsolicited mathematics, formulas, LaTeX equations, proofs, or technical jargon unless the user explicitly asks a math question or asks for calculations. If an image is provided, discuss it warmly and naturally like a friend would.";
+
     this.init();
+    this.syncServerApiKey();
+  }
+
+  cleanApiKey(raw) {
+    if (!raw || typeof raw !== 'string') return '';
+    let k = raw.trim();
+    if (k.includes('=')) {
+      const parts = k.split('=');
+      k = parts[parts.length - 1].trim();
+    }
+    k = k.replace(/^["'`]+|["'`]+$/g, '').trim();
+    k = k.replace(/[,;]+$/, '').trim();
+    return k;
+  }
+
+  getBackendUrl() {
+    if (typeof window !== 'undefined' && window.location && window.location.origin) {
+      const origin = window.location.origin;
+      if (origin.startsWith('http:') || origin.startsWith('https:')) {
+        if (origin.includes(':3000')) {
+          return '';
+        }
+        if (origin.includes(':5500') || origin.includes(':5000') || origin.includes(':8080') || origin.includes(':5173')) {
+          const host = window.location.hostname || 'localhost';
+          return `http://${host}:3000`;
+        }
+        return origin;
+      }
+    }
+    return 'http://localhost:3000';
+  }
+
+  async syncServerApiKey() {
+    try {
+      const backend = this.getBackendUrl();
+      const res = await fetch(`${backend}/api/config/ai-key`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && (data.serverConfigured || data.hasKey)) {
+          this.isServerProxyActive = true;
+          this.updateKeyBadge();
+        }
+      }
+    } catch (e) {}
+  }
+
+  getApiKey() {
+    let key = this.cleanApiKey(localStorage.getItem('aethera_gemini_api_key') || '');
+    if (!key) {
+      try {
+        const fbConfig = JSON.parse(localStorage.getItem('aethera_firebase_cloud_config') || '{}');
+        if (fbConfig && fbConfig.apiKey) {
+          key = this.cleanApiKey(fbConfig.apiKey);
+        }
+      } catch (e) {}
+    }
+    return key || '';
+  }
+
+  hasValidCloudKey() {
+    if (this.isServerProxyActive) return true;
+    const key = this.getApiKey();
+    return typeof key === 'string' && key.length >= 15;
+  }
+
+  getModel() {
+    let m = localStorage.getItem('aethera_selected_model') || 'gemini-3.6-flash';
+    if (m.includes('2.0') || m.includes('1.5')) {
+      m = 'gemini-3.6-flash';
+      localStorage.setItem('aethera_selected_model', 'gemini-3.6-flash');
+    }
+    return m;
+  }
+
+  getEndpoint() {
+    const model = this.getModel();
+    return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   }
 
   init() {
@@ -47,7 +127,7 @@ class AetheraChatbot {
             </div>
             <div>
               <div class="chatbot-title">Aethera Assistant</div>
-              <div class="chatbot-status-text">Active now // Vision &amp; Free AI</div>
+              <div class="chatbot-status-text" id="chatbot-status-subtext">Active // Gemini AI &amp; Vision</div>
             </div>
           </div>
           <div class="chatbot-header-actions">
@@ -64,14 +144,14 @@ class AetheraChatbot {
         <div id="chatbot-messages" class="chatbot-messages">
           <div class="chatbot-date-pill">Today</div>
           
-          <!-- Initial Welcome Message from Bot (Left-aligned DM bubble) -->
+          <!-- Initial Welcome Message from Bot -->
           <div class="chatbot-msg-row bot">
             <div class="bot-mini-avatar">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
             </div>
             <div class="chatbot-bubble">
               <div class="msg-text">
-                <p>Hey! I am <strong>Aethera AI</strong>. How can I help with your code, math problems, homework photos, daily tasks, or study concepts today?</p>
+                <p>Hey there! 👋 I'm <strong>Aethera</strong>. How's your day going? Feel free to chat about anything on your mind, bounce ideas around, share what you're working on, or drop a picture!</p>
               </div>
               <div class="msg-meta">
                 <span>${this.getCurrentTime()}</span>
@@ -82,10 +162,10 @@ class AetheraChatbot {
 
         <!-- Suggestion Chips -->
         <div class="chatbot-suggestions">
-          <div class="chatbot-chip" data-query="Evaluate Gaussian integral: \int_0^\infty e^{-x^2} dx">Gaussian Integral</div>
-          <div class="chatbot-chip" data-query="Explain quantum computing in simple terms">Quantum Computing</div>
-          <div class="chatbot-chip" data-query="Help me write a binary search in Python">Binary Search</div>
-          <div class="chatbot-chip" data-query="Draft polite follow-up email after an interview">Interview Email</div>
+          <div class="chatbot-chip" data-query="Plan tomorrow: 9am deep work & 2pm meeting">📅 Plan Tomorrow</div>
+          <div class="chatbot-chip" data-query="Schedule a study session tomorrow at 3pm">📚 Schedule Study</div>
+          <div class="chatbot-chip" data-query="How's your day going? Let's chat!">How's your day going?</div>
+          <div class="chatbot-chip" data-query="Help me plan some fun, relaxing things to do this weekend">Weekend Ideas</div>
         </div>
 
         <!-- Chatbot Image Attachment Preview Bar -->
@@ -109,7 +189,7 @@ class AetheraChatbot {
           </button>
           <input type="file" id="chatbot-image-input" accept="image/*" style="display: none;">
 
-          <textarea id="chatbot-input" class="chatbot-input" placeholder="Message Aethera, attach photo, or paste screenshot..." rows="1"></textarea>
+          <textarea id="chatbot-input" class="chatbot-input" placeholder="Message Aethera..." rows="1"></textarea>
           <button id="chatbot-send-btn" class="chatbot-send-btn" title="Send Message">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
@@ -155,6 +235,73 @@ class AetheraChatbot {
         }
       });
     });
+  }
+
+  toggleWindow() {
+    if (this.isOpen) {
+      this.closeWindow();
+    } else {
+      this.openWindow();
+    }
+  }
+
+  openWindow(text = '') {
+    const win = document.getElementById('chatbot-window');
+    const input = document.getElementById('chatbot-input');
+    if (win) {
+      win.classList.add('open');
+      win.setAttribute('aria-hidden', 'false');
+      this.isOpen = true;
+    }
+    if (input) {
+      if (text) {
+        input.value = text;
+        input.style.height = 'auto';
+        input.style.height = `${Math.min(input.scrollHeight, 90)}px`;
+      }
+      setTimeout(() => input.focus(), 150);
+    }
+    this.scrollToBottom();
+  }
+
+  closeWindow() {
+    const win = document.getElementById('chatbot-window');
+    if (win) {
+      win.classList.remove('open');
+      win.setAttribute('aria-hidden', 'true');
+      this.isOpen = false;
+    }
+  }
+
+  clearChat() {
+    this.history = [];
+    this.clearAttachedImage();
+    const messages = document.getElementById('chatbot-messages');
+    if (messages) {
+      messages.innerHTML = `
+        <div class="chatbot-date-pill">Today</div>
+        <div class="chatbot-msg-row bot">
+          <div class="bot-mini-avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          </div>
+          <div class="chatbot-bubble">
+            <div class="msg-text">
+              <p>Conversation cleared. What would you like to explore next?</p>
+            </div>
+            <div class="msg-meta">
+              <span>${this.getCurrentTime()}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  scrollToBottom() {
+    const messages = document.getElementById('chatbot-messages');
+    if (messages) {
+      messages.scrollTop = messages.scrollHeight;
+    }
   }
 
   bindImageUpload() {
@@ -276,9 +423,373 @@ class AetheraChatbot {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 
-
   getCurrentTime() {
     return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  appendMessage(sender, content, image = null, isRawHtml = false) {
+    const messages = document.getElementById('chatbot-messages');
+    if (!messages) return null;
+
+    const row = document.createElement('div');
+    row.className = `chatbot-msg-row ${sender}`;
+
+    let avatarHtml = '';
+    if (sender === 'bot') {
+      avatarHtml = `
+        <div class="bot-mini-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        </div>
+      `;
+    }
+
+    let imageHtml = '';
+    if (image && image.url) {
+      imageHtml = `
+        <div class="chatbot-bubble-image-wrapper">
+          <img src="${image.url}" class="chatbot-msg-image" alt="${this.escapeHtml(image.fileName || 'Attached image')}">
+        </div>
+      `;
+    }
+
+    let bodyHtml = isRawHtml ? content : `<div class="msg-text">${this.formatMarkdown(content)}</div>`;
+    let metaTicks = sender === 'user' ? `<span class="read-ticks">✓✓</span>` : '';
+
+    row.innerHTML = `
+      ${avatarHtml}
+      <div class="chatbot-bubble">
+        ${imageHtml}
+        ${bodyHtml}
+        <div class="msg-meta">
+          <span>${this.getCurrentTime()}</span>
+          ${metaTicks}
+        </div>
+      </div>
+    `;
+
+    messages.appendChild(row);
+    this.scrollToBottom();
+    return row;
+  }
+
+  appendTypingIndicator() {
+    const messages = document.getElementById('chatbot-messages');
+    if (!messages) return null;
+
+    const row = document.createElement('div');
+    row.className = 'chatbot-msg-row bot typing-row';
+    row.innerHTML = `
+      <div class="bot-mini-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      </div>
+      <div class="chatbot-bubble typing-bubble">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+    `;
+
+    messages.appendChild(row);
+    this.scrollToBottom();
+    return row;
+  }
+
+  removeTypingIndicator(row) {
+    if (row && row.parentNode) {
+      row.parentNode.removeChild(row);
+    }
+  }
+
+  async sendMessage() {
+    const input = document.getElementById('chatbot-input');
+    if (!input || this.isGenerating) return;
+
+    const text = input.value.trim();
+    const image = this.currentImage;
+
+    if (!text && !image) return;
+
+    this.lastUserQuery = text || "Analyze this attached image.";
+
+    // Reset input field & image preview
+    input.value = '';
+    input.style.height = 'auto';
+    this.clearAttachedImage();
+
+    // 1. Render User Message
+    this.appendMessage('user', text || 'Sent an image attachment', image, false);
+
+    // 2. Prepare Gemini Payload Parts
+    const userParts = [];
+    if (image && image.base64 && image.mimeType) {
+      userParts.push({
+        inlineData: {
+          mimeType: image.mimeType,
+          data: image.base64
+        }
+      });
+    }
+    if (text) {
+      userParts.push({ text: text });
+    } else if (image) {
+      userParts.push({ text: "Please inspect, describe, and solve or extract everything from this attached image." });
+    }
+
+    this.history.push({
+      role: 'user',
+      parts: userParts
+    });
+
+    // 3. Show typing wave
+    this.isGenerating = true;
+    const typingIndicator = this.appendTypingIndicator();
+
+    const hasValidKey = this.hasValidCloudKey();
+    if (!hasValidKey) {
+      this.simulateBotResponse(typingIndicator, text);
+      return;
+    }
+
+    try {
+      const apiKey = this.getApiKey();
+      const backend = this.getBackendUrl();
+      const endpoint = this.isServerProxyActive
+        ? `${backend}/api/ai/generate`
+        : (apiKey ? `${this.getEndpoint()}?key=${encodeURIComponent(apiKey)}` : `${backend}/api/ai/generate`);
+      const requestBody = {
+        model: this.getModel(),
+        contents: this.history,
+        systemInstruction: {
+          parts: [{ text: this.getDynamicSystemInstruction() }]
+        }
+      };
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 400 || response.status === 403 || response.status === 429) {
+          this.simulateBotResponse(typingIndicator, text, {
+            notice: response.status === 429
+              ? "Gemini API daily quota limit reached (HTTP 429). Switched to Aethera local reasoning."
+              : "Google API returned 401 (Key Expired). Switched to Aethera local reasoning."
+          });
+          return;
+        }
+        this.removeTypingIndicator(typingIndicator);
+        this.isGenerating = false;
+        const errorData = await response.json().catch(() => ({}));
+        const status = response.status;
+        const errMsg = errorData.error?.message || `API error ${status}`;
+        this.renderAuthErrorBubble(status, errMsg);
+        return;
+      }
+
+      this.removeTypingIndicator(typingIndicator);
+      this.isGenerating = false;
+
+      const data = await response.json();
+      const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!botReply) {
+        this.appendMessage('bot', "I couldn't generate a response. Please try rephrasing your prompt.");
+        return;
+      }
+
+      // Check for structured calendar plan
+      let planEvents = [];
+      let cleanedReply = botReply;
+
+      const planMatch = botReply.match(/```(?:calendar_plan|json:calendar_events|calendar_events)\s*([\s\S]*?)```/i);
+      if (planMatch) {
+        try {
+          const parsed = JSON.parse(planMatch[1].trim());
+          if (Array.isArray(parsed)) {
+            planEvents = parsed;
+          } else if (parsed && Array.isArray(parsed.events)) {
+            planEvents = parsed.events;
+          }
+          cleanedReply = botReply.replace(/```(?:calendar_plan|json:calendar_events|calendar_events)\s*[\s\S]*?```/gi, '').trim();
+        } catch (e) {
+          console.warn('[Chatbot] Failed to parse calendar_plan JSON:', e);
+        }
+      } else if (this.isPlanningQuery(text)) {
+        // Fallback schedule extraction if the model formulated a schedule in plain text
+        const targetDate = this.parseNaturalDate(text);
+        planEvents = this.extractScheduleEvents(botReply, targetDate);
+      }
+
+      this.history.push({
+        role: 'model',
+        parts: [{ text: cleanedReply || botReply }]
+      });
+
+      const row = this.appendMessage('bot', cleanedReply || botReply, null, false);
+
+      if (planEvents && planEvents.length > 0) {
+        const savedEvents = await this.savePlannedEventsToCalendar(planEvents, this.parseNaturalDate(text));
+        if (row && savedEvents.length > 0) {
+          this.attachCalendarCard(row, savedEvents);
+        }
+      }
+
+    } catch (err) {
+      console.error('[Chatbot Error]:', err);
+      if (err.message && (err.message.includes('401') || err.message.includes('400') || err.message.includes('403'))) {
+        this.simulateBotResponse(typingIndicator, text, {
+          notice: "Google API returned 401. Switched to Aethera local reasoning."
+        });
+        return;
+      }
+      this.removeTypingIndicator(typingIndicator);
+      this.isGenerating = false;
+      this.renderAuthErrorBubble(0, err.message || "Failed to reach Google Gemini endpoint.");
+    }
+  }
+
+  renderAuthErrorBubble(status, errorMsg) {
+    const messages = document.getElementById('chatbot-messages');
+    if (!messages) return;
+
+    const row = document.createElement('div');
+    row.className = 'chatbot-msg-row bot';
+
+    const isAuth = status === 401 || status === 403 || status === 400 || (errorMsg && errorMsg.toLowerCase().includes('key'));
+    const safeError = this.escapeHtml(errorMsg || 'Connection error');
+
+    row.innerHTML = `
+      <div class="bot-mini-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      </div>
+      <div class="chatbot-bubble">
+        <div class="chatbot-auth-card">
+          <div class="chatbot-auth-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            ${isAuth ? 'Authentication Error (401)' : 'Network / API Error'}
+          </div>
+          <p style="font-size: 0.78rem; line-height: 1.4; margin: 0.2rem 0 0.5rem; color: var(--text-secondary);">
+            ${isAuth ? 'Google AI Studio rejected the request with invalid credentials.' : safeError}
+          </p>
+          <div class="chatbot-auth-input-row">
+            <input type="password" class="chatbot-auth-input" placeholder="Paste your AIzaSy... key" autocomplete="off">
+            <button class="chatbot-auth-save-btn">Save</button>
+          </div>
+          <div style="display: flex; gap: 0.35rem; align-items: center; justify-content: space-between; margin-top: 0.25rem;">
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="font-size: 0.68rem; color: var(--accent-primary); text-decoration: underline;">
+              Get Free Key &rarr;
+            </a>
+            <button class="chatbot-auth-fallback-btn">⚡ Run Simulation</button>
+          </div>
+        </div>
+        <div class="msg-meta">
+          <span>${this.getCurrentTime()}</span>
+        </div>
+      </div>
+    `;
+
+    messages.appendChild(row);
+    this.scrollToBottom();
+
+    // Bind card interactive events
+    const inputField = row.querySelector('.chatbot-auth-input');
+    const saveBtn = row.querySelector('.chatbot-auth-save-btn');
+    const simBtn = row.querySelector('.chatbot-auth-fallback-btn');
+
+    if (saveBtn && inputField) {
+      saveBtn.addEventListener('click', () => {
+        const raw = inputField.value;
+        const val = this.cleanApiKey(raw);
+        if (!val || val.length < 15) {
+          alert('Please enter a valid Google Gemini API key.');
+          return;
+        }
+        localStorage.setItem('aethera_gemini_api_key', val);
+        try {
+          const backend = this.getBackendUrl();
+          fetch(`${backend}/api/config/ai-key`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: val })
+          }).catch(() => {});
+        } catch (e) {}
+        saveBtn.textContent = 'Saved! ✓';
+        setTimeout(() => {
+          row.remove();
+          this.sendMessage();
+        }, 600);
+      });
+    }
+
+    if (simBtn) {
+      simBtn.addEventListener('click', () => {
+        row.remove();
+        this.simulateBotResponse(this.lastUserQuery);
+      });
+    }
+  }
+
+  simulateBotResponse(existingIndicator = null, query = null, options = {}) {
+    const typingIndicator = existingIndicator || this.appendTypingIndicator();
+    this.isGenerating = true;
+    const qText = query || this.lastUserQuery || '';
+
+    setTimeout(() => {
+      this.removeTypingIndicator(typingIndicator);
+      this.isGenerating = false;
+
+      // Check if user is asking to make a plan / schedule on a specific date or hours
+      if (this.isPlanningQuery(qText)) {
+        const planResult = this.generateSimulatedPlan(qText);
+        let reply = planResult.reply;
+        if (options.notice) {
+          reply = `> *${options.notice}*\n\n` + reply;
+        }
+
+        this.history.push({
+          role: 'model',
+          parts: [{ text: reply }]
+        });
+
+        const row = this.appendMessage('bot', reply, null, false);
+
+        if (planResult.events && planResult.events.length > 0) {
+          this.savePlannedEventsToCalendar(planResult.events).then(saved => {
+            if (row && saved.length > 0) {
+              this.attachCalendarCard(row, saved);
+            }
+          });
+        }
+        return;
+      }
+
+      let reply = "";
+      const q = (qText || "").toLowerCase();
+
+      if (q.includes('integral') || q.includes('gaussian') || q.includes('math') || q.includes('calculus')) {
+        reply = `### Gaussian Integral Evaluation\n\nThe famous Gaussian integral is defined as:\n\n$$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$\n\nFor the one-sided integral over $[0, \\infty)$:\n\n$$\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}$$\n\n**Proof via Polar Coordinate Transformation:**\nLet $I = \\int_{-\\infty}^{\\infty} e^{-x^2} dx$. Then:\n\n$$I^2 = \\left(\\int_{-\\infty}^\\infty e^{-x^2} dx\\right)\\left(\\int_{-\\infty}^\\infty e^{-y^2} dy\\right) = \\int_{-\\infty}^\\infty \\int_{-\\infty}^\\infty e^{-(x^2+y^2)} dx dy$$\n\nSwitching to polar coordinates ($x = r\\cos\\theta, y = r\\sin\\theta, dx dy = r dr d\\theta$):\n\n$$I^2 = \\int_0^{2\\pi} d\\theta \\int_0^\\infty r e^{-r^2} dr = 2\\pi \\left[ -\\frac{1}{2} e^{-r^2} \\right]_0^\\infty = \\pi$$\n\nTaking square roots confirms $I = \\sqrt{\\pi}$.`;
+      } else if (q.includes('binary search') || q.includes('python') || q.includes('algorithm')) {
+        reply = `Here is an optimal **Binary Search** implementation in Python with $O(\\log n)$ time complexity:\n\n\`\`\`python\ndef binary_search(arr, target):\n    \"\"\"\n    Perform binary search on a sorted list.\n    Returns index of target if found, else -1.\n    \"\"\"\n    left, right = 0, len(arr) - 1\n    \n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n            \n    return -1\n\n# Verification\nnums = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]\nprint(binary_search(nums, 23))  # Output: 5\n\`\`\`\n\n- **Time Complexity:** $O(\\log n)$\n- **Space Complexity:** $O(1)$`;
+      } else if (q.includes('quantum') || q.includes('qubit')) {
+        reply = `### Quantum Computing in Simple Terms\n\n1. **Bits vs. Qubits:** A classical computer bit is either 0 or 1 (like a light switch). A quantum qubit can exist as both 0 and 1 simultaneously thanks to **Superposition**:\n\n$$|\\psi\\rangle = \\alpha |0\\rangle + \\beta |1\\rangle$$\n\n2. **Entanglement:** Two or more qubits can be linked so that the state of one instantly determines the state of another, no matter the distance.\n\n3. **Practical Superpowers:** Quantum computers excel at factoring massive prime numbers, simulating complex molecular reactions for medicine discovery, and global combinatorial optimization.`;
+      } else if (q.includes('email') || q.includes('interview')) {
+        reply = `### Post-Interview Follow-Up Email\n\n**Subject:** Thank You — [Role Title] Interview Follow-up\n\nDear [Interviewer Name],\n\nThank you for taking the time to speak with me today about the [Role Title] position. I thoroughly enjoyed learning more about [Company Name]'s vision for [specific project/team discussed].\n\nOur conversation reinforced my enthusiasm for the opportunity, especially given my experience in [1-2 key skills]. Please let me know if you need any additional information or portfolio samples.\n\nWarm regards,\n\n**[Your Name]**\n[Your Phone] | [Your LinkedIn]`;
+      } else {
+        reply = `Hey! 😊 So about **${this.escapeHtml(qText || 'that')}**: I'm totally with you!\n\nWe can definitely talk through this together or brainstorm some fun ways to tackle it. What's the main thing on your mind right now?`;
+      }
+
+      if (options.notice) {
+        reply = `> *${options.notice}*\n\n` + reply;
+      }
+
+      this.appendMessage('bot', reply, null, false);
+      this.history.push({
+        role: 'model',
+        parts: [{ text: reply }]
+      });
+    }, 450);
   }
 
   renderLatex(latex, isDisplay = false) {
@@ -357,7 +868,502 @@ class AetheraChatbot {
   }
 
   escapeHtml(str) {
+    if (!str) return '';
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  /* --------------------------------------------------------------------------
+     AETHERA CALENDAR & AI PLANNER INTEGRATION
+     -------------------------------------------------------------------------- */
+  getDynamicSystemInstruction() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const isoDate = this.formatDateISO(now);
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    return `${this.systemInstruction}
+
+CURRENT REAL-WORLD DATE & TIME CONTEXT:
+- Today is ${dateStr} (ISO Date: ${isoDate}).
+- Current local time: ${timeStr}.
+
+INTEGRATED AETHERA CALENDAR & SCHEDULER:
+You are directly connected to the user's interactive Aethera Calendar.
+When the user asks you to make a plan, schedule an event or task, organize their day, or add items to their calendar for a specific date or hours (e.g. "plan a meeting tomorrow at 3pm", "make a plan for tomorrow: 9am deep work, 2pm gym", "schedule study session on Friday from 10 to 12", "put workout on my calendar today at 6pm"):
+1. Respond warmly and conversationally confirming that you've planned and added it to their calendar.
+2. At the very end of your response, output a structured JSON block tagged with \`\`\`calendar_plan:
+\`\`\`calendar_plan
+[
+  {
+    "title": "Clear descriptive title",
+    "date": "YYYY-MM-DD",
+    "startTime": "HH:MM",
+    "endTime": "HH:MM",
+    "category": "deep-work" | "meeting" | "study" | "deadline" | "personal" | "work",
+    "priority": "Q1" | "Q2" | "Q3" | "Q4",
+    "quadrant": "Urgent & Important" | "Important, Not Urgent" | "Urgent, Not Important" | "Not Urgent, Not Important",
+    "notes": "Short helpful note or description"
+  }
+]
+\`\`\`
+Rules for calendar_plan:
+- Always resolve relative dates ("tomorrow", "Monday", "next week", "today") to exact YYYY-MM-DD based on today (${isoDate}).
+- Times must be in 24-hour format HH:MM (e.g. "09:00", "14:30"). If only a start time is given, set endTime 1 hour later.
+- Categories: "deep-work" (focus/coding/design), "meeting" (calls/syncs), "study" (learning/homework/exams), "deadline" (deliverables/urgent), "personal" (meals/gym/wellness/rest), "work" (general professional tasks).
+- ONLY output the \`\`\`calendar_plan block if the user specifically asked to plan, schedule, or put events on their calendar.`;
+  }
+
+  isPlanningQuery(text) {
+    if (!text || typeof text !== 'string') return false;
+    const lower = text.toLowerCase();
+
+    const planKeywords = [
+      'plan', 'schedule', 'calendar', 'put on my calendar', 'put it on my calendar',
+      'add to calendar', 'add to my calendar', 'set up a meeting', 'book a',
+      'set a reminder', 'agenda', 'itinerary', 'time block', 'routine',
+      'jadwal', 'jadwalkan', 'rencana', 'rencanakan'
+    ];
+
+    const hasPlanKeyword = planKeywords.some(kw => lower.includes(kw));
+
+    const timeOrDateIndicators = [
+      'today', 'tonight', 'tomorrow', 'tmrw', 'yesterday',
+      'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+      'am', 'pm', 'hour', 'hours', 'morning', 'afternoon', 'evening', 'night',
+      'at ', 'from ', 'o\'clock', 'oclock', 'next week', 'this weekend',
+      'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
+      'jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'sept', 'oct', 'nov', 'dec',
+      'besok', 'hari ini', 'lusa', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu', 'jam', 'pukul'
+    ];
+
+    const hasTimeOrDate = timeOrDateIndicators.some(kw => lower.includes(kw)) ||
+      /\d{1,2}:\d{2}/.test(lower) ||
+      /\d{4}-\d{2}-\d{2}/.test(lower);
+
+    return hasPlanKeyword && hasTimeOrDate;
+  }
+
+  parseNaturalDate(text, refDate = new Date()) {
+    const lower = (text || '').toLowerCase();
+    const d = new Date(refDate);
+
+    if (lower.includes('today') || lower.includes('tonight') || lower.includes('hari ini')) {
+      return this.formatDateISO(d);
+    }
+    if (lower.includes('day after tomorrow') || lower.includes('lusa')) {
+      d.setDate(d.getDate() + 2);
+      return this.formatDateISO(d);
+    }
+    if (lower.includes('tomorrow') || lower.includes('tmrw') || lower.includes('besok')) {
+      d.setDate(d.getDate() + 1);
+      return this.formatDateISO(d);
+    }
+
+    // Specific ISO date YYYY-MM-DD
+    const isoMatch = text.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+    if (isoMatch) {
+      return isoMatch[0];
+    }
+
+    // Month + Day, e.g. "Sep 15", "September 15th", "15 September"
+    const months = {
+      jan: 0, january: 0, feb: 1, february: 1, mar: 2, march: 2, apr: 3, april: 3,
+      may: 4, jun: 5, june: 5, jul: 6, july: 6, aug: 7, august: 7, sep: 8, sept: 8, september: 8,
+      oct: 9, october: 9, nov: 10, november: 10, dec: 11, december: 11
+    };
+    const monthDayMatch = text.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+(\d{1,2})(?:st|nd|rd|th)?\b/i) ||
+                          text.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\b/i);
+    if (monthDayMatch) {
+      let mStr, dayNum;
+      if (isNaN(monthDayMatch[1])) {
+        mStr = monthDayMatch[1].toLowerCase();
+        dayNum = parseInt(monthDayMatch[2], 10);
+      } else {
+        dayNum = parseInt(monthDayMatch[1], 10);
+        mStr = monthDayMatch[2].toLowerCase();
+      }
+      const monthKey = Object.keys(months).find(k => mStr.startsWith(k));
+      if (monthKey !== undefined && dayNum >= 1 && dayNum <= 31) {
+        const targetMonth = months[monthKey];
+        let year = d.getFullYear();
+        const candidate = new Date(year, targetMonth, dayNum, 12);
+        if (candidate < d && (d - candidate) > 30 * 86400000) {
+          candidate.setFullYear(year + 1);
+        }
+        return this.formatDateISO(candidate);
+      }
+    }
+
+    // Days of week
+    const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const idnDays = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+    for (let i = 0; i < 7; i++) {
+      const en = daysOfWeek[i];
+      const id = idnDays[i];
+      if (new RegExp(`\\b(this\\s+|next\\s+)?(${en}|${id})\\b`, 'i').test(lower)) {
+        const currentDay = d.getDay();
+        let diff = i - currentDay;
+        if (diff <= 0) diff += 7;
+        if ((lower.includes(`next ${en}`) || lower.includes(`next ${id}`)) && diff < 7) {
+          diff += 7;
+        }
+        d.setDate(d.getDate() + diff);
+        return this.formatDateISO(d);
+      }
+    }
+
+    // Default: if past 8pm local time, schedule for tomorrow
+    if (refDate.getHours() >= 20) {
+      d.setDate(d.getDate() + 1);
+      return this.formatDateISO(d);
+    }
+    return this.formatDateISO(d);
+  }
+
+  parseTimes(text) {
+    const rangeMatch = text.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)\s*(?:-|–|—|to)\s*(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i);
+    if (rangeMatch) {
+      const start = this.normalizeTime(rangeMatch[1]);
+      const end = this.normalizeTime(rangeMatch[2]);
+      return { startTime: start, endTime: end };
+    }
+    const singleMatch = text.match(/(?:at|for|around|pukul|jam)\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i) ||
+                        text.match(/\b(\d{1,2}(?::\d{2})?\s*(?:am|pm))\b/i);
+    if (singleMatch) {
+      const start = this.normalizeTime(singleMatch[1]);
+      const [hh, mm] = start.split(':').map(Number);
+      const end = `${String((hh + 1) % 24).padStart(2, '0')}:${String(mm || 0).padStart(2, '0')}`;
+      return { startTime: start, endTime: end };
+    }
+    return { startTime: '09:00', endTime: '10:30' };
+  }
+
+  normalizeTime(str) {
+    if (!str) return '09:00';
+    const m = str.trim().match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm)?$/i);
+    if (!m) return '09:00';
+    let h = parseInt(m[1], 10);
+    const mins = m[2] || '00';
+    const ampm = m[3] ? m[3].toLowerCase() : null;
+    if (ampm === 'pm' && h < 12) h += 12;
+    if (ampm === 'am' && h === 12) h = 0;
+    return `${String(h).padStart(2, '0')}:${mins}`;
+  }
+
+  inferCategory(text) {
+    const lower = (text || '').toLowerCase();
+    if (/deep\s*work|code|program|architect|dev|build|focus|engineer|write\s*code|debug|koding/i.test(lower)) return 'deep-work';
+    if (/meet|sync|standup|call|review|interview|discuss|client|zoom|rapat/i.test(lower)) return 'meeting';
+    if (/study|exam|homework|read|learn|prep|class|lecture|math|revision|belajar|kuliah|tugas/i.test(lower)) return 'study';
+    if (/deadline|due|submit|critical|urgent|deliver|launch|release/i.test(lower)) return 'deadline';
+    if (/gym|workout|lunch|dinner|break|rest|walk|meditat|coffee|personal|sleep|istirahat|makan|olahraga/i.test(lower)) return 'personal';
+    return 'work';
+  }
+
+  inferPriority(category) {
+    switch (category) {
+      case 'deadline': return { priority: 'Q1', quadrant: 'Urgent & Important' };
+      case 'deep-work': return { priority: 'Q2', quadrant: 'Important, Not Urgent' };
+      case 'study': return { priority: 'Q2', quadrant: 'Important, Not Urgent' };
+      case 'meeting': return { priority: 'Q3', quadrant: 'Urgent, Not Important' };
+      case 'personal': return { priority: 'Q4', quadrant: 'Not Urgent, Not Important' };
+      default: return { priority: 'Q2', quadrant: 'Important, Not Urgent' };
+    }
+  }
+
+  formatDateISO(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  cleanEventTitle(raw) {
+    if (!raw) return 'Scheduled Activity';
+    let s = raw.trim();
+    s = s.replace(/^(to\s+|for\s+)/i, '');
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  generateSimulatedPlan(query) {
+    const targetDate = this.parseNaturalDate(query);
+    const dateObj = new Date(targetDate + 'T12:00:00');
+    const formattedDate = dateObj.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
+    // 1. Check for multiple events separated by comma, '&', 'and', or newlines
+    const tokens = query.split(/(?:,\s*|\s+and\s+|\s*&\s*|\n+)(?=\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i);
+    let events = [];
+
+    if (tokens.length >= 2) {
+      for (const tok of tokens) {
+        const m = tok.match(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)\s*(?:-|–|—|to)?\s*(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)?\s*([^,;]+)/i);
+        if (m) {
+          const rawTime1 = m[1];
+          const rawTime2 = m[2];
+          let title = m[3]
+            .replace(/^(plan|schedule|put|add|tomorrow|today|tmrw|next week|for|at|on|:)+/gi, '')
+            .replace(/^[\s,;:\-–—]+|[\s,;:\-–—?!.]+$/g, '')
+            .trim();
+
+          if (title.length >= 2 && !/^(tomorrow|today|tonight|next week)$/i.test(title)) {
+            const startTime = this.normalizeTime(rawTime1);
+            let endTime = rawTime2 ? this.normalizeTime(rawTime2) : null;
+            if (!endTime) {
+              const [sh, sm] = startTime.split(':').map(Number);
+              endTime = `${String((sh + 1) % 24).padStart(2, '0')}:${String(sm || 0).padStart(2, '0')}`;
+            }
+            const category = this.inferCategory(title);
+            const prio = this.inferPriority(category);
+            events.push({
+              id: 'evt_' + Math.random().toString(36).substr(2, 9),
+              title: this.cleanEventTitle(title),
+              date: targetDate,
+              startTime,
+              endTime,
+              category,
+              priority: prio.priority,
+              quadrant: prio.quadrant,
+              notes: 'Planned via Aethera Assistant',
+              completed: false,
+              createdAt: new Date().toISOString()
+            });
+          }
+        }
+      }
+    }
+
+    if (events.length === 0) {
+      const times = this.parseTimes(query);
+      let title = query
+        .replace(/^(can you\s+)?(please\s+)?(make a plan\s+(for|to|on)?|plan\s+(my|a|an)?|schedule\s+(my|a|an)?|put\s+(my|a|an)?|add\s+(my|a|an)?)/i, '')
+        .replace(/(on\s+my\s+calendar|to\s+my\s+calendar|on\s+calendar|to\s+calendar)/gi, '')
+        .replace(/\b(today|tonight|tomorrow|tmrw|yesterday)\b/gi, '')
+        .replace(/\b(on|this|next)?\s*(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/gi, '')
+        .replace(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+\d{1,2}(?:st|nd|rd|th)?\b/gi, '')
+        .replace(/\b(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\b/gi, '')
+        .replace(/(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)\s*(?:-|–|—|to)\s*(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/gi, '')
+        .replace(/(?:at|for|around)\s+(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/gi, '')
+        .replace(/\b(\d{1,2}(?::\d{2})?\s*(?:am|pm))\b/gi, '')
+        .replace(/^[\s,;:\-–—]+|[\s,;:\-–—?!.]+$/g, '')
+        .trim();
+
+      if (title.length >= 2 && !/^(plan|schedule|calendar)$/i.test(title)) {
+        title = this.cleanEventTitle(title);
+        const category = this.inferCategory(title);
+        const prio = this.inferPriority(category);
+        events.push({
+          id: 'evt_' + Math.random().toString(36).substr(2, 9),
+          title,
+          date: targetDate,
+          startTime: times.startTime,
+          endTime: times.endTime,
+          category,
+          priority: prio.priority,
+          quadrant: prio.quadrant,
+          notes: 'Planned via Aethera Assistant',
+          completed: false,
+          createdAt: new Date().toISOString()
+        });
+      }
+    }
+
+    if (events.length === 0) {
+      const template = [
+        { title: 'Morning Focus & Day Setup', start: '08:30', end: '09:30', cat: 'personal', prio: 'Q4', quad: 'Not Urgent, Not Important' },
+        { title: 'Deep Work Session // Core Objectives', start: '09:30', end: '12:00', cat: 'deep-work', prio: 'Q2', quad: 'Important, Not Urgent' },
+        { title: 'Lunch Break & Mind Recharge', start: '12:00', end: '13:00', cat: 'personal', prio: 'Q4', quad: 'Not Urgent, Not Important' },
+        { title: 'Team Sync & Project Coordination', start: '13:00', end: '14:30', cat: 'meeting', prio: 'Q3', quad: 'Urgent, Not Important' },
+        { title: 'Implementation & Deliverables Execution', start: '14:30', end: '16:30', cat: 'work', prio: 'Q2', quad: 'Important, Not Urgent' },
+        { title: 'Daily Review & Learning Wrap-up', start: '16:30', end: '17:30', cat: 'study', prio: 'Q2', quad: 'Important, Not Urgent' }
+      ];
+
+      events = template.map(t => ({
+        id: 'evt_' + Math.random().toString(36).substr(2, 9),
+        title: t.title,
+        date: targetDate,
+        startTime: t.start,
+        endTime: t.end,
+        category: t.cat,
+        priority: t.prio,
+        quadrant: t.quad,
+        notes: 'Planned via Aethera Assistant',
+        completed: false,
+        createdAt: new Date().toISOString()
+      }));
+    }
+
+    let reply = "";
+    if (events.length === 1) {
+      const ev = events[0];
+      reply = `I've got you covered! 😊 I planned your **${ev.title}** and put it directly on your calendar for **${formattedDate}** from **${ev.startTime} to ${ev.endTime}**.\n\nYou can click **Open in Calendar** below to check it out or jump straight to your schedule!`;
+    } else {
+      reply = `I've planned out your day for **${formattedDate}** and put **${events.length} schedule blocks** directly on your calendar:\n\n` +
+        events.map(e => `* **${e.startTime} – ${e.endTime}**: ${e.title} *(${e.category.replace('-', ' ')})*`).join('\n') +
+        `\n\nAll tasks have been organized with Eisenhower Matrix priorities. Let me know if you want to make any adjustments!`;
+    }
+
+    return { reply, events };
+  }
+
+  extractScheduleEvents(text, defaultDate = null) {
+    if (window.aetheraDB && typeof window.aetheraDB.parseAIScheduleText === 'function') {
+      const parsed = window.aetheraDB.parseAIScheduleText(text, defaultDate);
+      if (parsed && parsed.length > 0) return parsed;
+    }
+    return [];
+  }
+
+  async savePlannedEventsToCalendar(events, fallbackDate = null) {
+    if (!events || !events.length) return [];
+
+    const validated = events.map(e => {
+      const cat = e.category || this.inferCategory(e.title || '');
+      const prio = this.inferPriority(cat);
+      const [sh, sm] = (e.startTime || '09:00').split(':').map(Number);
+      const defaultEnd = `${String((sh + 1) % 24).padStart(2, '0')}:${String(sm || 0).padStart(2, '0')}`;
+
+      return {
+        id: e.id || ('evt_' + Math.random().toString(36).substr(2, 9)),
+        title: e.title || 'Scheduled Activity',
+        date: e.date || fallbackDate || this.formatDateISO(new Date()),
+        startTime: e.startTime || '09:00',
+        endTime: e.endTime || defaultEnd,
+        category: cat,
+        priority: e.priority || prio.priority,
+        quadrant: e.quadrant || prio.quadrant,
+        notes: e.notes || 'Planned via Aethera Assistant',
+        completed: false,
+        createdAt: new Date().toISOString()
+      };
+    });
+
+    if (window.aetheraDB) {
+      await window.aetheraDB.ready();
+      await window.aetheraDB.saveCalendarEventsBatch(validated);
+    }
+    return validated;
+  }
+
+  attachCalendarCard(row, events) {
+    if (!row || !events || !events.length) return;
+    const bubble = row.querySelector('.chatbot-bubble');
+    const meta = row.querySelector('.msg-meta');
+    if (!bubble) return;
+
+    const card = this.createCalendarCardElement(events);
+    if (meta) {
+      bubble.insertBefore(card, meta);
+    } else {
+      bubble.appendChild(card);
+    }
+    this.scrollToBottom();
+  }
+
+  createCalendarCardElement(events) {
+    const card = document.createElement('div');
+    card.className = 'chatbot-calendar-card';
+
+    const firstEvent = events[0];
+    const eventDate = firstEvent.date;
+    const dateObj = new Date(eventDate + 'T12:00:00');
+    const friendlyDate = dateObj.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
+    const isPlural = events.length > 1;
+
+    let itemsHtml = events.map(evt => {
+      const catClass = evt.category || 'work';
+      const catLabel = catClass.replace('-', ' ');
+      return `
+        <div class="chatbot-cal-event-item" data-id="${evt.id}">
+          <div class="chatbot-cal-item-left">
+            <span class="chatbot-cal-item-time">${evt.startTime} – ${evt.endTime}</span>
+            <span class="chatbot-cal-item-title" title="${this.escapeHtml(evt.title)}">${this.escapeHtml(evt.title)}</span>
+          </div>
+          <div class="chatbot-cal-item-right">
+            <span class="chatbot-cal-chip ${catClass}">${catLabel}</span>
+            <span class="chatbot-cal-quad">${evt.priority || 'Q2'}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="chatbot-cal-card-header">
+        <div class="chatbot-cal-status">
+          <span class="chatbot-cal-dot"></span>
+          <span>${isPlural ? `${events.length} Events Added to Calendar` : 'Added to Calendar'}</span>
+        </div>
+        <span class="chatbot-cal-date-badge">📅 ${friendlyDate}</span>
+      </div>
+
+      <div class="chatbot-cal-events-list">
+        ${itemsHtml}
+      </div>
+
+      <div class="chatbot-cal-card-footer">
+        <button type="button" class="chatbot-cal-btn-view" data-date="${eventDate}">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Open in Calendar</span>
+        </button>
+        <button type="button" class="chatbot-cal-btn-undo" title="Remove from calendar">
+          <span>Undo</span>
+        </button>
+      </div>
+    `;
+
+    const viewBtn = card.querySelector('.chatbot-cal-btn-view');
+    if (viewBtn) {
+      viewBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window.aetheraCalendar) {
+          window.aetheraCalendar.selectedDate = eventDate;
+          window.aetheraCalendar.currentDate = new Date(eventDate + 'T12:00:00');
+          window.aetheraCalendar.render();
+          viewBtn.innerHTML = `<span>✓ Showing on Calendar</span>`;
+          setTimeout(() => {
+            viewBtn.innerHTML = `
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Open in Calendar</span>
+            `;
+          }, 2000);
+        } else {
+          window.location.href = `calendar.html?date=${encodeURIComponent(eventDate)}&view=month`;
+        }
+      });
+    }
+
+    const undoBtn = card.querySelector('.chatbot-cal-btn-undo');
+    if (undoBtn) {
+      undoBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        undoBtn.disabled = true;
+        undoBtn.textContent = 'Removing...';
+
+        if (window.aetheraDB) {
+          for (const evt of events) {
+            await window.aetheraDB.deleteCalendarEvent(evt.id);
+          }
+        }
+
+        card.classList.add('is-undone');
+        const footer = card.querySelector('.chatbot-cal-card-footer');
+        if (footer) {
+          footer.innerHTML = `<div class="chatbot-cal-undone-notice">✓ Removed ${events.length > 1 ? 'events' : 'event'} from calendar</div>`;
+        }
+      });
+    }
+
+    return card;
   }
 }
 

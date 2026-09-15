@@ -12,17 +12,14 @@
 
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/auth-modal.css">
+  <link rel="stylesheet" href="css/style.css?v=3.9.9">
+  <link rel="stylesheet" href="css/components.css?v=3.9.9">
+  <link rel="stylesheet" href="css/chatbot.css?v=3.9.7">
+  <link rel="stylesheet" href="css/music-player.css?v=1.0.0">
+  <link rel="stylesheet" href="css/quick-access.css?v=1.0.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
   <!-- KaTeX Math Rendering Engine -->
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-
-  <!-- Firebase Official Web SDK (Compat CDN for cross-device cloud auth & Firestore sync) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -52,6 +49,7 @@
 
       <ul class="nav-links">
         <li><a href="ai.html" class="nav-link">AI Tools</a></li>
+        <li><a href="calendar.html" class="nav-link">Calendar</a></li>
         <li><a href="#tools" class="nav-link">Tool Suite</a></li>
         <li><a href="ai.html?tool=vuln-scanner" class="nav-link">Cyber SecOps</a></li>
         <li><a href="#benchmarks" class="nav-link">Benchmarks</a></li>
@@ -59,9 +57,7 @@
       </ul>
 
       <div class="nav-actions">
-        <!-- User Account & Database HUD Slot -->
-        <div id="navbar-auth-slot" class="navbar-auth-slot"></div>
-
+        <div id="navbar-auth-slot"></div>
         <!-- Dark / Light Mode Toggle Button -->
         <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Dark and Light Theme" title="Toggle Theme">
           <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -111,12 +107,13 @@
         </div>
         <ul class="mobile-nav-menu">
           <li><a href="ai.html" class="mobile-nav-item highlight">⚡ AI Tools Suite</a></li>
+          <li><a href="calendar.html" class="mobile-nav-item">📅 Interactive Calendar</a></li>
           <li><a href="#tools" class="mobile-nav-item">🛠️ Tool Suite Catalog</a></li>
           <li><a href="ai.html?tool=vuln-scanner" class="mobile-nav-item">🛡️ Cyber SecOps Suite</a></li>
           <li><a href="#benchmarks" class="mobile-nav-item">📊 AI Benchmarks</a></li>
           <li><a href="#faq" class="mobile-nav-item">❓ FAQ &amp; Guides</a></li>
         </ul>
-        <div class="mobile-nav-actions">
+        <div class="mobile-nav-actions" style="display: flex; flex-direction: column; gap: 0.65rem;">
           <a href="ai.html" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem 1.25rem;">
             <span>Launch AI Studio</span>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -139,7 +136,7 @@
           <!-- Hero Left Column: Narrative & Instant Prompt Launcher -->
           <div class="hero-content">
             <h1 class="heading-display hero-title">
-              Cognitive AI, <br>
+              <span class="font-speed-rusher">Cognitive AI,</span> <br>
               <span class="text-gradient">
                 <span id="hero-rotator" class="typewriter-text">For Daily Productivity.</span><span class="typewriter-cursor">|</span>
               </span>
@@ -183,11 +180,6 @@
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   <span>Calculus Solver</span>
                 </button>
-              </div>
-
-              <div class="mac-test-badge">
-                <span class="pulse-dot"></span>
-                <span id="showcase-status-badge">AI LIVE // GEMINI 3.6 FLASH</span>
               </div>
             </div>
 
@@ -238,7 +230,7 @@
                       <span class="bubble-timestamp">Just now</span>
                     </div>
                     <div class="bubble-text-mini" id="showcase-user-prompt">
-                      How does an LLM generate tokens autoregressively, and how does KV-caching speed up inference?
+                      Hey! How can I make my weekends feel more relaxing and less stressful?
                     </div>
                   </div>
 
@@ -248,29 +240,27 @@
                       <div class="ai-avatar-mini">
                         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
                       </div>
-                      <span class="bubble-role-ai">Aethera Cortex</span>
-                      <span class="bubble-model-pill">Gemini 3.6 Flash</span>
+                      <span class="bubble-role-ai">Aethera Friend</span>
+                      <span class="bubble-model-pill">Gemini 3.5 Flash</span>
                       <span class="bubble-latency-metric">12.4ms • 142 T/s</span>
                     </div>
                     <div class="bubble-text-mini" id="showcase-ai-response">
-                      <p>In autoregressive generation, each token is sampled sequentially by projecting hidden states through the LM head: <code>P(x_t | x_&lt;t) = softmax(W &middot; h_t)</code>.</p>
+                      <p>Hey there! Honestly, the secret to a genuinely relaxing weekend is protecting your peace of mind before Saturday even hits. Here's what works wonders:</p>
                       
                       <div class="showcase-code-snippet">
                         <div class="snippet-header">
-                          <span>kv_cache_attention.py</span>
-                          <span class="snippet-tag">O(1) Attention Cache</span>
+                          <span>weekend_unwind_guide.md</span>
+                          <span class="snippet-tag">Zero Stress Plan</span>
                         </div>
-                        <pre><code># KV Cache eliminates redundant computation:
-K_cached = torch.cat([K_prev, K_new], dim=-2)
-V_cached = torch.cat([V_prev, V_new], dim=-2)
-scores = (Q_curr @ K_cached.transpose(-1, -2)) / math.sqrt(d_k)
-out = softmax(scores) @ V_cached</code></pre>
+                        <pre><code>✨ 1. Friday Brain Dump: Write down pending tasks so they stop looping in your head.
+☕ 2. Slow Morning: No social media or email for the first hour after waking up.
+🌿 3. Unstructured Hours: Keep at least one afternoon free with zero planned obligations.</code></pre>
                       </div>
 
                       <div class="showcase-followups">
-                        <span class="followup-chip">Explain FlashAttention-2</span>
-                        <span class="followup-chip">Compare PagedAttention</span>
-                        <span class="followup-chip">Quantization to INT4</span>
+                        <span class="followup-chip">Quick digital detox tips</span>
+                        <span class="followup-chip">Fun low-energy hobbies</span>
+                        <span class="followup-chip">Sunday evening reset</span>
                       </div>
                     </div>
                   </div>
@@ -280,7 +270,7 @@ out = softmax(scores) @ V_cached</code></pre>
                 <a href="ai.html" class="mac-showcase-input-bar" title="Click to launch interactive session in AI Studio">
                   <div class="showcase-input-field">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <span id="showcase-input-placeholder">Ask AI Chatbot anything, paste code, or drop an image...</span>
+                    <span id="showcase-input-placeholder">Chat freely about anything, brainstorm, or chat like a friend...</span>
                   </div>
                   <div class="showcase-input-actions">
                     <span class="showcase-action-tag">VISION AI</span>
@@ -406,8 +396,8 @@ out = softmax(scores) @ V_cached</code></pre>
                 </div>
                 <span class="badge">WORK &amp; LIFE</span>
               </div>
-              <h3 class="bento-card-title">Professional Email Drafter</h3>
-              <p class="bento-card-desc">Turn rough bullet points into polished, persuasive executive emails, salary negotiations, client proposals, and polite professor follow-ups.</p>
+              <h3 class="bento-card-title">Email &amp; Message Helper</h3>
+              <p class="bento-card-desc">Turn rough bullet points into polite, friendly emails, salary talks, client updates, and thoughtful follow-ups.</p>
               
               <!-- Email Preview Mockup -->
               <div class="bento-email-mockup">
@@ -429,7 +419,7 @@ out = softmax(scores) @ V_cached</code></pre>
             </div>
             <div class="bento-card-footer">
               <a href="ai.html?tool=email-drafter" class="bento-action-btn">
-                <span class="action-btn-text">Open Email Drafter</span>
+                <span class="action-btn-text">Open Email Helper</span>
                 <span class="action-btn-icon">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </span>
@@ -449,8 +439,8 @@ out = softmax(scores) @ V_cached</code></pre>
                 </div>
                 <span class="badge">ACADEMIC &amp; MATH</span>
               </div>
-              <h3 class="bento-card-title">Math &amp; Algorithm Solver</h3>
-              <p class="bento-card-desc">Step-by-step solutions for calculus integrals, matrices, discrete proofs, and algebraic equations rendered in textbook-grade KaTeX LaTeX math.</p>
+              <h3 class="bento-card-title">Step-by-Step Math Tutor</h3>
+              <p class="bento-card-desc">Clear, patient explanations for calculus, algebra, equations, and tricky homework problems formatted neatly so they make sense.</p>
               
               <!-- Math Formula Preview Box -->
               <div class="bento-math-formula-box">
@@ -469,7 +459,7 @@ out = softmax(scores) @ V_cached</code></pre>
             </div>
             <div class="bento-card-footer">
               <a href="ai.html?tool=math-solver" class="bento-action-btn">
-                <span class="action-btn-text">Open Math Solver</span>
+                <span class="action-btn-text">Open Math Tutor</span>
                 <span class="action-btn-icon">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </span>
@@ -489,8 +479,8 @@ out = softmax(scores) @ V_cached</code></pre>
                 </div>
                 <span class="badge">WORK &amp; STUDY</span>
               </div>
-              <h3 class="bento-card-title">Document &amp; Notes Summarizer</h3>
-              <p class="bento-card-desc">Condense lengthy reports, meeting recordings, PDFs, contracts, or study lectures into executive action items and core takeaways.</p>
+              <h3 class="bento-card-title">Quick Document Summarizer</h3>
+              <p class="bento-card-desc">Turn long articles, meeting notes, PDFs, or study lectures into friendly, bite-sized takeaways in seconds.</p>
               
               <div class="bento-feature-tags">
                 <span class="bento-tag">Action Items</span>
@@ -521,8 +511,8 @@ out = softmax(scores) @ V_cached</code></pre>
                 </div>
                 <span class="badge">PRODUCTIVITY</span>
               </div>
-              <h3 class="bento-card-title">Schedule &amp; Task Planner</h3>
-              <p class="bento-card-desc">Organize chaotic to-dos into Eisenhower priority matrices, time-blocked daily schedules, and Pomodoro study routines.</p>
+              <h3 class="bento-card-title">Day &amp; Routine Planner</h3>
+              <p class="bento-card-desc">Organize your to-dos with calm focus, balanced schedules, and realistic time blocks that keep your days stress-free.</p>
               
               <!-- Mini Priority Matrix Indicator -->
               <div class="bento-matrix-pills">
@@ -540,13 +530,20 @@ out = softmax(scores) @ V_cached</code></pre>
                 <span class="bento-tag">Eisenhower Matrix</span>
                 <span class="bento-tag">Pomodoro</span>
                 <span class="bento-tag">Time Blocking</span>
+                <span class="bento-tag" style="border-color: rgba(6, 182, 212, 0.4); color: var(--accent-cyan, #06B6D4);">Synced Calendar</span>
               </div>
             </div>
-            <div class="bento-card-footer">
+            <div class="bento-card-footer" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
               <a href="ai.html?tool=task-planner" class="bento-action-btn">
-                <span class="action-btn-text">Open Planner</span>
+                <span class="action-btn-text">Open Day Planner</span>
                 <span class="action-btn-icon">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </span>
+              </a>
+              <a href="calendar.html" class="bento-action-btn" style="background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.35); color: var(--accent-cyan, #06B6D4);">
+                <span class="action-btn-text">Open Calendar</span>
+                <span class="action-btn-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 </span>
               </a>
             </div>
@@ -564,8 +561,8 @@ out = softmax(scores) @ V_cached</code></pre>
                 </div>
                 <span class="badge">DEVS &amp; CLOUD ARCHITECTURE</span>
               </div>
-              <h3 class="bento-card-title">Code Explainer &amp; System Architecture Designer</h3>
-              <p class="bento-card-desc">Break down complex codebases line-by-line, calculate Big-O time and space complexity, and architect high-availability distributed cloud systems with auto-generated Mermaid.js architecture diagrams.</p>
+              <h3 class="bento-card-title">Code Explainer &amp; App Blueprint</h3>
+              <p class="bento-card-desc">Understand code in plain English, discover how your programs run, and sketch out clean app architectures with simple visual diagrams.</p>
               
               <!-- Code & Topology Box -->
               <div class="bento-code-topology-box">
@@ -591,7 +588,7 @@ out = softmax(scores) @ V_cached</code></pre>
             </div>
             <div class="bento-card-footer">
               <a href="ai.html?tool=code-explainer" class="bento-action-btn">
-                <span class="action-btn-text">Open Developer &amp; Architecture Tools</span>
+                <span class="action-btn-text">Open Code &amp; Blueprint Tools</span>
                 <span class="action-btn-icon">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </span>
@@ -609,20 +606,20 @@ out = softmax(scores) @ V_cached</code></pre>
                   </div>
                   <span class="bento-card-idx">06</span>
                 </div>
-                <span class="badge badge-cyber">CYBER SECOPS</span>
+                <span class="badge badge-cyber">SAFETY &amp; SECURITY</span>
               </div>
-              <h3 class="bento-card-title">Cyber SecOps &amp; Threat Intel</h3>
-              <p class="bento-card-desc">Zero-day vulnerability scanning, CVSS 3.1 exploit scoring, automated mitigation patch generation, and MITRE ATT&amp;CK triage.</p>
+              <h3 class="bento-card-title">Online Safety &amp; Security Shield</h3>
+              <p class="bento-card-desc">Friendly safety checkups, phishing alerts, and simple privacy advice to keep your apps and data safe without confusing jargon.</p>
 
               <!-- Cyber Key Stats 2-Column Grid -->
               <div class="bento-cyber-stats">
                 <div class="cyber-stat-card">
                   <span class="cyber-stat-num">248K+</span>
-                  <span class="cyber-stat-lbl">CVEs Indexed</span>
+                  <span class="cyber-stat-lbl">Known Checks</span>
                 </div>
                 <div class="cyber-stat-card">
                   <span class="cyber-stat-num">0.04ms</span>
-                  <span class="cyber-stat-lbl">Scan Latency</span>
+                  <span class="cyber-stat-lbl">Check Speed</span>
                 </div>
               </div>
 
@@ -636,38 +633,38 @@ out = softmax(scores) @ V_cached</code></pre>
                   </div>
                   <div class="cyber-terminal-status">
                     <span class="cyber-pulse-dot"></span>
-                    <span class="cyber-terminal-title">secops.daemon // ACTIVE</span>
+                    <span class="cyber-terminal-title">safety.guard // ACTIVE</span>
                   </div>
                 </div>
                 <div class="cyber-terminal-logs">
                   <div class="terminal-log-line success">
                     <span class="terminal-log-tag">[INIT]</span>
-                    <span>Zero-day heuristics pipeline active</span>
+                    <span>Safety shield and privacy checkup active</span>
                   </div>
                   <div class="terminal-log-line warn">
-                    <span class="terminal-log-tag">[WARN]</span>
-                    <span>CVE-2024-3094 signature matched</span>
+                    <span class="terminal-log-tag">[NOTICE]</span>
+                    <span>Found 1 recommended security update</span>
                   </div>
                   <div class="terminal-log-line success">
-                    <span class="terminal-log-tag">[PATCH]</span>
-                    <span>Auto-mitigation generated &amp; isolated</span>
+                    <span class="terminal-log-tag">[FIX]</span>
+                    <span>Easy copy-paste patch ready to apply</span>
                   </div>
                   <div class="terminal-log-line">
                     <span class="terminal-log-tag">[STATUS]</span>
-                    <span>0 active zero-day exploits detected</span>
+                    <span>Your environment is protected and safe</span>
                   </div>
                 </div>
               </div>
 
               <div class="bento-feature-tags">
-                <span class="bento-tag" style="border-color: rgba(0, 255, 204, 0.25); color: #00FFCC;">CVE Zero-Day</span>
-                <span class="bento-tag" style="border-color: rgba(0, 255, 204, 0.25); color: #00FFCC;">Auto-Patch</span>
-                <span class="bento-tag" style="border-color: rgba(0, 255, 204, 0.25); color: #00FFCC;">MITRE Matrix</span>
+                <span class="bento-tag">Safety Checkup</span>
+                <span class="bento-tag">Easy Fixes</span>
+                <span class="bento-tag">Phishing Alert</span>
               </div>
             </div>
             <div class="bento-card-footer">
               <a href="ai.html?tool=vuln-scanner" class="bento-action-btn">
-                <span class="action-btn-text">Open Security Suite</span>
+                <span class="action-btn-text">Open Safety Checkup</span>
                 <span class="action-btn-icon">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </span>
@@ -685,20 +682,20 @@ out = softmax(scores) @ V_cached</code></pre>
                   </div>
                   <span class="bento-card-idx">07</span>
                 </div>
-                <span class="badge">SMART CONTRACTS</span>
+                <span class="badge">SAFETY &amp; RELIABILITY</span>
               </div>
-              <h3 class="bento-card-title">Solidity &amp; Web3 Auditor</h3>
-              <p class="bento-card-desc">Audit smart contracts for reentrancy vectors, EVM bytecode defects, flash-loan vulnerabilities, and OWASP Web3 protocols.</p>
+              <h3 class="bento-card-title">Code Safety &amp; Contract Audit</h3>
+              <p class="bento-card-desc">Review smart contracts and login logic for common safety flaws, protecting user data and funds with confidence.</p>
 
               <div class="bento-feature-tags">
-                <span class="bento-tag">Reentrancy Shield</span>
-                <span class="bento-tag">EVM Decompiler</span>
-                <span class="bento-tag">Flash-Loan Guard</span>
+                <span class="bento-tag">Reentrancy Guard</span>
+                <span class="bento-tag">Logic Review</span>
+                <span class="bento-tag">Fund Safety</span>
               </div>
             </div>
             <div class="bento-card-footer">
               <a href="ai.html?tool=payload-generator" class="bento-action-btn">
-                <span class="action-btn-text">Audit Smart Contracts</span>
+                <span class="action-btn-text">Review Code Safety</span>
                 <span class="action-btn-icon">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </span>
@@ -709,12 +706,12 @@ out = softmax(scores) @ V_cached</code></pre>
 
         <!-- Quick Catalog Explorer Strip -->
         <div class="bento-catalog-strip">
-          <span class="catalog-strip-title">EXPLORE MORE CATEGORIES:</span>
+          <span class="catalog-strip-title">EXPLORE MORE HELPERS:</span>
           <div class="catalog-strip-pills">
-            <a href="ai.html?tool=resume-builder" class="catalog-pill">Resume Polish</a>
-            <a href="ai.html?tool=research-lab" class="catalog-pill">Deep Research Lab</a>
-            <a href="ai.html?tool=payload-generator" class="catalog-pill">Payload Generator</a>
-            <a href="ai.html?tool=system-architect" class="catalog-pill">System Architect</a>
+            <a href="ai.html?tool=resume-builder" class="catalog-pill">Job &amp; Resume Coach</a>
+            <a href="ai.html?tool=research-lab" class="catalog-pill">Curious Explorer</a>
+            <a href="ai.html?tool=payload-generator" class="catalog-pill">Code Safety Review</a>
+            <a href="ai.html?tool=system-architect" class="catalog-pill">System &amp; App Blueprint</a>
             <a href="ai.html" class="catalog-pill highlight">+14 More in Studio</a>
           </div>
         </div>
@@ -839,30 +836,31 @@ out = softmax(scores) @ V_cached</code></pre>
         <div>
           <h4 class="footer-col-title">Daily Life &amp; Work</h4>
           <ul class="footer-links">
-            <li><a href="ai.html?tool=email-drafter" class="footer-link">Email &amp; Message Drafter</a></li>
-            <li><a href="ai.html?tool=doc-summarizer" class="footer-link">Document &amp; Notes Summarizer</a></li>
-            <li><a href="ai.html?tool=task-planner" class="footer-link">Schedule &amp; Task Planner</a></li>
-            <li><a href="ai.html?tool=resume-builder" class="footer-link">Resume &amp; Cover Letter</a></li>
+            <li><a href="ai.html?tool=email-drafter" class="footer-link">Email &amp; Message Helper</a></li>
+            <li><a href="calendar.html" class="footer-link">Interactive Calendar &amp; Matrix</a></li>
+            <li><a href="ai.html?tool=task-planner" class="footer-link">Day &amp; Routine Planner</a></li>
+            <li><a href="ai.html?tool=doc-summarizer" class="footer-link">Quick Document Summarizer</a></li>
+            <li><a href="ai.html?tool=resume-builder" class="footer-link">Job &amp; Resume Coach</a></li>
           </ul>
         </div>
 
         <div>
-          <h4 class="footer-col-title">Student &amp; Dev Tools</h4>
+          <h4 class="footer-col-title">Study &amp; Coding Tools</h4>
           <ul class="footer-links">
-            <li><a href="ai.html?tool=math-solver" class="footer-link">Math &amp; Calculus Solver</a></li>
-            <li><a href="ai.html?tool=code-explainer" class="footer-link">Code Explainer &amp; Big-O</a></li>
-            <li><a href="ai.html?tool=bug-hunter" class="footer-link">Smart Bug Hunter</a></li>
-            <li><a href="ai.html?tool=sql-architect" class="footer-link">SQL &amp; Database Architect</a></li>
+            <li><a href="ai.html?tool=math-solver" class="footer-link">Step-by-Step Math Tutor</a></li>
+            <li><a href="ai.html?tool=code-explainer" class="footer-link">Code Explainer</a></li>
+            <li><a href="ai.html?tool=bug-hunter" class="footer-link">Bug Doctor &amp; Fixer</a></li>
+            <li><a href="ai.html?tool=sql-architect" class="footer-link">Database &amp; SQL Helper</a></li>
           </ul>
         </div>
 
         <div>
-          <h4 class="footer-col-title">Cyber SecOps</h4>
+          <h4 class="footer-col-title">Safety &amp; Security</h4>
           <ul class="footer-links">
-            <li><a href="ai.html?tool=vuln-scanner" class="footer-link">Vulnerability &amp; CVE Scanner</a></li>
-            <li><a href="ai.html?tool=threat-intel" class="footer-link">Threat Intel &amp; IR</a></li>
-            <li><a href="ai.html?tool=payload-generator" class="footer-link">Smart Contract Auditor</a></li>
-            <li><a href="ai.html?tool=network-forensics" class="footer-link">Network &amp; PCAP Forensics</a></li>
+            <li><a href="ai.html?tool=vuln-scanner" class="footer-link">Security Checkup</a></li>
+            <li><a href="ai.html?tool=threat-intel" class="footer-link">Threat &amp; Phishing Shield</a></li>
+            <li><a href="ai.html?tool=payload-generator" class="footer-link">Code Safety &amp; Contract Audit</a></li>
+            <li><a href="ai.html?tool=network-forensics" class="footer-link">Network &amp; Traffic Guard</a></li>
           </ul>
         </div>
 
@@ -873,7 +871,7 @@ out = softmax(scores) @ V_cached</code></pre>
               <span>100% FREE ACCESS // LIVE</span>
             </div>
             <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);">
-              MODEL: GEMINI-3.6-FLASH
+              MODEL: GEMINI-2.5-FLASH
             </span>
           </div>
         </div>
@@ -881,9 +879,9 @@ out = softmax(scores) @ V_cached</code></pre>
 
       <div class="footer-bottom">
         <span>&copy; 2026 AETHERA OPEN LABS. FREE &amp; OPEN ACCESS.</span>
-        <div style="display: flex; gap: 1.5rem;">
+        <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
           <a href="ai.html" class="footer-link">FREE AI STUDIO</a>
-          <a href="login.html" class="footer-link">CLOUD ACCOUNT &amp; DB</a>
+          <a href="calendar.html" class="footer-link">CALENDAR</a>
           <a href="#" class="footer-link">PRIVACY</a>
           <a href="#" class="footer-link">TERMS</a>
           <span style="color: var(--text-primary); font-weight: 600;">BUILD v3.9.0-LIVE</span>
@@ -894,8 +892,11 @@ out = softmax(scores) @ V_cached</code></pre>
 
   <!-- Scripts -->
   <script src="js/data.js"></script>
-  <script src="js/background-engine.js"></script>
-  <script src="js/user-db.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/background-engine.js?v=4.0.0"></script>
+  <script src="js/user-db.js?v=3.9.1"></script>
+  <script src="js/app.js?v=3.9.1"></script>
+  <script src="js/chatbot.js?v=3.9.5"></script>
+  <script src="js/music-player.js?v=1.0.0"></script>
+  <script src="js/quick-access.js?v=1.0.0"></script>
 </body>
 </html>

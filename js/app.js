@@ -19,59 +19,59 @@ class AetheraApp {
     // Comprehensive Diverse Hero Demos (Concise & Short)
     this.heroDemos = {
       "email": {
-        tabName: "Email Drafter",
-        prompt: "Draft salary negotiation email after receiving senior developer offer",
-        output: "Subject: Senior Developer Offer — Compensation Discussion\n\nDear Alex, thank you for the offer. Given my 5+ years in distributed systems, I propose a base salary of $165,000. Excited to drive immediate impact.",
-        tag: "EMAIL DRAFTER // CORPORATE",
+        tabName: "Email Helper",
+        prompt: "Draft a polite, confident message asking for a friendly compensation discussion",
+        output: "Subject: Senior Developer Offer — Warm Gratitude & Compensation Discussion\n\nDear Alex, thank you so much for the exciting offer. Given my 5+ years in distributed systems, I'd love to propose a base salary of $165,000. I'm thrilled about the role and looking forward to building together!",
+        tag: "EMAIL HELPER // KIND & CLEAR",
         toolLink: "email-drafter"
       },
       "notes": {
-        tabName: "Doc Summarizer",
-        prompt: "Summarize 1-hour corporate meeting transcript into 3 executive action items",
-        output: "EXECUTIVE SUMMARY // Q3 INFRASTRUCTURE\n\n• Database: Deploy Redis caching to cut latency to <5ms (Assignee: Alex).\n• Security: Implement SOC2 audit logging by Friday.\n• Release: 2-week freeze before global rollout.",
-        tag: "SUMMARIZER // ACTION ITEMS",
+        tabName: "Quick Summarizer",
+        prompt: "Summarize a 1-hour team meeting transcript into 3 friendly, easy action items",
+        output: "QUICK SUMMARY // TEAM SYNC\n\n• Database: Set up Redis caching to make page loads feel instant (Assignee: Alex).\n• Security: Wrap up SOC2 audit logging checklist by Friday.\n• Release: Friendly reminder: 2-week freeze before rollout.",
+        tag: "SUMMARIZER // QUICK & SIMPLE",
         toolLink: "doc-summarizer"
       },
       "schedule": {
-        tabName: "Task Planner",
-        prompt: "Organize 8-hour workday with Eisenhower matrix and Pomodoro time-blocks",
-        output: "DAILY FLOW // EISENHOWER PRODUCTIVITY\n\n• 09:00 - 11:30 | Deep Work: Fix PostgreSQL deadlock (Pomodoro x 3)\n• 13:00 - 14:30 | Architecture Review & Planning\n• 16:00 - 17:00 | Clear inbox & triage Jira tickets",
-        tag: "TASK PLANNER // TIME BLOCKING",
+        tabName: "Day Planner",
+        prompt: "Organize an 8-hour workday with balanced time-blocks and breathing room",
+        output: "CALM DAILY FLOW // BALANCED DAY\n\n• 09:00 - 11:30 | Focused Work: Solve database bottleneck (with coffee break)\n• 13:00 - 14:30 | Collaborative Architecture Planning\n• 16:00 - 17:00 | Relaxed inbox clearing & wrapping up tasks",
+        tag: "DAY PLANNER // CALM & FOCUSED",
         toolLink: "task-planner"
       },
       "resume": {
-        tabName: "Resume Polish",
-        prompt: "Rewrite weak resume bullet with Google XYZ formula & quantified metrics",
-        output: "Original: 'Sped up website database queries.'\n\n→ Google XYZ Rewrite:\n'Architected Redis read-through caching, reducing p95 API latency from 420ms to 28ms for 1.4M daily active users.'",
-        tag: "CAREER // GOOGLE XYZ",
+        tabName: "Job Coach",
+        prompt: "Rewrite a resume bullet point so it sounds natural, confident, and impactful",
+        output: "Original: 'Sped up website database queries.'\n\n→ Friendly & Impactful Rewrite:\n'Designed Redis read-through caching, helping 1.4M daily active users enjoy super-fast 28ms page load times.'",
+        tag: "JOB COACH // RESUME & CAREER",
         toolLink: "resume-builder"
       },
       "calculus": {
-        tabName: "Calculus / Math",
-        prompt: "Evaluate the definite integral: \\int_0^\\infty x^2 e^{-x^2} dx step-by-step",
-        output: "Gaussian Integral Closed Form:\n$$\\int_0^\\infty x^2 e^{-x^2} dx = \\frac{1}{2} \\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{4}$$",
-        tag: "MATH SOLVER // LATEX",
+        tabName: "Math Tutor",
+        prompt: "Explain how to evaluate the definite integral: \\int_0^\\infty x^2 e^{-x^2} dx step-by-step",
+        output: "Step-by-Step Explanation:\n$$\\int_0^\\infty x^2 e^{-x^2} dx = \\frac{1}{2} \\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{4}$$\n\nNotice how integration by parts pairs naturally with the Gaussian integral to give this elegant closed form!",
+        tag: "MATH TUTOR // CLEAR EXPLANATION",
         toolLink: "math-solver"
       },
       "code": {
         tabName: "Code Explainer",
-        prompt: "Explain QuickSort partition logic & Big-O complexity bounds",
-        output: "QuickSort Summary:\n• Time: Average O(N log N), Worst O(N²)\n• Space: O(log N) stack | In-place: Yes (Lomuto partition)\n• Key: Pivot partitions smaller left, larger right.",
-        tag: "CODE EXPLAINER // BIG-O",
+        prompt: "Explain QuickSort partition logic & efficiency in simple terms",
+        output: "QuickSort in Plain English:\n• How fast is it? Average O(N log N), which is very fast for large lists!\n• Memory: Very light on memory since it works right in place.\n• The core idea: Pick a pivot item, slide smaller items to the left and larger to the right.",
+        tag: "CODE EXPLAINER // SIMPLE & CLEAR",
         toolLink: "code-explainer"
       },
       "sql": {
-        tabName: "SQL Architect",
-        prompt: "Write optimized PostgreSQL CTE for customer lifetime value ranking",
-        output: "```sql\nWITH ltv AS (\n  SELECT customer_id, SUM(total) as rev\n  FROM orders WHERE status = 'PAID' GROUP BY customer_id\n)\nSELECT * FROM ltv ORDER BY rev DESC LIMIT 5;\n```",
-        tag: "SQL ARCHITECT // CTE",
+        tabName: "SQL Helper",
+        prompt: "Write an easy, clean SQL query to find top 5 customers by lifetime order value",
+        output: "```sql\nWITH customer_totals AS (\n  SELECT customer_id, SUM(total) AS total_spent\n  FROM orders WHERE status = 'PAID' GROUP BY customer_id\n)\nSELECT * FROM customer_totals ORDER BY total_spent DESC LIMIT 5;\n```",
+        tag: "SQL HELPER // EASY QUERIES",
         toolLink: "sql-architect"
       },
       "cyber": {
-        tabName: "Cyber SecOps",
-        prompt: "Scan CVE-2024-3094 xz-utils backdoor, calculate CVSS score & output remediation",
-        output: "SECOPS THREAT REPORT // CVE-2024-3094\n• Severity: CVSS 10.0 (CRITICAL) | Attack Vector: Supply Chain Injection\n• Mechanism: IFUNC hook hijacking RSA_public_decrypt in sshd.\n• Remediation: Revert liblzma5 to >=5.6.1-patch or <=5.4.6 stable immediately.",
-        tag: "SECOPS // CVE MATRIX",
+        tabName: "Safety Checkup",
+        prompt: "Review a security vulnerability notice and give me simple steps to stay safe",
+        output: "SAFETY CHECKUP // REASSURING ADVICE\n• Notice: Upstream library vulnerability identified.\n• Good News: An easy, stable fix is already available!\n• Simple Fix: Update liblzma to version 5.4.5 or 5.6.1-patch with one easy command.",
+        tag: "SECURITY // SAFETY CHECKUP",
         toolLink: "vuln-scanner"
       }
     };
@@ -280,8 +280,8 @@ class AetheraApp {
 
     const words = [
       "For Daily Productivity.",
-      "For Step-by-Step Math.",
-      "For Instant Code Debugging.",
+      "For Calculus & Math.",
+      "For Instant Debugging.",
       "For Everyday Workers.",
       "100% Free Forever."
     ];
@@ -457,30 +457,28 @@ class AetheraApp {
 
     const showcaseData = {
       chatbot: {
-        badge: "AI LIVE // GEMINI 3.6 FLASH",
-        userPrompt: "How does an LLM generate tokens autoregressively, and how does KV-caching speed up inference?",
-        model: "Gemini 3.6 Flash",
+        badge: "CONVERSATIONAL // CASUAL FRIEND",
+        userPrompt: "Hey! How can I make my weekends feel more relaxing and less stressful?",
+        model: "Gemini 3.5 Flash",
         metrics: "12.4ms • 142 T/s",
         htmlResponse: `
-          <p>In autoregressive generation, each token is sampled sequentially by projecting hidden states through the LM head: <code>P(x_t | x_&lt;t) = softmax(W &middot; h_t)</code>.</p>
+          <p>Hey there! Honestly, the secret to a genuinely relaxing weekend is protecting your peace of mind before Saturday even hits. Here's what works wonders:</p>
           <div class="showcase-code-snippet">
             <div class="snippet-header">
-              <span>kv_cache_attention.py</span>
-              <span class="snippet-tag">O(1) Attention Cache</span>
+              <span>weekend_unwind_guide.md</span>
+              <span class="snippet-tag">Zero Stress Plan</span>
             </div>
-            <pre><code># KV Cache eliminates redundant computation:
-K_cached = torch.cat([K_prev, K_new], dim=-2)
-V_cached = torch.cat([V_prev, V_new], dim=-2)
-scores = (Q_curr @ K_cached.transpose(-1, -2)) / math.sqrt(d_k)
-out = softmax(scores) @ V_cached</code></pre>
+            <pre><code>✨ 1. Friday Brain Dump: Write down pending tasks so they stop looping in your head.
+☕ 2. Slow Morning: No social media or email for the first hour after waking up.
+🌿 3. Unstructured Hours: Keep at least one afternoon free with zero planned obligations.</code></pre>
           </div>
           <div class="showcase-followups">
-            <span class="followup-chip">Explain FlashAttention-2</span>
-            <span class="followup-chip">Compare PagedAttention</span>
-            <span class="followup-chip">Quantization to INT4</span>
+            <span class="followup-chip">Quick digital detox tips</span>
+            <span class="followup-chip">Fun low-energy hobbies</span>
+            <span class="followup-chip">Sunday evening reset</span>
           </div>
         `,
-        placeholder: "Ask AI Chatbot anything, paste homework, code, or drop an image...",
+        placeholder: "Chat freely about anything, brainstorm, or chat like a friend...",
         toolLink: "chatbot"
       },
       email: {
@@ -510,9 +508,9 @@ out = softmax(scores) @ V_cached</code></pre>
         toolLink: "email-drafter"
       },
       code: {
-        badge: "SMART BUG HUNTER // AUDIT",
+        badge: "BUG DOCTOR // EASY FIX",
         userPrompt: "Audit this TypeScript function for a memory leak and race condition, then provide a thread-safe fix.",
-        model: "Smart Bug Hunter",
+        model: "Bug Doctor & Fixer",
         metrics: "14.1ms • 138 T/s",
         htmlResponse: `
           <p><strong>Analysis:</strong> Identified 2 critical issues:</p>
@@ -548,7 +546,7 @@ out = softmax(scores) @ V_cached</code></pre>
       math: {
         badge: "CALCULUS & LATEX // CLOSED FORM",
         userPrompt: "Compute the gradient vector and Hessian matrix of f(x, y) = x^2 + 3xy + 2y^2, and classify all critical points.",
-        model: "Math Solver 3.6",
+        model: "Step-by-Step Math Tutor",
         metrics: "11.2ms • 155 T/s",
         htmlResponse: `
           <p><strong>Step 1: Compute Gradient Vector:</strong></p>
@@ -574,9 +572,9 @@ det(H) = (2)(4) - (3)(3) = 8 - 9 = -1 &lt; 0
         toolLink: "math-solver"
       },
       cve: {
-        badge: "CYBER SECOPS // CVE RADAR",
+        badge: "SAFETY CHECKUP // SIMPLE FIX",
         userPrompt: "Analyze CVE-2024-3094 (XZ Utils backdoor) attack vector and provide immediate mitigation command.",
-        model: "CVE Scanner & SecOps",
+        model: "Security Checkup",
         metrics: "8.9ms • 170 T/s",
         htmlResponse: `
           <p><strong>Threat Intel:</strong> CVE-2024-3094 (CVSS 10.0) introduces an obfuscated payload through modified m4 macro files during tarball generation, hijacking OpenSSH's <code>RSA_public_decrypt</code> routine.</p>

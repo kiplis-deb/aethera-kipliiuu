@@ -1,0 +1,19 @@
+# Environment & API Keys (CRITICAL: Never commit secrets)
+.env
+.env.*
+!.env.example
+
+# Server Database & Persistent User Data
+server/data/
+server/user_data/
+server/db.json
+*.tmp.*
+
+# Dependencies & Build
+node_modules/
+npm-debug.log*
+
+# Temporary Scratch Files & OS files
+scratch/
+.DS_Store
+Thumbs.db

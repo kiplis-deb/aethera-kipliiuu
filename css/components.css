@@ -252,7 +252,7 @@
   justify-content: center;
   width: 24px;
   height: 24px;
-  border-radius: 50%;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.07);
   color: var(--text-primary);
   transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease;
@@ -328,6 +328,12 @@
   background: rgba(0, 255, 204, 0.08);
 }
 
+.bento-card-cyber .bento-tag {
+  border-color: rgba(0, 255, 204, 0.25);
+  color: #00FFCC;
+  background: rgba(0, 255, 204, 0.04);
+}
+
 .bento-card-cyber .bento-action-btn {
   border-color: rgba(0, 255, 204, 0.25);
   color: #00FFCC;
@@ -348,6 +354,66 @@
 .bento-card-cyber .bento-action-btn:hover .action-btn-icon {
   background: #00FFCC;
   color: #000000;
+}
+
+/* Light Mode High-Visibility Cyber Cobalt Overrides (Replaces hard-to-read green) */
+[data-theme="light"] .bento-card-cyber {
+  border-color: rgba(37, 99, 235, 0.24);
+  background: rgba(37, 99, 235, 0.03);
+}
+
+[data-theme="light"] .bento-card-cyber:hover {
+  border-color: rgba(37, 99, 235, 0.48);
+  background: rgba(37, 99, 235, 0.06);
+  box-shadow: inset 0 1px 0 rgba(37, 99, 235, 0.18), 0 12px 36px rgba(37, 99, 235, 0.12);
+}
+
+[data-theme="light"] .bento-card-cyber .bento-icon {
+  color: #1D4ED8;
+  border-color: rgba(37, 99, 235, 0.32);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+[data-theme="light"] .bento-card-cyber .bento-card-idx {
+  color: #1D4ED8;
+  border-color: rgba(37, 99, 235, 0.28);
+  background: rgba(37, 99, 235, 0.07);
+}
+
+[data-theme="light"] .badge-cyber {
+  border-color: rgba(37, 99, 235, 0.35);
+  color: #1D4ED8;
+  background: rgba(37, 99, 235, 0.09);
+  font-weight: 700;
+}
+
+[data-theme="light"] .bento-card-cyber .bento-tag {
+  border-color: rgba(37, 99, 235, 0.32);
+  color: #1D4ED8;
+  background: rgba(37, 99, 235, 0.08);
+  font-weight: 600;
+}
+
+[data-theme="light"] .bento-card-cyber .bento-action-btn {
+  border-color: rgba(37, 99, 235, 0.28);
+  color: #1D4ED8;
+  background: rgba(37, 99, 235, 0.05);
+}
+
+[data-theme="light"] .bento-card-cyber .bento-action-btn .action-btn-icon {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1D4ED8;
+}
+
+[data-theme="light"] .bento-card-cyber .bento-action-btn:hover {
+  border-color: #2563EB;
+  background: rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 16px rgba(37, 99, 235, 0.2);
+}
+
+[data-theme="light"] .bento-card-cyber .bento-action-btn:hover .action-btn-icon {
+  background: #2563EB;
+  color: #FFFFFF;
 }
 
 /* Backward compatibility for visual wrapper */
@@ -382,7 +448,7 @@
   font-size: 0.72rem;
   font-weight: 500;
   padding: 0.22rem 0.6rem;
-  border-radius: var(--radius-pill);
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
@@ -434,6 +500,10 @@
   font-size: 0.7rem;
 }
 
+[data-theme="light"] .cyber-telemetry-val {
+  color: #1D4ED8;
+}
+
 /* Bento Catalog Quick Explorer Strip */
 .bento-catalog-strip {
   display: flex;
@@ -444,7 +514,7 @@
   margin-top: 2.25rem;
   margin-bottom: 1.5rem;
   padding: 0.85rem 1.25rem;
-  border-radius: var(--radius-pill);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-subtle);
   backdrop-filter: blur(12px);
@@ -471,7 +541,7 @@
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.28rem 0.75rem;
-  border-radius: var(--radius-pill);
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-glass);
   color: var(--text-secondary);
@@ -625,6 +695,54 @@
   color: #00FFCC;
 }
 
+/* Light Mode Overrides for Cyber Terminal (High-Visibility Blue Accent) */
+[data-theme="light"] .bento-cyber-terminal {
+  background: #0B132B;
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 8px 24px rgba(15, 23, 42, 0.2);
+}
+
+[data-theme="light"] .cyber-terminal-bar {
+  background: rgba(37, 99, 235, 0.12);
+  border-bottom: 1px solid rgba(37, 99, 235, 0.24);
+}
+
+[data-theme="light"] .cyber-pulse-dot {
+  background: #38BDF8;
+  box-shadow: 0 0 8px #38BDF8;
+}
+
+[data-theme="light"] .cyber-terminal-title {
+  color: #60A5FA;
+}
+
+[data-theme="light"] .bento-cyber-terminal .terminal-log-line {
+  color: #CBD5E1;
+}
+
+[data-theme="light"] .bento-cyber-terminal .terminal-log-line.warn {
+  color: #FCD34D;
+}
+
+[data-theme="light"] .bento-cyber-terminal .terminal-log-line.success {
+  color: #60A5FA;
+}
+
+[data-theme="light"] .bento-cyber-terminal .terminal-log-tag {
+  background: rgba(255, 255, 255, 0.14);
+  color: #F1F5F9;
+}
+
+[data-theme="light"] .bento-cyber-terminal .terminal-log-line.warn .terminal-log-tag {
+  background: rgba(252, 211, 77, 0.22);
+  color: #FCD34D;
+}
+
+[data-theme="light"] .bento-cyber-terminal .terminal-log-line.success .terminal-log-tag {
+  background: rgba(59, 130, 246, 0.25);
+  color: #93C5FD;
+}
+
 /* 2. Cyber Key Stats 2-Column Grid (Box 6) */
 .bento-cyber-stats {
   display: grid;
@@ -657,6 +775,20 @@
   text-transform: uppercase;
   margin-top: 0.2rem;
   display: block;
+}
+
+/* Light Mode Overrides for Cyber Stats (High-Visibility Blue Accent) */
+[data-theme="light"] .cyber-stat-card {
+  background: rgba(37, 99, 235, 0.045);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+}
+
+[data-theme="light"] .cyber-stat-num {
+  color: #1D4ED8;
+}
+
+[data-theme="light"] .cyber-stat-lbl {
+  color: #4B5563;
 }
 
 /* 3. Email Preview Mockup (Box 1: Tall Left Card) */
@@ -1025,7 +1157,7 @@
   font-weight: 600;
   font-size: 0.85rem;
   padding: 0.6rem 1.4rem;
-  border-radius: var(--radius-pill);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1204,7 +1336,7 @@
   font-size: 0.68rem;
   font-weight: 700;
   padding: 0.2rem 0.8rem;
-  border-radius: var(--radius-pill);
+  border-radius: 6px;
   border: 1px solid var(--border-glass);
 }
 
@@ -1322,7 +1454,7 @@
   padding: 0.25rem 0.75rem;
   background: var(--bg-primary);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-pill);
+  border-radius: 6px;
   color: var(--text-primary);
 }
 
@@ -1397,17 +1529,30 @@
 .typewriter-text {
   display: inline-block;
   white-space: nowrap;
-  vertical-align: bottom;
-  font-family: inherit;
+  vertical-align: baseline;
+  font-family: 'Speed Rusher', var(--font-display), sans-serif;
+  font-size: clamp(1.15rem, 1.8vw, 1.55rem);
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
 .typewriter-cursor {
   display: inline-block;
-  font-weight: 300;
+  width: 3px;
+  height: 0.85em;
+  background-color: var(--text-primary, #ffffff);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  margin-left: 6px;
+  vertical-align: baseline;
   animation: blinkCursor 0.9s infinite;
-  color: var(--text-primary);
-  margin-left: 2px;
-  vertical-align: bottom;
+  font-size: 0;
+  line-height: 0;
+}
+
+[data-theme="light"] .typewriter-cursor {
+  background-color: #0f172a;
+  box-shadow: 0 0 6px rgba(15, 23, 42, 0.35);
 }
 
 @keyframes blinkCursor {
@@ -1433,7 +1578,7 @@
 
 .hero-chip {
   padding: 0.35rem 0.75rem;
-  border-radius: var(--radius-pill);
+  border-radius: 8px;
   background: var(--bg-glass-card);
   border: 1px solid var(--border-subtle);
   font-family: var(--font-mono);
@@ -2125,7 +2270,7 @@
   font-size: 0.65rem;
   letter-spacing: 0.04em;
   padding: 0.15rem 0.55rem;
-  border-radius: 9999px;
+  border-radius: 6px;
   backdrop-filter: blur(8px);
 }
 
@@ -2458,7 +2603,7 @@
 
 .scenario-tab-btn {
   padding: 0.6rem 1.25rem;
-  border-radius: var(--radius-pill);
+  border-radius: 8px;
   background: var(--bg-glass-card);
   border: 1px solid var(--border-glass);
   color: var(--text-secondary);

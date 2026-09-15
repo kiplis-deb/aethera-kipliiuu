@@ -78,6 +78,7 @@ class BackgroundUniverseEngine {
     this.natureBirds = [];
     this.natureDandelions = [];
     this.natureReeds = [];
+    this.natureWildlife = [];
 
     // Theme Transition & Celestial Morph Dynamics (Sun <-> Saturn Drag)
     this.themeMorphProgress = this.isLightMode ? 1.0 : 0.0;
@@ -453,19 +454,6 @@ class BackgroundUniverseEngine {
         tilt: 0.22
       },
       {
-        id: 'veil',
-        name: 'VEIL NEBULA (NGC 6960)',
-        status: 'SUPERNOVA SHOCK',
-        statusColor: '#38BDF8',
-        spec: '2,400 LY • CYGNUS LOOP',
-        relX: 0.74,
-        relY: 0.22,
-        radius: 260,
-        depth: 0.55,
-        theme: 'veil',
-        tilt: -0.42
-      },
-      {
         id: 'helix',
         name: 'HELIX NEBULA (NGC 7293)',
         status: 'PLANETARY RING',
@@ -477,6 +465,19 @@ class BackgroundUniverseEngine {
         depth: 0.28,
         theme: 'helix',
         tilt: 0.18
+      },
+      {
+        id: 'vein',
+        name: 'CYGNUS VEIN NEBULA (NGC 6960)',
+        status: 'FILAMENTARY VEIN SHOCK',
+        statusColor: '#38BDF8',
+        spec: '2,400 LY • SUPERNOVA REMNANT',
+        relX: 0.74,
+        relY: 0.22,
+        radius: 275,
+        depth: 0.52,
+        theme: 'vein',
+        tilt: -0.42
       }
     ];
 
@@ -542,44 +543,59 @@ class BackgroundUniverseEngine {
     });
 
     // ------------------------------------------------------------------------
-    // 15. Earth's Nature: Fluttering Garden Butterflies
+    // 15. Earth's Nature: Fluttering Garden Butterflies (Horizontal Flight Engine)
     // ------------------------------------------------------------------------
-    this.natureButterflies = Array.from({ length: 3 }, (_, i) => ({
-      x: Math.random() * this.width,
-      y: Math.random() * (this.height * 0.5) + (this.height * 0.2),
-      baseY: Math.random() * (this.height * 0.5) + (this.height * 0.2),
-      speedX: (i % 2 === 0 ? 1 : -1) * (Math.random() * 0.7 + 0.6),
-      flapSpeed: 0.2 + Math.random() * 0.06,
-      wingAngle: 0,
-      color: ['#10B981', '#F59E0B', '#0284C7'][i % 3],
-      size: 11 + i * 2
-    }));
+    this.natureButterflies = Array.from({ length: 6 }, (_, i) => {
+      const isRight = i % 2 === 0;
+      return {
+        x: Math.random() * this.width,
+        y: Math.random() * (this.height * 0.45) + (this.height * 0.2),
+        baseY: Math.random() * (this.height * 0.45) + (this.height * 0.2),
+        speedX: (isRight ? 1 : -1) * (Math.random() * 0.7 + 1.2), // Clear horizontal speed
+        flapSpeed: 0.22 + Math.random() * 0.08,
+        wingAngle: 0,
+        phase: Math.random() * Math.PI * 2,
+        color: ['#06B6D4', '#F59E0B', '#10B981', '#EC4899', '#8B5CF6', '#F97316'][i % 6],
+        accentColor: ['#0891B2', '#D97706', '#059669', '#DB2777', '#7C3AED', '#EA580C'][i % 6],
+        size: 10 + (i % 3) * 2.5
+      };
+    });
 
     // ------------------------------------------------------------------------
-    // 16. Earth's Nature: Botanical Procedural Trees (Sakura, Lush Oaks, Mountain Pines & Weeping Willows)
+    // 15b. Earth's Nature: Animated Meadow Wildlife (Deer, Does, Fawns & Hares)
+    // ------------------------------------------------------------------------
+    this.initNatureWildlife();
+
+    // ------------------------------------------------------------------------
+    // 16. Earth's Nature: Botanical Procedural Trees (Scenic Border Framing Groves)
+    // Trees relocated to outer mountain flanks to keep hero content & buttons clear
     // ------------------------------------------------------------------------
     const treeConfigs = [
-      // Left Woodland Grove (Foreground to Midground)
-      { xRatio: 0.035, yRatio: 0.95, height: 165, scale: 1.25, type: 'sakura', parallax: 0.85, swayAmp: 15, swaySpeed: 1.05, lean: 12 },
-      { xRatio: 0.065, yRatio: 0.92, height: 145, scale: 1.15, type: 'willow', parallax: 0.78, swayAmp: 17, swaySpeed: 1.10, lean: 7 },
-      { xRatio: 0.095, yRatio: 0.90, height: 135, scale: 1.05, type: 'oak', parallax: 0.70, swayAmp: 12, swaySpeed: 1.25, lean: -8 },
-      { xRatio: 0.125, yRatio: 0.87, height: 120, scale: 0.92, type: 'sakura', parallax: 0.62, swayAmp: 14, swaySpeed: 1.30, lean: -6 },
-      { xRatio: 0.155, yRatio: 0.84, height: 110, scale: 0.85, type: 'pine', parallax: 0.55, swayAmp: 8, swaySpeed: 1.45, lean: 4 },
-      { xRatio: 0.185, yRatio: 0.81, height: 98, scale: 0.75, type: 'oak', parallax: 0.50, swayAmp: 11, swaySpeed: 1.35, lean: 5 },
-      { xRatio: 0.22, yRatio: 0.78, height: 88, scale: 0.68, type: 'willow', parallax: 0.45, swayAmp: 16, swaySpeed: 1.12, lean: -10 },
-      { xRatio: 0.27, yRatio: 0.75, height: 75, scale: 0.58, type: 'pine', parallax: 0.40, swayAmp: 7, swaySpeed: 1.60, lean: -4 },
+      // Far Left Alpine Edge (Deep framing grove along the extreme left border)
+      { xRatio: 0.008, yRatio: 1.02, height: 160, scale: 1.25, type: 'pine', parallax: 0.72, swayAmp: 10, swaySpeed: 1.10, lean: 5 },
+      { xRatio: 0.022, yRatio: 0.99, height: 145, scale: 1.15, type: 'sakura', parallax: 0.65, swayAmp: 12, swaySpeed: 1.05, lean: 6 },
+      { xRatio: 0.042, yRatio: 0.98, height: 130, scale: 1.05, type: 'willow', parallax: 0.60, swayAmp: 14, swaySpeed: 1.10, lean: 4 },
+      { xRatio: 0.065, yRatio: 0.97, height: 115, scale: 0.92, type: 'pine', parallax: 0.52, swayAmp: 8, swaySpeed: 1.25, lean: -3 },
+      { xRatio: 0.088, yRatio: 1.00, height: 105, scale: 0.84, type: 'oak', parallax: 0.48, swayAmp: 9, swaySpeed: 1.20, lean: 3 },
 
-      // Midground Distant Hill Crest Pines & Oaks
-      { xRatio: 0.34, yRatio: 0.71, height: 58, scale: 0.48, type: 'pine', parallax: 0.35, swayAmp: 6, swaySpeed: 1.70, lean: 3 },
-      { xRatio: 0.41, yRatio: 0.69, height: 50, scale: 0.42, type: 'pine', parallax: 0.30, swayAmp: 5, swaySpeed: 1.85, lean: -2 },
-      { xRatio: 0.56, yRatio: 0.70, height: 54, scale: 0.45, type: 'pine', parallax: 0.32, swayAmp: 5, swaySpeed: 1.75, lean: 2 },
-      { xRatio: 0.64, yRatio: 0.73, height: 68, scale: 0.55, type: 'oak', parallax: 0.38, swayAmp: 7, swaySpeed: 1.40, lean: 6 },
+      // Left Midground Mountain Ridge Grove (Tiered ridge trees nestled on the hills)
+      { xRatio: 0.115, yRatio: 0.96, height: 90, scale: 0.72, type: 'pine', parallax: 0.42, swayAmp: 7, swaySpeed: 1.30, lean: 2 },
+      { xRatio: 0.145, yRatio: 0.94, height: 80, scale: 0.62, type: 'oak', parallax: 0.38, swayAmp: 6, swaySpeed: 1.20, lean: -3 },
+      { xRatio: 0.178, yRatio: 0.92, height: 72, scale: 0.55, type: 'sakura', parallax: 0.35, swayAmp: 7, swaySpeed: 1.15, lean: 2 },
+      { xRatio: 0.208, yRatio: 0.90, height: 65, scale: 0.48, type: 'pine', parallax: 0.32, swayAmp: 5, swaySpeed: 1.35, lean: -1 },
 
-      // Right Woodland Grove (Midground to Foreground)
-      { xRatio: 0.77, yRatio: 0.79, height: 95, scale: 0.78, type: 'willow', parallax: 0.48, swayAmp: 17, swaySpeed: 1.18, lean: 8 },
-      { xRatio: 0.84, yRatio: 0.86, height: 125, scale: 0.95, type: 'pine', parallax: 0.62, swayAmp: 10, swaySpeed: 1.40, lean: -5 },
-      { xRatio: 0.91, yRatio: 0.92, height: 150, scale: 1.15, type: 'sakura', parallax: 0.78, swayAmp: 15, swaySpeed: 1.15, lean: -14 },
-      { xRatio: 0.975, yRatio: 0.96, height: 175, scale: 1.35, type: 'oak', parallax: 0.88, swayAmp: 14, swaySpeed: 1.05, lean: -10 }
+      // Right Midground Mountain Ridge Grove (Tiered ridge trees nestled on the eastern hills)
+      { xRatio: 0.792, yRatio: 0.91, height: 68, scale: 0.50, type: 'pine', parallax: 0.33, swayAmp: 5, swaySpeed: 1.35, lean: 2 },
+      { xRatio: 0.825, yRatio: 0.93, height: 76, scale: 0.58, type: 'sakura', parallax: 0.36, swayAmp: 7, swaySpeed: 1.15, lean: -3 },
+      { xRatio: 0.860, yRatio: 0.95, height: 85, scale: 0.66, type: 'oak', parallax: 0.40, swayAmp: 7, swaySpeed: 1.20, lean: 2 },
+      { xRatio: 0.892, yRatio: 0.97, height: 98, scale: 0.76, type: 'willow', parallax: 0.45, swayAmp: 9, swaySpeed: 1.10, lean: -3 },
+
+      // Far Right Alpine Edge (Deep framing grove along the extreme right border)
+      { xRatio: 0.918, yRatio: 1.00, height: 110, scale: 0.88, type: 'pine', parallax: 0.50, swayAmp: 8, swaySpeed: 1.30, lean: 3 },
+      { xRatio: 0.938, yRatio: 0.98, height: 125, scale: 0.98, type: 'oak', parallax: 0.58, swayAmp: 10, swaySpeed: 1.20, lean: -4 },
+      { xRatio: 0.960, yRatio: 0.99, height: 140, scale: 1.10, type: 'willow', parallax: 0.65, swayAmp: 13, swaySpeed: 1.10, lean: -6 },
+      { xRatio: 0.980, yRatio: 1.01, height: 155, scale: 1.20, type: 'sakura', parallax: 0.70, swayAmp: 14, swaySpeed: 1.05, lean: -7 },
+      { xRatio: 0.995, yRatio: 1.03, height: 168, scale: 1.30, type: 'pine', parallax: 0.75, swayAmp: 11, swaySpeed: 1.10, lean: -4 }
     ];
 
     this.natureTrees = treeConfigs.map((t, idx) => {
@@ -1570,6 +1586,9 @@ class BackgroundUniverseEngine {
                            tree.windImpulse;
       }
 
+      // 6b. Alpine Wildlife Autonomous Roaming & Walk Cycles
+      this.updateNatureWildlife();
+
       // 7. Migratory Birds Flocking Flight
       for (const bird of this.natureBirds) {
         bird.x += bird.speedX;
@@ -2026,41 +2045,128 @@ class BackgroundUniverseEngine {
     this.ctx.restore();
   }
 
-  /* 3. Rolling Mountain Ridges with Parallax & Watercolor Layers */
+  /* 3. Rolling Mountain Ridges with Parallax & Watercolor Layers + Alpine Snow Peaks */
   drawNatureMountains(cx, cy, mouseNormX, mouseNormY) {
     this.ctx.save();
 
+    // =========================================================================
+    // 3a. DISTANT MAJESTIC SNOW-CAPPED ALPINE PEAKS (Far Horizon)
+    // =========================================================================
+    const alpineParallax = 0.14;
+    const alpineOffsetX = (mouseNormX || 0) * 16 * alpineParallax;
+    const alpineBaseY = (this.height * 0.56) + ((mouseNormY || 0) * 12 * alpineParallax) - (this.scrollProgress * 45 * alpineParallax);
+
+    // Array of majestic mountain peaks (xRatio, peakHeight, width, snowRatio)
+    const alpinePeaks = [
+      { xR: 0.08, h: this.height * 0.22, w: this.width * 0.24, snow: 0.35 },
+      { xR: 0.22, h: this.height * 0.28, w: this.width * 0.30, snow: 0.40 },
+      { xR: 0.38, h: this.height * 0.20, w: this.width * 0.22, snow: 0.32 },
+      { xR: 0.52, h: this.height * 0.25, w: this.width * 0.28, snow: 0.38 },
+      { xR: 0.68, h: this.height * 0.30, w: this.width * 0.32, snow: 0.42 },
+      { xR: 0.84, h: this.height * 0.24, w: this.width * 0.26, snow: 0.36 },
+      { xR: 0.95, h: this.height * 0.27, w: this.width * 0.28, snow: 0.38 }
+    ];
+
+    for (const peak of alpinePeaks) {
+      const peakX = (peak.xR * this.width) + alpineOffsetX;
+      const peakTopY = alpineBaseY - peak.h;
+      const leftBaseX = peakX - peak.w * 0.55;
+      const rightBaseX = peakX + peak.w * 0.55;
+
+      // 1. Shaded Mountain Body (Right/Leeward flank)
+      this.ctx.beginPath();
+      this.ctx.moveTo(peakX, peakTopY);
+      this.ctx.lineTo(rightBaseX, alpineBaseY);
+      this.ctx.lineTo(leftBaseX, alpineBaseY);
+      this.ctx.closePath();
+      const shadeGrad = this.ctx.createLinearGradient(peakX, peakTopY, rightBaseX, alpineBaseY);
+      shadeGrad.addColorStop(0, 'rgba(148, 163, 184, 0.45)');
+      shadeGrad.addColorStop(1, 'rgba(203, 213, 225, 0.70)');
+      this.ctx.fillStyle = shadeGrad;
+      this.ctx.fill();
+
+      // 2. Sunlit Face (Left/Windward flank catching morning sun)
+      this.ctx.beginPath();
+      this.ctx.moveTo(peakX, peakTopY);
+      this.ctx.lineTo(peakX + (peak.w * 0.05), alpineBaseY);
+      this.ctx.lineTo(leftBaseX, alpineBaseY);
+      this.ctx.closePath();
+      const sunGrad = this.ctx.createLinearGradient(peakX, peakTopY, leftBaseX, alpineBaseY);
+      sunGrad.addColorStop(0, 'rgba(224, 231, 255, 0.60)');
+      sunGrad.addColorStop(1, 'rgba(241, 245, 249, 0.75)');
+      this.ctx.fillStyle = sunGrad;
+      this.ctx.fill();
+
+      // 3. Snow-Capped Peak with Jagged Descending Couloirs
+      const snowH = peak.h * peak.snow;
+      const snowBaseY = peakTopY + snowH;
+      const snowLeftX = peakX - (peak.w * 0.55) * peak.snow;
+      const snowRightX = peakX + (peak.w * 0.55) * peak.snow;
+
+      this.ctx.beginPath();
+      this.ctx.moveTo(peakX, peakTopY);
+      this.ctx.lineTo(snowRightX, snowBaseY);
+      // Jagged snow tongues
+      this.ctx.lineTo(peakX + (peak.w * 0.08), snowBaseY - snowH * 0.25);
+      this.ctx.lineTo(peakX, snowBaseY + snowH * 0.15);
+      this.ctx.lineTo(peakX - (peak.w * 0.08), snowBaseY - snowH * 0.20);
+      this.ctx.lineTo(snowLeftX, snowBaseY);
+      this.ctx.closePath();
+
+      const snowGrad = this.ctx.createLinearGradient(peakX, peakTopY, peakX, snowBaseY);
+      snowGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+      snowGrad.addColorStop(0.7, 'rgba(241, 245, 249, 0.88)');
+      snowGrad.addColorStop(1, 'rgba(224, 231, 255, 0.75)');
+      this.ctx.fillStyle = snowGrad;
+      this.ctx.fill();
+    }
+
+    // =========================================================================
+    // 3b. TIERED ROLLING RIDGES & FOOTHILLS WITH PARALLAX
+    // =========================================================================
     const mountainLayers = [
       {
-        baseYRatio: 0.62,
-        amplitude: 55,
-        freq: 0.0016,
-        parallax: 0.25,
-        colorTop: 'rgba(148, 163, 184, 0.48)', // Crisp Alpine Slate Mist
-        colorBottom: 'rgba(203, 213, 225, 0.72)'
+        baseYRatio: 0.59,
+        amplitude: 45,
+        freq: 0.0018,
+        parallax: 0.22,
+        colorTop: 'rgba(148, 163, 184, 0.52)', // Distant Alpine Slate Mist
+        colorBottom: 'rgba(203, 213, 225, 0.78)',
+        hasPines: true
       },
       {
-        baseYRatio: 0.72,
-        amplitude: 65,
+        baseYRatio: 0.67,
+        amplitude: 55,
         freq: 0.0022,
-        parallax: 0.45,
-        colorTop: 'rgba(134, 239, 172, 0.50)', // Vibrant Sage Grass Ridge
-        colorBottom: 'rgba(187, 247, 208, 0.75)'
+        parallax: 0.35,
+        colorTop: 'rgba(167, 243, 208, 0.48)', // Soft Sage Foothill Ridge
+        colorBottom: 'rgba(187, 247, 208, 0.75)',
+        hasPines: false
+      },
+      {
+        baseYRatio: 0.75,
+        amplitude: 65,
+        freq: 0.0025,
+        parallax: 0.48,
+        colorTop: 'rgba(110, 231, 183, 0.52)', // Vibrant Meadow Grass Ridge
+        colorBottom: 'rgba(167, 243, 208, 0.80)',
+        hasPines: false
       },
       {
         baseYRatio: 0.84,
         amplitude: 75,
         freq: 0.0028,
-        parallax: 0.7,
-        colorTop: 'rgba(34, 197, 94, 0.52)', // Lush Celadon Valley Base
-        colorBottom: 'rgba(134, 239, 172, 0.80)'
+        parallax: 0.70,
+        colorTop: 'rgba(34, 197, 94, 0.55)', // Lush Celadon Valley Base
+        colorBottom: 'rgba(134, 239, 172, 0.85)',
+        hasPines: false
       }
     ];
 
     for (let l = 0; l < mountainLayers.length; l++) {
       const layer = mountainLayers[l];
-      const layerBaseY = (this.height * layer.baseYRatio) + (mouseNormY * 20 * layer.parallax) - (this.scrollProgress * 80 * layer.parallax);
-      const layerOffsetX = (mouseNormX * 30 * layer.parallax);
+      const layerBaseY = (this.height * layer.baseYRatio) + ((mouseNormY || 0) * 20 * layer.parallax) - (this.scrollProgress * 80 * layer.parallax);
+      const layerOffsetX = ((mouseNormX || 0) * 30 * layer.parallax);
 
       this.ctx.beginPath();
       this.ctx.moveTo(0, this.height);
@@ -2084,6 +2190,25 @@ class BackgroundUniverseEngine {
       mGrad.addColorStop(1, layer.colorBottom);
       this.ctx.fillStyle = mGrad;
       this.ctx.fill();
+
+      // Subtle distant pine silhouettes along the crest of the first slate ridge
+      if (layer.hasPines && this.isLightMode) {
+        this.ctx.fillStyle = 'rgba(71, 85, 105, 0.45)';
+        for (let px = 20; px < this.width; px += 28) {
+          const pmx = px + layerOffsetX;
+          const py = layerBaseY + 
+                    Math.sin(pmx * layer.freq) * layer.amplitude + 
+                    Math.cos(pmx * layer.freq * 2.1) * (layer.amplitude * 0.4) +
+                    Math.sin(pmx * 0.0005) * (layer.amplitude * 0.3);
+          const pineH = 7 + ((px * 7) % 6);
+          this.ctx.beginPath();
+          this.ctx.moveTo(px, py);
+          this.ctx.lineTo(px - 2.5, py + pineH);
+          this.ctx.lineTo(px + 2.5, py + pineH);
+          this.ctx.closePath();
+          this.ctx.fill();
+        }
+      }
     }
 
     this.ctx.restore();
@@ -2852,96 +2977,211 @@ class BackgroundUniverseEngine {
     this.ctx.restore();
   }
 
-  /* 7. Peaceful Alpine Wildlife (Majestic Stag, Grazing Does, Spotted Fawns & Meadow Hares) */
-  drawNatureWildlife(cx, cy, mouseNormX, mouseNormY) {
-    if (!this.isLightMode) return;
-    this.ctx.save();
-
-    const isMobile = this.isMobile;
-    const wildlifeList = [
-      // 1. Noble Antlered Stag standing proudly on the scenic left knoll slope
+  /* ==========================================================================
+     7. AUTONOMOUS ROAMING ALPINE WILDLIFE (Stag, Does, Fawns & Hopping Hares)
+     Living wildlife with realistic 4-legged walk cycles, hopping mechanics & browsing AI
+     ========================================================================== */
+  initNatureWildlife() {
+    const isMobile = this.isMobile || (this.width && this.width < 768);
+    const w = this.width || 1200;
+    this.natureWildlife = [
+      // 1. Majestic Antlered Stag: Patrols and walks across the left valley meadow
       {
+        id: 'stag',
         type: 'stag',
-        relX: 0.22,
-        relY: 0.73,
-        scale: isMobile ? 0.9 : 1.35,
-        parallax: 18,
-        facing: 1 // facing right towards valley
+        x: w * 0.16,
+        yRatio: 0.85,
+        scale: isMobile ? 0.85 : 1.25,
+        speed: 0.44,
+        facing: 1, // 1: walking right, -1: walking left
+        state: 'walking', // 'walking', 'grazing', 'alert'
+        stateTimer: 180 + Math.random() * 100,
+        walkPhase: 0,
+        minXRatio: 0.04,
+        maxXRatio: 0.42,
+        parallax: 18
       },
-      // 2. Mother Doe grazing peacefully in the center-left meadow glade
+      // 2. Mother Doe: Walks and grazes peacefully in the center meadow
       {
+        id: 'doe-1',
         type: 'doe-grazing',
-        relX: 0.35,
-        relY: 0.81,
-        scale: isMobile ? 0.75 : 1.15,
-        parallax: 22,
-        facing: 1
+        x: w * 0.36,
+        yRatio: 0.87,
+        scale: isMobile ? 0.75 : 1.10,
+        speed: 0.38,
+        facing: -1,
+        state: 'walking',
+        stateTimer: 160 + Math.random() * 100,
+        walkPhase: 1.4,
+        minXRatio: 0.18,
+        maxXRatio: 0.58,
+        parallax: 22
       },
-      // 3. Playful Spotted Fawn looking up towards mother doe
+      // 3. Playful Spotted Fawn: Trots and gambols near mother doe
       {
+        id: 'fawn-1',
         type: 'fawn',
-        relX: 0.30,
-        relY: 0.825,
-        scale: isMobile ? 0.48 : 0.72,
-        parallax: 24,
-        facing: 1
+        x: w * 0.41,
+        yRatio: 0.88,
+        scale: isMobile ? 0.48 : 0.70,
+        speed: 0.52,
+        facing: -1,
+        state: 'walking',
+        stateTimer: 140 + Math.random() * 80,
+        walkPhase: 0.6,
+        minXRatio: 0.22,
+        maxXRatio: 0.62,
+        parallax: 24
       },
-      // 4. Alert Doe standing gracefully in the right woodland meadow clearing
+      // 4. Alert Doe: Roams and gazes gracefully across the right clearing
       {
+        id: 'doe-2',
         type: 'doe-alert',
-        relX: 0.76,
-        relY: 0.80,
-        scale: isMobile ? 0.75 : 1.15,
-        parallax: 22,
-        facing: -1 // facing left across valley
+        x: w * 0.76,
+        yRatio: 0.86,
+        scale: isMobile ? 0.75 : 1.10,
+        speed: 0.38,
+        facing: -1,
+        state: 'walking',
+        stateTimer: 200 + Math.random() * 100,
+        walkPhase: 2.2,
+        minXRatio: 0.52,
+        maxXRatio: 0.88,
+        parallax: 22
       },
-      // 5. Gentle Young Fawn resting/grazing in the right meadow
+      // 5. Meadow Hare 1 (Rabbit): Hops playfully along the western prairie
       {
-        type: 'fawn-grazing',
-        relX: 0.71,
-        relY: 0.815,
-        scale: isMobile ? 0.45 : 0.68,
-        parallax: 24,
-        facing: -1
-      },
-      // 6. Charming Meadow Hare 1 nibbling clover in the central prairie
-      {
+        id: 'hare-1',
         type: 'hare',
-        relX: 0.46,
-        relY: 0.865,
-        scale: isMobile ? 0.65 : 0.95,
-        parallax: 26,
-        facing: 1
+        x: w * 0.26,
+        yRatio: 0.895,
+        scale: isMobile ? 0.60 : 0.92,
+        speed: 0.88,
+        facing: 1,
+        state: 'hopping', // 'hopping', 'grazing', 'pause'
+        stateTimer: 140 + Math.random() * 80,
+        hopPhase: 0,
+        minXRatio: 0.10,
+        maxXRatio: 0.48,
+        parallax: 26
       },
-      // 7. Charming Meadow Hare 2 alert in the wildflowers
+      // 6. Meadow Hare 2: Hops and nibbles clover in the eastern prairie
       {
+        id: 'hare-2',
         type: 'hare',
-        relX: 0.60,
-        relY: 0.855,
+        x: w * 0.66,
+        yRatio: 0.90,
         scale: isMobile ? 0.55 : 0.85,
-        parallax: 25,
-        facing: -1
+        speed: 0.92,
+        facing: -1,
+        state: 'grazing',
+        stateTimer: 160 + Math.random() * 80,
+        hopPhase: 1.8,
+        minXRatio: 0.42,
+        maxXRatio: 0.86,
+        parallax: 25
       }
     ];
+  }
 
-    for (const w of wildlifeList) {
-      const wx = (this.width * w.relX) + ((mouseNormX || 0) * w.parallax);
-      const wy = (this.height * w.relY) + ((mouseNormY || 0) * 12) - (this.scrollProgress * 42 * 0.7);
+  /* Autonomous Wildlife Artificial Intelligence & Physics Loop */
+  updateNatureWildlife() {
+    if (!this.natureWildlife || this.natureWildlife.length === 0) {
+      this.initNatureWildlife();
+      return;
+    }
+
+    for (const w of this.natureWildlife) {
+      w.stateTimer--;
+
+      // State transitions for natural organic animal behavior
+      if (w.stateTimer <= 0) {
+        if (w.type === 'hare') {
+          if (w.state === 'hopping') {
+            w.state = Math.random() > 0.35 ? 'grazing' : 'pause';
+            w.stateTimer = 110 + Math.random() * 160;
+          } else {
+            w.state = 'hopping';
+            w.stateTimer = 90 + Math.random() * 140;
+            if (Math.random() > 0.45) w.facing *= -1; // turn around
+          }
+        } else {
+          // Deer / Stag / Fawn
+          if (w.state === 'walking') {
+            w.state = Math.random() > 0.35 ? 'grazing' : 'alert';
+            w.stateTimer = 140 + Math.random() * 200;
+          } else {
+            w.state = 'walking';
+            w.stateTimer = 160 + Math.random() * 240;
+            if (Math.random() > 0.45) w.facing *= -1; // change direction
+          }
+        }
+      }
+
+      // Check patrol territory boundaries and smoothly turn around
+      const minX = this.width * w.minXRatio;
+      const maxX = this.width * w.maxXRatio;
+      if (w.x <= minX) {
+        w.x = minX;
+        w.facing = 1;
+        w.state = (w.type === 'hare') ? 'hopping' : 'walking';
+        w.stateTimer = 140 + Math.random() * 100;
+      } else if (w.x >= maxX) {
+        w.x = maxX;
+        w.facing = -1;
+        w.state = (w.type === 'hare') ? 'hopping' : 'walking';
+        w.stateTimer = 140 + Math.random() * 100;
+      }
+
+      // Movement & gait cycle advancement
+      if (w.state === 'walking') {
+        w.x += w.speed * w.facing;
+        w.walkPhase += 0.088;
+      } else if (w.state === 'hopping') {
+        w.x += w.speed * w.facing;
+        w.hopPhase += 0.13;
+      }
+    }
+  }
+
+  /* Render Wildlife with True 4-Legged Walking Mechanics & Hopping Animation */
+  drawNatureWildlife(cx, cy, mouseNormX, mouseNormY) {
+    if (!this.isLightMode) return;
+    if (!this.natureWildlife || this.natureWildlife.length === 0) {
+      this.initNatureWildlife();
+    }
+    this.ctx.save();
+
+    for (const w of this.natureWildlife) {
+      const wx = w.x + ((mouseNormX || 0) * (w.parallax || 20));
+      const wy = (this.height * w.yRatio) + ((mouseNormY || 0) * 12) - (this.scrollProgress * 42 * 0.7);
       const s = w.scale;
       const facing = w.facing || 1;
-      const breathe = Math.sin(this.time * 2.2 + w.relX * 7) * (0.8 * s);
+      const breathe = Math.sin(this.time * 2.2 + (w.x || 0) * 0.02) * (0.8 * s);
+      const isWalking = (w.state === 'walking');
+      const wp = w.walkPhase || 0;
+
+      // Realistic Quadruped Walking Gait: Leg Swings & Ground Lifts
+      const bl1_dx = isWalking ? Math.sin(wp) * (4.5 * s) : 0;
+      const bl1_lift = isWalking ? Math.max(0, -Math.cos(wp) * (3.5 * s)) : 0;
+
+      const bl2_dx = isWalking ? Math.sin(wp + Math.PI) * (4.5 * s) : 0;
+      const bl2_lift = isWalking ? Math.max(0, -Math.cos(wp + Math.PI) * (3.5 * s)) : 0;
+
+      const fl1_dx = isWalking ? Math.sin(wp + Math.PI * 0.55) * (4.5 * s) : 0;
+      const fl1_lift = isWalking ? Math.max(0, -Math.cos(wp + Math.PI * 0.55) * (3.5 * s)) : 0;
+
+      const fl2_dx = isWalking ? Math.sin(wp + Math.PI * 1.55) * (4.5 * s) : 0;
+      const fl2_lift = isWalking ? Math.max(0, -Math.cos(wp + Math.PI * 1.55) * (3.5 * s)) : 0;
+
+      const walkBob = isWalking ? Math.abs(Math.sin(wp * 2)) * (0.85 * s) : 0;
+      const walkNod = isWalking ? Math.sin(wp) * (1.1 * s) : 0;
 
       this.ctx.save();
       this.ctx.translate(wx, wy);
       this.ctx.scale(facing, 1);
 
-      // Soft Ground Occlusion Shadow
-      this.ctx.beginPath();
-      this.ctx.ellipse(0, 1 * s, 15 * s, 4 * s, 0, 0, Math.PI * 2);
-      this.ctx.fillStyle = 'rgba(6, 78, 59, 0.30)';
-      this.ctx.fill();
-
-      // Rich Warm Chestnut Coat Gradient
+      // Rich Warm Chestnut Fur Gradient
       const coatGrad = this.ctx.createLinearGradient(0, -26 * s, 0, 0);
       coatGrad.addColorStop(0, '#9A3412'); // Rich Chestnut Russet
       coatGrad.addColorStop(0.5, '#78350F'); // Warm Umber
@@ -2949,9 +3189,15 @@ class BackgroundUniverseEngine {
 
       if (w.type === 'stag') {
         // =====================================================================
-        // MAJESTIC ANTLERED STAG (Nobly crowned buck surveying the valley)
+        // MAJESTIC ANTLERED STAG (Nobly crowned buck walking across valley)
         // =====================================================================
-        // 1. Slender Strong Legs with Hooves
+        // Soft Ground Occlusion Shadow
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 1 * s, 16 * s, 4.5 * s, 0, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(6, 78, 59, 0.30)';
+        this.ctx.fill();
+
+        // 1. Dynamic Slender Strong Legs with Hooves (Stepping animatedly)
         this.ctx.strokeStyle = '#381605';
         this.ctx.lineWidth = 1.6 * s;
         this.ctx.lineCap = 'round';
@@ -2959,62 +3205,65 @@ class BackgroundUniverseEngine {
         // Back legs
         this.ctx.beginPath();
         this.ctx.moveTo(-9 * s, -12 * s);
-        this.ctx.lineTo(-12 * s, -6 * s);
-        this.ctx.lineTo(-10 * s, 0);
+        this.ctx.lineTo(-12 * s + bl1_dx * 0.5, -6 * s - bl1_lift * 0.4);
+        this.ctx.lineTo(-10 * s + bl1_dx, 0 - bl1_lift);
+
         this.ctx.moveTo(-5 * s, -12 * s);
-        this.ctx.lineTo(-7 * s, -5 * s);
-        this.ctx.lineTo(-6 * s, 0);
+        this.ctx.lineTo(-7 * s + bl2_dx * 0.5, -5 * s - bl2_lift * 0.4);
+        this.ctx.lineTo(-6 * s + bl2_dx, 0 - bl2_lift);
+
         // Front legs
         this.ctx.moveTo(7 * s, -12 * s);
-        this.ctx.lineTo(8 * s, -5 * s);
-        this.ctx.lineTo(8 * s, 0);
+        this.ctx.lineTo(8 * s + fl1_dx * 0.5, -5 * s - fl1_lift * 0.4);
+        this.ctx.lineTo(8 * s + fl1_dx, 0 - fl1_lift);
+
         this.ctx.moveTo(11 * s, -12 * s);
-        this.ctx.lineTo(12 * s, -6 * s);
-        this.ctx.lineTo(12 * s, 0);
+        this.ctx.lineTo(12 * s + fl2_dx * 0.5, -6 * s - fl2_lift * 0.4);
+        this.ctx.lineTo(12 * s + fl2_dx, 0 - fl2_lift);
         this.ctx.stroke();
 
         // Dark Hooves
         this.ctx.fillStyle = '#1C0A00';
-        this.ctx.fillRect(-11 * s, -1.5 * s, 2.5 * s, 1.8 * s);
-        this.ctx.fillRect(-7 * s, -1.5 * s, 2.5 * s, 1.8 * s);
-        this.ctx.fillRect(7 * s, -1.5 * s, 2.5 * s, 1.8 * s);
-        this.ctx.fillRect(11 * s, -1.5 * s, 2.5 * s, 1.8 * s);
+        this.ctx.fillRect(-11 * s + bl1_dx, -1.5 * s - bl1_lift, 2.5 * s, 1.8 * s);
+        this.ctx.fillRect(-7 * s + bl2_dx, -1.5 * s - bl2_lift, 2.5 * s, 1.8 * s);
+        this.ctx.fillRect(7 * s + fl1_dx, -1.5 * s - fl1_lift, 2.5 * s, 1.8 * s);
+        this.ctx.fillRect(11 * s + fl2_dx, -1.5 * s - fl2_lift, 2.5 * s, 1.8 * s);
 
         // 2. Muscular Torso Body
         this.ctx.beginPath();
-        this.ctx.ellipse(0, -15 * s + breathe, 14 * s, 8.5 * s, -0.06, 0, Math.PI * 2);
+        this.ctx.ellipse(0, -15 * s + breathe - walkBob, 14 * s, 8.5 * s, -0.06, 0, Math.PI * 2);
         this.ctx.fillStyle = coatGrad;
         this.ctx.fill();
 
         // White rump patch & tail
         this.ctx.beginPath();
-        this.ctx.ellipse(-13 * s, -18 * s + breathe, 3.2 * s, 4 * s, 0.4, 0, Math.PI * 2);
+        this.ctx.ellipse(-13 * s, -18 * s + breathe - walkBob, 3.2 * s, 4 * s, 0.4, 0, Math.PI * 2);
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
         this.ctx.fill();
 
         // Tail tip
         this.ctx.beginPath();
-        this.ctx.moveTo(-14 * s, -18 * s + breathe);
-        this.ctx.lineTo(-17 * s, -15 * s + breathe);
-        this.ctx.lineTo(-14 * s, -13 * s + breathe);
+        this.ctx.moveTo(-14 * s, -18 * s + breathe - walkBob);
+        this.ctx.lineTo(-17 * s, -15 * s + breathe - walkBob);
+        this.ctx.lineTo(-14 * s, -13 * s + breathe - walkBob);
         this.ctx.closePath();
         this.ctx.fillStyle = '#78350F';
         this.ctx.fill();
 
         // 3. Noble Arched Muscular Neck
-        const headTurn = Math.sin(this.time * 0.9) * 0.8 * s;
+        const headTurn = Math.sin(this.time * 0.9) * 0.8 * s + walkNod;
         this.ctx.beginPath();
-        this.ctx.moveTo(7 * s, -16 * s + breathe);
+        this.ctx.moveTo(7 * s, -16 * s + breathe - walkBob);
         this.ctx.quadraticCurveTo(11 * s, -23 * s, 13 * s, -30 * s + headTurn);
         this.ctx.lineTo(8 * s, -31 * s + headTurn);
-        this.ctx.quadraticCurveTo(4 * s, -22 * s, 2 * s, -16 * s + breathe);
+        this.ctx.quadraticCurveTo(4 * s, -22 * s, 2 * s, -16 * s + breathe - walkBob);
         this.ctx.closePath();
         this.ctx.fillStyle = coatGrad;
         this.ctx.fill();
 
         // Cream throat bib
         this.ctx.beginPath();
-        this.ctx.moveTo(9 * s, -20 * s + breathe);
+        this.ctx.moveTo(9 * s, -20 * s + breathe - walkBob);
         this.ctx.quadraticCurveTo(11.5 * s, -25 * s, 12 * s, -29 * s + headTurn);
         this.ctx.lineTo(8 * s, -29 * s + headTurn);
         this.ctx.closePath();
@@ -3037,44 +3286,36 @@ class BackgroundUniverseEngine {
 
         // Gentle dark eye with glint
         this.ctx.beginPath();
-        this.ctx.arc(hx + 0.5 * s, hy - 1.2 * s, 0.9 * s, 0, Math.PI * 2);
+        this.ctx.arc(hx + 0.5 * s, hy - 0.8 * s, 0.95 * s, 0, Math.PI * 2);
         this.ctx.fillStyle = '#0F172A';
         this.ctx.fill();
         this.ctx.beginPath();
-        this.ctx.arc(hx + 0.3 * s, hy - 1.5 * s, 0.35 * s, 0, Math.PI * 2);
+        this.ctx.arc(hx + 0.3 * s, hy - 1.1 * s, 0.35 * s, 0, Math.PI * 2);
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fill();
 
-        // Alert perked ears
+        // Upright Alert Ears
         this.ctx.beginPath();
-        this.ctx.ellipse(hx - 2.5 * s, hy - 4 * s, 1.5 * s, 4.2 * s, -0.35, 0, Math.PI * 2);
-        this.ctx.fillStyle = '#9A3412';
+        this.ctx.ellipse(hx - 2.5 * s, hy - 4 * s, 1.4 * s, 3.8 * s, -0.4, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#78350F';
         this.ctx.fill();
-        this.ctx.strokeStyle = '#451A03';
-        this.ctx.lineWidth = 0.6 * s;
-        this.ctx.stroke();
 
-        // 5. Magnificent Branching Antlers
-        this.ctx.strokeStyle = '#D4B996';
+        // 5. Majestic Imperial 10-Point Royal Antler Crown
+        this.ctx.strokeStyle = '#D4A373'; // Weathered Bone Antler
         this.ctx.lineWidth = 1.4 * s;
         this.ctx.lineCap = 'round';
         this.ctx.lineJoin = 'round';
 
         // Main antler beam (Left / Far horn)
         this.ctx.beginPath();
-        this.ctx.moveTo(hx - 1 * s, hy - 3.5 * s);
-        this.ctx.quadraticCurveTo(hx - 6 * s, hy - 12 * s, hx - 4 * s, hy - 18 * s);
-        this.ctx.quadraticCurveTo(hx - 1 * s, hy - 22 * s, hx + 4 * s, hy - 24 * s);
-        // Brow tine
-        this.ctx.moveTo(hx - 3 * s, hy - 8 * s);
-        this.ctx.lineTo(hx + 2 * s, hy - 11 * s);
-        // Bez tine
-        this.ctx.moveTo(hx - 5 * s, hy - 13 * s);
-        this.ctx.lineTo(hx - 1 * s, hy - 16 * s);
-        // Crown forks
-        this.ctx.moveTo(hx - 2 * s, hy - 21 * s);
-        this.ctx.lineTo(hx - 1 * s, hy - 25 * s);
-        this.ctx.moveTo(hx + 2 * s, hy - 23 * s);
+        this.ctx.moveTo(hx - 1.5 * s, hy - 3 * s);
+        this.ctx.quadraticCurveTo(hx - 2 * s, hy - 12 * s, hx + 1 * s, hy - 18 * s);
+        this.ctx.quadraticCurveTo(hx + 3 * s, hy - 22 * s, hx + 5 * s, hy - 25 * s);
+        this.ctx.moveTo(hx - 1 * s, hy - 8 * s);
+        this.ctx.lineTo(hx + 2.5 * s, hy - 11 * s);
+        this.ctx.moveTo(hx + 1.5 * s, hy - 14 * s);
+        this.ctx.lineTo(hx + 4.5 * s, hy - 17 * s);
+        this.ctx.moveTo(hx + 3 * s, hy - 21 * s);
         this.ctx.lineTo(hx + 5 * s, hy - 27 * s);
         this.ctx.stroke();
 
@@ -3083,85 +3324,112 @@ class BackgroundUniverseEngine {
         this.ctx.moveTo(hx + 1 * s, hy - 3.5 * s);
         this.ctx.quadraticCurveTo(hx + 3 * s, hy - 13 * s, hx + 8 * s, hy - 19 * s);
         this.ctx.quadraticCurveTo(hx + 12 * s, hy - 23 * s, hx + 16 * s, hy - 25 * s);
-        // Brow tine
         this.ctx.moveTo(hx + 2.5 * s, hy - 8 * s);
         this.ctx.lineTo(hx + 7 * s, hy - 10 * s);
-        // Bez tine
         this.ctx.moveTo(hx + 5.5 * s, hy - 14 * s);
         this.ctx.lineTo(hx + 10 * s, hy - 16 * s);
-        // Crown forks
         this.ctx.moveTo(hx + 11 * s, hy - 21 * s);
         this.ctx.lineTo(hx + 14 * s, hy - 26 * s);
         this.ctx.moveTo(hx + 14 * s, hy - 24 * s);
         this.ctx.lineTo(hx + 18 * s, hy - 27 * s);
         this.ctx.stroke();
 
-      } else if (w.type === 'doe-grazing' || w.type === 'fawn-grazing') {
+      } else if (w.type === 'doe-grazing' || w.type === 'fawn-grazing' || w.type === 'fawn') {
         // =====================================================================
-        // GRAZING DOE / FAWN (Head gently bobbing as she grazes fresh grass)
+        // MOTHER DOE & SPOTTED FAWN (Walking & Grazing with dynamic stride)
         // =====================================================================
-        const isFawn = w.type === 'fawn-grazing';
+        const isFawn = (w.type === 'fawn-grazing' || w.type === 'fawn');
         const legW = isFawn ? 1.0 * s : 1.3 * s;
 
-        // Slender Legs
+        // Soft Ground Occlusion Shadow
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 1 * s, 14 * s, 4 * s, 0, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(6, 78, 59, 0.28)';
+        this.ctx.fill();
+
+        // Slender Animated Legs
         this.ctx.strokeStyle = '#451A03';
         this.ctx.lineWidth = legW;
         this.ctx.lineCap = 'round';
 
         this.ctx.beginPath();
         this.ctx.moveTo(-7 * s, -10 * s);
-        this.ctx.lineTo(-9 * s, -5 * s);
-        this.ctx.lineTo(-8 * s, 0);
+        this.ctx.lineTo(-9 * s + bl1_dx * 0.5, -5 * s - bl1_lift * 0.4);
+        this.ctx.lineTo(-8 * s + bl1_dx, 0 - bl1_lift);
+
         this.ctx.moveTo(-4 * s, -10 * s);
-        this.ctx.lineTo(-5 * s, -4 * s);
-        this.ctx.lineTo(-4 * s, 0);
+        this.ctx.lineTo(-5 * s + bl2_dx * 0.5, -4 * s - bl2_lift * 0.4);
+        this.ctx.lineTo(-4 * s + bl2_dx, 0 - bl2_lift);
+
         this.ctx.moveTo(5 * s, -10 * s);
-        this.ctx.lineTo(6 * s, -4 * s);
-        this.ctx.lineTo(6 * s, 0);
+        this.ctx.lineTo(6 * s + fl1_dx * 0.5, -4 * s - fl1_lift * 0.4);
+        this.ctx.lineTo(6 * s + fl1_dx, 0 - fl1_lift);
+
         this.ctx.moveTo(8 * s, -10 * s);
-        this.ctx.lineTo(9 * s, -5 * s);
-        this.ctx.lineTo(9 * s, 0);
+        this.ctx.lineTo(9 * s + fl2_dx * 0.5, -5 * s - fl2_lift * 0.4);
+        this.ctx.lineTo(9 * s + fl2_dx, 0 - fl2_lift);
         this.ctx.stroke();
 
-        // Torso Body
+        // Dark Hooves
+        this.ctx.fillStyle = '#1C0A00';
+        this.ctx.fillRect(-9 * s + bl1_dx, -1.2 * s - bl1_lift, 2 * s, 1.4 * s);
+        this.ctx.fillRect(-5 * s + bl2_dx, -1.2 * s - bl2_lift, 2 * s, 1.4 * s);
+        this.ctx.fillRect(5 * s + fl1_dx, -1.2 * s - fl1_lift, 2 * s, 1.4 * s);
+        this.ctx.fillRect(8 * s + fl2_dx, -1.2 * s - fl2_lift, 2 * s, 1.4 * s);
+
+        // Torso Body with Walking Bob
         this.ctx.beginPath();
-        this.ctx.ellipse(0, -12 * s + breathe, 11 * s, 6.5 * s, -0.08, 0, Math.PI * 2);
+        this.ctx.ellipse(0, -12 * s + breathe - walkBob, 11 * s, 6.5 * s, -0.08, 0, Math.PI * 2);
         this.ctx.fillStyle = coatGrad;
         this.ctx.fill();
 
         // White underbelly & tail flash
         this.ctx.beginPath();
-        this.ctx.ellipse(-10 * s, -15 * s + breathe, 2.5 * s, 3 * s, 0.4, 0, Math.PI * 2);
+        this.ctx.ellipse(-10 * s, -15 * s + breathe - walkBob, 2.5 * s, 3 * s, 0.4, 0, Math.PI * 2);
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
         this.ctx.fill();
 
-        // Grazing Neck lowered towards ground
-        const headBob = Math.sin(this.time * 1.6 + w.relX * 4) * 1.8 * s;
+        // Grazing Neck / Walking Neck
+        const isGrazingState = (w.state === 'grazing');
+        const headBob = isGrazingState 
+          ? (Math.sin(this.time * 1.6 + (w.x || 0) * 0.05) * 1.8 * s)
+          : (-6 * s + walkNod); // Lifted neck when walking
+
         this.ctx.beginPath();
-        this.ctx.moveTo(7 * s, -13 * s + breathe);
-        this.ctx.quadraticCurveTo(11 * s, -9 * s, 14 * s, -4 * s + headBob);
-        this.ctx.lineTo(10 * s, -2 * s + headBob);
-        this.ctx.quadraticCurveTo(7 * s, -8 * s, 4 * s, -12 * s + breathe);
+        this.ctx.moveTo(7 * s, -13 * s + breathe - walkBob);
+        this.ctx.quadraticCurveTo(11 * s, isGrazingState ? -9 * s : -16 * s, 14 * s, isGrazingState ? (-4 * s + headBob) : (-14 * s + headBob));
+        this.ctx.lineTo(10 * s, isGrazingState ? (-2 * s + headBob) : (-16 * s + headBob));
+        this.ctx.quadraticCurveTo(7 * s, isGrazingState ? -8 * s : -14 * s, 4 * s, -12 * s + breathe - walkBob);
         this.ctx.closePath();
         this.ctx.fillStyle = coatGrad;
         this.ctx.fill();
 
         // Head
+        const headY = isGrazingState ? (-3.5 * s + headBob) : (-18 * s + headBob);
         this.ctx.beginPath();
-        this.ctx.ellipse(14 * s, -3.5 * s + headBob, 4.2 * s, 2.8 * s, 0.45, 0, Math.PI * 2);
+        this.ctx.ellipse(14 * s, headY, 4.2 * s, 2.8 * s, isGrazingState ? 0.45 : -0.15, 0, Math.PI * 2);
         this.ctx.fillStyle = '#78350F';
         this.ctx.fill();
 
         // Muzzle & eye
         this.ctx.beginPath();
-        this.ctx.arc(17 * s, -2 * s + headBob, 0.9 * s, 0, Math.PI * 2);
+        this.ctx.arc(17 * s, headY + 1 * s, 0.9 * s, 0, Math.PI * 2);
         this.ctx.fillStyle = '#1C0A00';
         this.ctx.fill();
 
-        // Ears twitching alertly
-        const earTwitch = Math.sin(this.time * 3.8 + w.relX * 3) * 0.45;
         this.ctx.beginPath();
-        this.ctx.ellipse(12 * s, -6.5 * s + headBob + earTwitch, 1.4 * s, 3.2 * s, -0.3, 0, Math.PI * 2);
+        this.ctx.arc(13 * s, headY - 1 * s, 0.85 * s, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#0F172A';
+        this.ctx.fill();
+        this.ctx.beginPath();
+        this.ctx.arc(12.7 * s, headY - 1.2 * s, 0.3 * s, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.fill();
+
+        // Ears twitching alertly
+        const earTwitch = Math.sin(this.time * 3.8 + (w.x || 0) * 0.05) * 0.45;
+        this.ctx.beginPath();
+        this.ctx.ellipse(12 * s, headY - 3 * s + earTwitch, 1.4 * s, 3.2 * s, -0.3, 0, Math.PI * 2);
         this.ctx.fillStyle = '#9A3412';
         this.ctx.fill();
 
@@ -3170,222 +3438,194 @@ class BackgroundUniverseEngine {
           this.ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
           for (let sp = 0; sp < 4; sp++) {
             this.ctx.beginPath();
-            this.ctx.arc(-5 * s + sp * 3 * s, -13 * s + breathe + (sp % 2) * 1.4 * s, 0.9 * s, 0, Math.PI * 2);
+            this.ctx.arc(-5 * s + sp * 3 * s, -13 * s + breathe - walkBob + (sp % 2) * 1.4 * s, 0.9 * s, 0, Math.PI * 2);
             this.ctx.fill();
           }
         }
 
       } else if (w.type === 'doe-alert') {
         // =====================================================================
-        // ALERT DOE (Elegantly standing with head held high listening to wind)
+        // ALERT DOE (Elegantly striding with head held high listening to wind)
         // =====================================================================
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 1 * s, 14 * s, 4 * s, 0, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(6, 78, 59, 0.28)';
+        this.ctx.fill();
+
         this.ctx.strokeStyle = '#451A03';
         this.ctx.lineWidth = 1.3 * s;
         this.ctx.lineCap = 'round';
 
         this.ctx.beginPath();
         this.ctx.moveTo(-7 * s, -11 * s);
-        this.ctx.lineTo(-9 * s, -5 * s);
-        this.ctx.lineTo(-8 * s, 0);
+        this.ctx.lineTo(-9 * s + bl1_dx * 0.5, -5 * s - bl1_lift * 0.4);
+        this.ctx.lineTo(-8 * s + bl1_dx, 0 - bl1_lift);
+
         this.ctx.moveTo(-4 * s, -11 * s);
-        this.ctx.lineTo(-5 * s, -4 * s);
-        this.ctx.lineTo(-4 * s, 0);
+        this.ctx.lineTo(-5 * s + bl2_dx * 0.5, -4 * s - bl2_lift * 0.4);
+        this.ctx.lineTo(-4 * s + bl2_dx, 0 - bl2_lift);
+
         this.ctx.moveTo(5 * s, -11 * s);
-        this.ctx.lineTo(6 * s, -4 * s);
-        this.ctx.lineTo(6 * s, 0);
+        this.ctx.lineTo(6 * s + fl1_dx * 0.5, -4 * s - fl1_lift * 0.4);
+        this.ctx.lineTo(6 * s + fl1_dx, 0 - fl1_lift);
+
         this.ctx.moveTo(8 * s, -11 * s);
-        this.ctx.lineTo(9 * s, -5 * s);
-        this.ctx.lineTo(9 * s, 0);
+        this.ctx.lineTo(9 * s + fl2_dx * 0.5, -5 * s - fl2_lift * 0.4);
+        this.ctx.lineTo(9 * s + fl2_dx, 0 - fl2_lift);
         this.ctx.stroke();
+
+        // Dark Hooves
+        this.ctx.fillStyle = '#1C0A00';
+        this.ctx.fillRect(-9 * s + bl1_dx, -1.2 * s - bl1_lift, 2 * s, 1.4 * s);
+        this.ctx.fillRect(-5 * s + bl2_dx, -1.2 * s - bl2_lift, 2 * s, 1.4 * s);
+        this.ctx.fillRect(5 * s + fl1_dx, -1.2 * s - fl1_lift, 2 * s, 1.4 * s);
+        this.ctx.fillRect(8 * s + fl2_dx, -1.2 * s - fl2_lift, 2 * s, 1.4 * s);
 
         // Torso Body
         this.ctx.beginPath();
-        this.ctx.ellipse(0, -13 * s + breathe, 12 * s, 7 * s, -0.06, 0, Math.PI * 2);
+        this.ctx.ellipse(0, -13 * s + breathe - walkBob, 12 * s, 7 * s, -0.06, 0, Math.PI * 2);
         this.ctx.fillStyle = coatGrad;
         this.ctx.fill();
 
         // White rump patch
         this.ctx.beginPath();
-        this.ctx.ellipse(-11 * s, -16 * s + breathe, 2.8 * s, 3.4 * s, 0.4, 0, Math.PI * 2);
+        this.ctx.ellipse(-11 * s, -16 * s + breathe - walkBob, 2.8 * s, 3.4 * s, 0.4, 0, Math.PI * 2);
         this.ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
         this.ctx.fill();
 
-        // High Upright Alert Neck
+        // High Upright Alert Neck with Stride Nod
+        const headNod = walkNod;
         this.ctx.beginPath();
-        this.ctx.moveTo(6 * s, -14 * s + breathe);
-        this.ctx.quadraticCurveTo(9 * s, -20 * s, 11 * s, -26 * s);
-        this.ctx.lineTo(7 * s, -26 * s);
-        this.ctx.quadraticCurveTo(4 * s, -19 * s, 2 * s, -14 * s + breathe);
+        this.ctx.moveTo(6 * s, -14 * s + breathe - walkBob);
+        this.ctx.quadraticCurveTo(9 * s, -20 * s, 11 * s, -26 * s + headNod);
+        this.ctx.lineTo(7 * s, -26 * s + headNod);
+        this.ctx.quadraticCurveTo(4 * s, -19 * s, 2 * s, -14 * s + breathe - walkBob);
         this.ctx.closePath();
         this.ctx.fillStyle = coatGrad;
         this.ctx.fill();
 
         // Doe Head
         this.ctx.beginPath();
-        this.ctx.ellipse(10 * s, -27 * s, 4.2 * s, 2.9 * s, -0.25, 0, Math.PI * 2);
+        this.ctx.ellipse(10 * s, -27 * s + headNod, 4.2 * s, 2.9 * s, -0.25, 0, Math.PI * 2);
         this.ctx.fillStyle = '#78350F';
         this.ctx.fill();
 
         // Muzzle & eye
         this.ctx.beginPath();
-        this.ctx.arc(13.5 * s, -26.5 * s, 1.0 * s, 0, Math.PI * 2);
+        this.ctx.arc(13.5 * s, -26.5 * s + headNod, 1.0 * s, 0, Math.PI * 2);
         this.ctx.fillStyle = '#1C0A00';
         this.ctx.fill();
         this.ctx.beginPath();
-        this.ctx.arc(9.5 * s, -28.2 * s, 0.8 * s, 0, Math.PI * 2);
+        this.ctx.arc(9.5 * s, -28.2 * s + headNod, 0.8 * s, 0, Math.PI * 2);
         this.ctx.fillStyle = '#0F172A';
+        this.ctx.fill();
+        this.ctx.beginPath();
+        this.ctx.arc(9.3 * s, -28.5 * s + headNod, 0.3 * s, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fill();
 
         // Large perked listening ears
         this.ctx.beginPath();
-        this.ctx.ellipse(7.5 * s, -31.5 * s, 1.4 * s, 3.8 * s, -0.22, 0, Math.PI * 2);
-        this.ctx.ellipse(11.5 * s, -31.5 * s, 1.4 * s, 3.8 * s, 0.22, 0, Math.PI * 2);
+        this.ctx.ellipse(7.5 * s, -31.5 * s + headNod, 1.4 * s, 3.8 * s, -0.22, 0, Math.PI * 2);
+        this.ctx.ellipse(11.5 * s, -31.5 * s + headNod, 1.4 * s, 3.8 * s, 0.22, 0, Math.PI * 2);
         this.ctx.fillStyle = '#9A3412';
         this.ctx.fill();
-
-      } else if (w.type === 'fawn') {
-        // =====================================================================
-        // PLAYFUL SPOTTED FAWN (Alert, perked ears, white dapple spots)
-        // =====================================================================
-        this.ctx.strokeStyle = '#451A03';
-        this.ctx.lineWidth = 1.1 * s;
-        this.ctx.lineCap = 'round';
-
-        this.ctx.beginPath();
-        this.ctx.moveTo(-6 * s, -9 * s);
-        this.ctx.lineTo(-8 * s, -4 * s);
-        this.ctx.lineTo(-7 * s, 0);
-        this.ctx.moveTo(-3 * s, -9 * s);
-        this.ctx.lineTo(-4 * s, -3 * s);
-        this.ctx.lineTo(-3 * s, 0);
-        this.ctx.moveTo(4 * s, -9 * s);
-        this.ctx.lineTo(5 * s, -3 * s);
-        this.ctx.lineTo(5 * s, 0);
-        this.ctx.moveTo(7 * s, -9 * s);
-        this.ctx.lineTo(8 * s, -4 * s);
-        this.ctx.lineTo(8 * s, 0);
-        this.ctx.stroke();
-
-        // Body
-        this.ctx.beginPath();
-        this.ctx.ellipse(0, -11 * s + breathe, 9 * s, 5.5 * s, -0.06, 0, Math.PI * 2);
-        this.ctx.fillStyle = coatGrad;
-        this.ctx.fill();
-
-        // White rump
-        this.ctx.beginPath();
-        this.ctx.ellipse(-8 * s, -13 * s + breathe, 2.2 * s, 2.8 * s, 0.4, 0, Math.PI * 2);
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        this.ctx.fill();
-
-        // Alert neck
-        this.ctx.beginPath();
-        this.ctx.moveTo(5 * s, -12 * s + breathe);
-        this.ctx.quadraticCurveTo(7 * s, -17 * s, 9 * s, -21 * s);
-        this.ctx.lineTo(6 * s, -21 * s);
-        this.ctx.quadraticCurveTo(4 * s, -16 * s, 2 * s, -12 * s + breathe);
-        this.ctx.closePath();
-        this.ctx.fillStyle = coatGrad;
-        this.ctx.fill();
-
-        // Head
-        this.ctx.beginPath();
-        this.ctx.ellipse(8 * s, -22 * s, 3.4 * s, 2.4 * s, -0.2, 0, Math.PI * 2);
-        this.ctx.fillStyle = '#78350F';
-        this.ctx.fill();
-
-        // Perked large ears
-        this.ctx.beginPath();
-        this.ctx.ellipse(6.5 * s, -26 * s, 1.1 * s, 3.2 * s, -0.2, 0, Math.PI * 2);
-        this.ctx.ellipse(9.5 * s, -26 * s, 1.1 * s, 3.2 * s, 0.2, 0, Math.PI * 2);
-        this.ctx.fillStyle = '#9A3412';
-        this.ctx.fill();
-
-        // White fawn spots
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.90)';
-        for (let sp = 0; sp < 4; sp++) {
-          this.ctx.beginPath();
-          this.ctx.arc(-4 * s + sp * 2.5 * s, -12 * s + breathe + (sp % 2) * 1.3 * s, 0.8 * s, 0, Math.PI * 2);
-          this.ctx.fill();
-        }
 
       } else if (w.type === 'hare') {
         // =====================================================================
-        // CHARMING MEADOW HARE / COTTONTAIL RABBIT (Nibbling prairie clover)
+        // CHARMING MEADOW HARE / COTTONTAIL RABBIT (Dynamic Hopping Animation)
         // =====================================================================
-        const hareBreathe = Math.sin(this.time * 3.2 + w.relX * 9) * (0.6 * s);
-        const noseTwitch = Math.sin(this.time * 6.5 + w.relX * 5) * 0.4 * s;
+        const isHopping = (w.state === 'hopping');
+        const hp = w.hopPhase || 0;
+        // Parabolic jump arc for each hop
+        const hopY = isHopping ? -Math.abs(Math.sin(hp * 2.5)) * (7.5 * s) : 0;
+        const pawStretch = isHopping ? Math.sin(hp * 2.5) * (2.4 * s) : 0;
+        const hareBreathe = Math.sin(this.time * 3.2 + (w.x || 0) * 0.05) * (0.6 * s);
+        const noseTwitch = Math.sin(this.time * 6.5 + (w.x || 0) * 0.05) * 0.4 * s;
+
+        // Ground shadow expands/contracts with hopping height
+        const shadowScale = isHopping ? Math.max(0.45, 1 - Math.abs(hopY) / (12 * s)) : 1;
+        this.ctx.beginPath();
+        this.ctx.ellipse(0, 1 * s, 10 * s * shadowScale, 3.5 * s * shadowScale, 0, 0, Math.PI * 2);
+        this.ctx.fillStyle = `rgba(6, 78, 59, ${0.30 * shadowScale})`;
+        this.ctx.fill();
 
         // Warm Hare Fur Gradient
-        const hareGrad = this.ctx.createLinearGradient(0, -12 * s, 0, 0);
+        const hareGrad = this.ctx.createLinearGradient(0, -12 * s + hopY, 0, 0 + hopY);
         hareGrad.addColorStop(0, '#D97706'); // Warm Amber
         hareGrad.addColorStop(0.55, '#B45309'); // Golden Ochre
         hareGrad.addColorStop(1, '#78350F'); // Soft Umber
 
         // 1. Tucked Paws & Back Haunches
         this.ctx.beginPath();
-        this.ctx.ellipse(-5 * s, -5 * s + hareBreathe, 5.5 * s, 4.5 * s, 0.25, 0, Math.PI * 2);
+        this.ctx.ellipse(-5 * s, -5 * s + hareBreathe + hopY, 5.5 * s, 4.5 * s, 0.25, 0, Math.PI * 2);
         this.ctx.fillStyle = hareGrad;
+        this.ctx.fill();
+
+        // Animated front paws extending forward when hopping
+        this.ctx.beginPath();
+        this.ctx.ellipse(3.5 * s + pawStretch, -2 * s + hopY, 2.5 * s, 1.6 * s, 0.1, 0, Math.PI * 2);
+        this.ctx.fillStyle = '#78350F';
         this.ctx.fill();
 
         // 2. Torso & Cream Chest
         this.ctx.beginPath();
-        this.ctx.ellipse(1 * s, -6.5 * s + hareBreathe, 6.5 * s, 4.8 * s, -0.2, 0, Math.PI * 2);
+        this.ctx.ellipse(1 * s, -6.5 * s + hareBreathe + hopY, 6.5 * s, 4.8 * s, -0.2, 0, Math.PI * 2);
         this.ctx.fillStyle = hareGrad;
         this.ctx.fill();
 
         this.ctx.beginPath();
-        this.ctx.ellipse(4 * s, -5.5 * s + hareBreathe, 2.8 * s, 3.2 * s, 0.1, 0, Math.PI * 2);
+        this.ctx.ellipse(4 * s, -5.5 * s + hareBreathe + hopY, 2.8 * s, 3.2 * s, 0.1, 0, Math.PI * 2);
         this.ctx.fillStyle = 'rgba(254, 243, 199, 0.88)';
         this.ctx.fill();
 
         // 3. Fluffy White Cottontail Powder Puff
         this.ctx.beginPath();
-        this.ctx.arc(-9.5 * s, -6 * s + hareBreathe, 2.4 * s, 0, Math.PI * 2);
+        this.ctx.arc(-9.5 * s, -6 * s + hareBreathe + hopY, 2.4 * s, 0, Math.PI * 2);
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fill();
 
         // 4. Round Hare Head
         this.ctx.beginPath();
-        this.ctx.ellipse(5.5 * s, -9.5 * s + hareBreathe, 3.2 * s, 2.6 * s, -0.15, 0, Math.PI * 2);
+        this.ctx.ellipse(5.5 * s, -9.5 * s + hareBreathe + hopY, 3.2 * s, 2.6 * s, -0.15, 0, Math.PI * 2);
         this.ctx.fillStyle = '#B45309';
         this.ctx.fill();
 
         // Twitching Dark Nose & Whisker Dots
         this.ctx.beginPath();
-        this.ctx.arc(8 * s + noseTwitch, -9 * s + hareBreathe, 0.6 * s, 0, Math.PI * 2);
+        this.ctx.arc(8 * s + noseTwitch, -9 * s + hareBreathe + hopY, 0.6 * s, 0, Math.PI * 2);
         this.ctx.fillStyle = '#1C0A00';
         this.ctx.fill();
 
         // Dark Glinting Eye
         this.ctx.beginPath();
-        this.ctx.arc(5.2 * s, -10.5 * s + hareBreathe, 0.7 * s, 0, Math.PI * 2);
+        this.ctx.arc(5.2 * s, -10.5 * s + hareBreathe + hopY, 0.7 * s, 0, Math.PI * 2);
         this.ctx.fillStyle = '#0F172A';
         this.ctx.fill();
         this.ctx.beginPath();
-        this.ctx.arc(5.0 * s, -10.7 * s + hareBreathe, 0.25 * s, 0, Math.PI * 2);
+        this.ctx.arc(5.0 * s, -10.7 * s + hareBreathe + hopY, 0.25 * s, 0, Math.PI * 2);
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.fill();
 
-        // 5. Long Upright Ears with Soft Pink Inner Glow
-        const earSway = Math.sin(this.time * 2.8 + w.relX * 6) * 0.3 * s;
+        // 5. Long Upright Ears with Wind Stream
+        const earSway = isHopping ? (-0.25 * s) : (Math.sin(this.time * 2.8 + (w.x || 0) * 0.05) * 0.3 * s);
         // Back ear
         this.ctx.beginPath();
-        this.ctx.ellipse(3 * s, -16 * s + hareBreathe, 1.2 * s, 4.5 * s, -0.18 + earSway * 0.05, 0, Math.PI * 2);
+        this.ctx.ellipse(3 * s, -16 * s + hareBreathe + hopY, 1.2 * s, 4.5 * s, -0.18 + earSway * 0.05, 0, Math.PI * 2);
         this.ctx.fillStyle = '#92400E';
         this.ctx.fill();
         this.ctx.beginPath();
-        this.ctx.ellipse(3 * s, -16 * s + hareBreathe, 0.6 * s, 3.2 * s, -0.18, 0, Math.PI * 2);
+        this.ctx.ellipse(3 * s, -16 * s + hareBreathe + hopY, 0.6 * s, 3.2 * s, -0.18, 0, Math.PI * 2);
         this.ctx.fillStyle = '#FBCFE8'; // Soft Pink Inner Ear
         this.ctx.fill();
 
         // Front ear
         this.ctx.beginPath();
-        this.ctx.ellipse(5.5 * s, -16.5 * s + hareBreathe, 1.3 * s, 4.8 * s, 0.12 - earSway * 0.05, 0, Math.PI * 2);
+        this.ctx.ellipse(5.5 * s, -16.5 * s + hareBreathe + hopY, 1.3 * s, 4.8 * s, 0.12 - earSway * 0.05, 0, Math.PI * 2);
         this.ctx.fillStyle = '#B45309';
         this.ctx.fill();
         this.ctx.beginPath();
-        this.ctx.ellipse(5.5 * s, -16.5 * s + hareBreathe, 0.7 * s, 3.4 * s, 0.12, 0, Math.PI * 2);
+        this.ctx.ellipse(5.5 * s, -16.5 * s + hareBreathe + hopY, 0.7 * s, 3.4 * s, 0.12, 0, Math.PI * 2);
         this.ctx.fillStyle = '#FBCFE8';
         this.ctx.fill();
       }
@@ -3946,11 +4186,11 @@ class BackgroundUniverseEngine {
         case 'carina':
           this.drawCarinaNebula(nx, ny, rad, hoverIntensity, neb.tilt);
           break;
-        case 'veil':
-          this.drawVeilNebula(nx, ny, rad, hoverIntensity, neb.tilt);
-          break;
         case 'helix':
           this.drawHelixNebula(nx, ny, rad, hoverIntensity, neb.tilt);
+          break;
+        case 'vein':
+          this.drawVeinNebula(nx, ny, rad, hoverIntensity, neb.tilt);
           break;
       }
 
@@ -4078,62 +4318,241 @@ class BackgroundUniverseEngine {
     this.ctx.restore();
   }
 
-  /* The Veil Nebula (NGC 6960) - Blended Cygnus Supernova Shock Waves */
-  drawVeilNebula(nx, ny, rad, hover, tilt) {
+  /* ==========================================================================
+     CYGNUS VEIN NEBULA (NGC 6960 / FILAMENTARY SUPERNOVA REMNANT)
+     Ethereal, realistic cosmic vein with ionized Oxygen-III cyan core filaments,
+     Hydrogen-alpha crimson/rose diffuse plasma sheath, and branching capillary tendrils
+     Strictly active in Dark Mode only.
+     ========================================================================== */
+  drawVeinNebula(nx, ny, rad, hover, tilt) {
+    if (this.isLightMode) return;
     this.ctx.save();
     this.ctx.translate(nx, ny);
     this.ctx.rotate(tilt);
     this.ctx.globalCompositeOperation = 'screen';
 
-    // 1. Broad Translucent Supernova Remnant Shell
-    this.drawNebulaGasPuff(0, 0, rad * 1.05, rad * 0.52, 0, 56, 189, 248, 0.10 * hover);
-    this.drawNebulaGasPuff(rad * 0.05, rad * 0.04, rad * 0.88, rad * 0.44, -0.1, 244, 63, 94, 0.09 * hover);
-    this.drawNebulaGasPuff(-rad * 0.05, -rad * 0.04, rad * 0.72, rad * 0.36, 0.15, 147, 51, 234, 0.07 * hover);
+    const drift = Math.sin(this.time * 0.35) * (rad * 0.03);
+    const breathe = Math.sin(this.time * 0.55) * 0.05 + 1.0;
 
-    // 2. Soft Whispering Filament Ribbons (Smooth feathered passes with screen blend)
-    const waveCount = 5;
-    const waveLen = rad * 1.5;
-    for (let w = 0; w < waveCount; w++) {
-      const isCyan = w % 2 === 0;
-      const offset = (w - 2) * (rad * 0.08);
-      const strokeColor = isCyan
-        ? `rgba(56, 189, 248, ${0.22 * hover})`
-        : `rgba(244, 63, 94, ${0.20 * hover})`;
+    // ------------------------------------------------------------------------
+    // 1. Diffuse Hydrogen-alpha (Hα) Crimson, Scarlet & Rose Plasma Billows
+    // Deep, velvety, textured ionized gas clouds enveloping and trailing the shock
+    // ------------------------------------------------------------------------
+    const hAlphaClouds = [
+      // Upper wisp sheath
+      { x: -rad * 0.65, y: -rad * 0.28 + drift, rx: rad * 0.45, ry: rad * 0.22, rot: -0.25, r: 190, g: 18, b: 60, a: 0.13 },
+      { x: -rad * 0.35, y: -rad * 0.22, rx: rad * 0.55, ry: rad * 0.28, rot: -0.15, r: 225, g: 29, b: 72, a: 0.16 },
+      // Main central core billow (deep crimson & vibrant rose)
+      { x: -rad * 0.05, y: -rad * 0.05 + drift * 0.5, rx: rad * 0.65, ry: rad * 0.35, rot: 0.05, r: 244, g: 63, b: 94, a: 0.18 },
+      { x: rad * 0.15, y: rad * 0.08, rx: rad * 0.60, ry: rad * 0.32, rot: 0.18, r: 225, g: 29, b: 72, a: 0.17 },
+      // Trailing lower billows & wisps (frayed tail)
+      { x: rad * 0.42, y: rad * 0.28 - drift * 0.5, rx: rad * 0.58, ry: rad * 0.30, rot: 0.32, r: 190, g: 18, b: 60, a: 0.15 },
+      { x: rad * 0.68, y: rad * 0.48, rx: rad * 0.48, ry: rad * 0.25, rot: 0.45, r: 159, g: 18, b: 57, a: 0.12 },
+      // Secondary diffuse side wisps
+      { x: -rad * 0.18, y: rad * 0.15, rx: rad * 0.42, ry: rad * 0.25, rot: 0.2, r: 159, g: 18, b: 57, a: 0.10 },
+      { x: rad * 0.25, y: -rad * 0.18, rx: rad * 0.38, ry: rad * 0.20, rot: -0.1, r: 219, g: 39, b: 119, a: 0.11 }
+    ];
+
+    for (const c of hAlphaClouds) {
+      this.drawNebulaGasPuff(
+        c.x, c.y,
+        c.rx * breathe, c.ry * breathe,
+        c.rot,
+        c.r, c.g, c.b,
+        c.a * hover
+      );
+    }
+
+    // ------------------------------------------------------------------------
+    // 2. Soft Ionized Oxygen [O III] Diffuse Turquoise Core Glow
+    // ------------------------------------------------------------------------
+    this.drawNebulaGasPuff(-rad * 0.30, -rad * 0.18, rad * 0.35, rad * 0.14, -0.2, 14, 165, 233, 0.16 * hover);
+    this.drawNebulaGasPuff(0, -rad * 0.02, rad * 0.42, rad * 0.16, 0.1, 56, 189, 248, 0.20 * hover);
+    this.drawNebulaGasPuff(rad * 0.35, rad * 0.22, rad * 0.38, rad * 0.15, 0.35, 6, 182, 212, 0.18 * hover);
+    this.drawNebulaGasPuff(rad * 0.58, rad * 0.42, rad * 0.30, rad * 0.12, 0.5, 14, 165, 233, 0.14 * hover);
+
+    // ------------------------------------------------------------------------
+    // 3. Realistic Braided Filamentary Vein Shockwave (High-Resolution Veins)
+    // Multi-octave sinusoidal & harmonic spline threads that twist and ripple
+    // ------------------------------------------------------------------------
+    const veinCount = 9;
+    const steps = 64;
+    const startX = -rad * 0.88;
+    const endX = rad * 0.82;
+    const spanX = endX - startX;
+
+    for (let v = 0; v < veinCount; v++) {
+      const vNorm = v / (veinCount - 1);
+      const isCore = v >= 3 && v <= 5;
+      const isCyan = v % 2 === 0;
+
+      let strokeColor, glowColor, lineWidth;
+      if (isCore) {
+        strokeColor = v === 4 ? `rgba(240, 249, 255, ${0.85 * hover})` : `rgba(56, 189, 248, ${0.75 * hover})`;
+        glowColor = '#38BDF8';
+        lineWidth = v === 4 ? 2.2 : 1.6;
+      } else if (isCyan) {
+        strokeColor = `rgba(14, 165, 233, ${0.55 * hover})`;
+        glowColor = '#0284C7';
+        lineWidth = 1.3;
+      } else {
+        strokeColor = `rgba(251, 113, 133, ${0.50 * hover})`;
+        glowColor = '#F43F5E';
+        lineWidth = 1.1;
+      }
+
+      const vPhase = v * 1.45 + (v % 3) * 0.8;
+      const vFreq = 0.018 + (v % 4) * 0.007;
 
       this.ctx.beginPath();
-      for (let x = -waveLen * 0.5; x <= waveLen * 0.5; x += 8) {
-        const norm = x / (waveLen * 0.5);
-        const taper = Math.cos(norm * Math.PI * 0.5);
-        const y = offset + Math.sin(x * 0.025 + this.time * 0.35 + w) * (rad * 0.12 * taper)
-                         + Math.cos(x * 0.05 - w * 1.1) * (rad * 0.05 * taper);
-        if (x === -waveLen * 0.5) {
-          this.ctx.moveTo(x, y);
+      for (let s = 0; s <= steps; s++) {
+        const u = s / steps;
+        const px = startX + u * spanX;
+
+        // Parabolic shock curve across diagonal
+        const arcY = (Math.pow(u - 0.25, 2) * 1.4 - 0.25) * rad * 0.65;
+
+        // Harmonic vein turbulence & braided twisting
+        const taper = Math.sin(u * Math.PI);
+        const wave1 = Math.sin(px * vFreq + this.time * 0.4 + vPhase) * (14 * taper);
+        const wave2 = Math.cos(px * 0.045 - this.time * 0.25 + v * 0.9) * (7 * taper);
+        const wave3 = Math.sin(px * 0.09 + v) * (3.5 * taper);
+
+        // Strand spread: fans wider toward trailing end
+        const spread = (vNorm - 0.5) * (rad * (0.12 + u * 0.22));
+
+        const py = arcY + spread + wave1 + wave2 + wave3;
+
+        if (s === 0) {
+          this.ctx.moveTo(px, py);
         } else {
-          this.ctx.lineTo(x, y);
+          this.ctx.lineTo(px, py);
         }
       }
+
       this.ctx.strokeStyle = strokeColor;
-      this.ctx.lineWidth = isCyan ? 2.2 : 1.6;
-      this.ctx.shadowColor = isCyan ? '#38BDF8' : '#F43F5E';
-      this.ctx.shadowBlur = 8;
+      this.ctx.lineWidth = lineWidth;
+      this.ctx.shadowColor = glowColor;
+      this.ctx.shadowBlur = isCore ? 12 : 6;
       this.ctx.stroke();
     }
 
-    // 3. Ionization Knots along Shockwave
-    const knots = [
-      { x: -rad * 0.32, y: -rad * 0.06, r: 1.5, c: '#38BDF8' },
-      { x: -rad * 0.08, y: rad * 0.04, r: 1.8, c: '#FDA4AF' },
-      { x: rad * 0.16, y: -rad * 0.03, r: 1.6, c: '#38BDF8' },
-      { x: rad * 0.38, y: rad * 0.08, r: 1.4, c: '#FDA4AF' }
-    ];
-    for (const k of knots) {
+    // ------------------------------------------------------------------------
+    // 4. Delicate Branching Capillary Tendrils (Feathered Vein Offshoots)
+    // ------------------------------------------------------------------------
+    const branchCount = 14;
+    for (let b = 0; b < branchCount; b++) {
+      const bU = 0.15 + (b / branchCount) * 0.75;
+      const bx = startX + bU * spanX;
+      const bArcY = (Math.pow(bU - 0.25, 2) * 1.4 - 0.25) * rad * 0.65;
+      const bDir = (b % 2 === 0 ? 1 : -1);
+      const bLen = (rad * 0.15) + (b % 3) * (rad * 0.08);
+      const isBranchCyan = b % 3 !== 0;
+
       this.ctx.beginPath();
-      this.ctx.arc(k.x, k.y, k.r, 0, Math.PI * 2);
-      this.ctx.fillStyle = k.c;
-      this.ctx.shadowColor = k.c;
-      this.ctx.shadowBlur = 8;
+      this.ctx.moveTo(bx, bArcY);
+
+      const cp1x = bx + (bLen * 0.45);
+      const cp1y = bArcY + bDir * (bLen * 0.6) + Math.sin(this.time * 0.8 + b) * 5;
+      const endBx = bx + bLen * 0.9;
+      const endBy = bArcY + bDir * bLen + Math.cos(this.time * 0.6 + b) * 4;
+
+      this.ctx.quadraticCurveTo(cp1x, cp1y, endBx, endBy);
+      this.ctx.strokeStyle = isBranchCyan
+        ? `rgba(56, 189, 248, ${0.32 * hover})`
+        : `rgba(244, 63, 94, ${0.28 * hover})`;
+      this.ctx.lineWidth = 0.85;
+      this.ctx.shadowColor = isBranchCyan ? '#38BDF8' : '#F43F5E';
+      this.ctx.shadowBlur = 4;
+      this.ctx.stroke();
+    }
+
+    // ------------------------------------------------------------------------
+    // 5. Embedded Ionizing Diamond Star ("52 Cygni" / Veil Core Illuminator)
+    // Brilliant blue-white beacon nestled in the crook of the shockwave
+    // ------------------------------------------------------------------------
+    const starX = -rad * 0.08;
+    const starY = -rad * 0.14 + drift * 0.4;
+    const starPulse = 1.0 + Math.sin(this.time * 2.4) * 0.08;
+
+    // Atmospheric Ionization Halo
+    const starGlow = this.ctx.createRadialGradient(starX, starY, 1, starX, starY, rad * 0.32 * starPulse);
+    starGlow.addColorStop(0, `rgba(255, 255, 255, ${0.95 * hover})`);
+    starGlow.addColorStop(0.12, `rgba(186, 230, 253, ${0.65 * hover})`);
+    starGlow.addColorStop(0.35, `rgba(56, 189, 248, ${0.25 * hover})`);
+    starGlow.addColorStop(0.70, `rgba(244, 63, 94, ${0.08 * hover})`);
+    starGlow.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+
+    this.ctx.fillStyle = starGlow;
+    this.ctx.beginPath();
+    this.ctx.arc(starX, starY, rad * 0.32 * starPulse, 0, Math.PI * 2);
+    this.ctx.fill();
+
+    // Intense Stellar Core
+    this.ctx.beginPath();
+    this.ctx.arc(starX, starY, 3.2 * starPulse, 0, Math.PI * 2);
+    this.ctx.fillStyle = '#FFFFFF';
+    this.ctx.shadowColor = '#BAE6FD';
+    this.ctx.shadowBlur = 16;
+    this.ctx.fill();
+
+    // 4-Point Celestial Cross Diffraction Spikes
+    const spikeLen = rad * 0.24 * starPulse;
+    const spikeRot = 0.12 + Math.sin(this.time * 0.3) * 0.04;
+    this.ctx.save();
+    this.ctx.translate(starX, starY);
+    this.ctx.rotate(spikeRot);
+
+    this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.75 * hover})`;
+    this.ctx.lineWidth = 1.2;
+    this.ctx.beginPath();
+    this.ctx.moveTo(-spikeLen, 0);
+    this.ctx.lineTo(spikeLen, 0);
+    this.ctx.moveTo(0, -spikeLen);
+    this.ctx.lineTo(0, spikeLen);
+    this.ctx.stroke();
+
+    // Faint diagonal secondary spike rays
+    const diagLen = spikeLen * 0.55;
+    this.ctx.strokeStyle = `rgba(186, 230, 253, ${0.40 * hover})`;
+    this.ctx.lineWidth = 0.8;
+    this.ctx.beginPath();
+    this.ctx.moveTo(-diagLen, -diagLen);
+    this.ctx.lineTo(diagLen, diagLen);
+    this.ctx.moveTo(-diagLen, diagLen);
+    this.ctx.lineTo(diagLen, -diagLen);
+    this.ctx.stroke();
+    this.ctx.restore();
+
+    // ------------------------------------------------------------------------
+    // 6. Stardust Shockwave Micro-Knots & Sparkles
+    // ------------------------------------------------------------------------
+    const shockKnots = [
+      { u: 0.08, offset: -4, r: 1.4, c: '#38BDF8' },
+      { u: 0.18, offset: 6, r: 1.6, c: '#FDA4AF' },
+      { u: 0.28, offset: -8, r: 1.8, c: '#BAE6FD' },
+      { u: 0.38, offset: 5, r: 1.3, c: '#38BDF8' },
+      { u: 0.52, offset: -6, r: 1.9, c: '#FFFFFF' },
+      { u: 0.62, offset: 9, r: 1.5, c: '#FB7185' },
+      { u: 0.72, offset: -7, r: 1.4, c: '#38BDF8' },
+      { u: 0.84, offset: 8, r: 1.6, c: '#FDA4AF' },
+      { u: 0.92, offset: -3, r: 1.2, c: '#38BDF8' }
+    ];
+
+    for (const sk of shockKnots) {
+      const kx = startX + sk.u * spanX;
+      const kArcY = (Math.pow(sk.u - 0.25, 2) * 1.4 - 0.25) * rad * 0.65 + sk.offset;
+      const kTwinkle = 0.6 + Math.sin(this.time * 3.0 + sk.u * 10) * 0.4;
+
+      this.ctx.beginPath();
+      this.ctx.arc(kx, kArcY, sk.r, 0, Math.PI * 2);
+      this.ctx.fillStyle = sk.c;
+      this.ctx.shadowColor = sk.c;
+      this.ctx.shadowBlur = 8 * kTwinkle;
+      this.ctx.globalAlpha = kTwinkle * hover;
       this.ctx.fill();
     }
+    this.ctx.globalAlpha = 1.0;
 
     this.ctx.restore();
   }
@@ -5784,11 +6203,11 @@ class BackgroundUniverseEngine {
     const sunRadius = Math.min(this.width, this.height) * 0.055 + 28;
 
     // The Sun (Sol) Anchor (Dark Mode / Right)
-    const planetBaseX = isMobile ? cx : cx + (this.width * 0.24);
-    const planetBaseY = isMobile ? cy - 10 : cy - (this.height * 0.04);
+    const planetBaseX = isMobile ? cx : Math.max(cx + (this.width * 0.26), this.width * 0.74);
+    const planetBaseY = isMobile ? Math.min(cy - 40, this.height * 0.35) : cy - (this.height * 0.07);
     const saturnX = planetBaseX - (mouseNormX * 35);
     const saturnY = planetBaseY - (mouseNormY * 35) + (this.scrollProgress * 120);
-    const saturnRadius = isMobile ? 68 : 108;
+    const saturnRadius = isMobile ? 60 : 105;
 
     // Fluid Gravitational Drag Arc
     const dragArc = Math.sin(easedT * Math.PI) * (this.height * 0.08);
