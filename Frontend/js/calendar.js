@@ -85,6 +85,14 @@ class AetheraCalendarApp {
     return typeof key === 'string' && key.length >= 15;
   }
 
+  getLocale() {
+    return (window.aetheraI18n && window.aetheraI18n.getLanguage() === 'id') ? 'id-ID' : 'en-US';
+  }
+
+  isId() {
+    return !!(window.aetheraI18n && window.aetheraI18n.getLanguage() === 'id');
+  }
+
   async init() {
     this.initTheme();
     this.initURLParams();
@@ -106,6 +114,12 @@ class AetheraCalendarApp {
     window.addEventListener('aethera:calendar-event-deleted', () => this.refreshData());
     window.addEventListener('aethera:calendar-events-batch-saved', () => this.refreshData());
     window.addEventListener('aethera:calendar-events-cleared', () => this.refreshData());
+
+    // Instant reactivity to platform language changes
+    window.addEventListener('aethera:language-change', () => {
+      this.render();
+      this.syncCustomSelects();
+    });
   }
 
   /* --------------------------------------------------------------------------
@@ -268,7 +282,10 @@ class AetheraCalendarApp {
 
     // 8. Clean Workspace / Reset Calendar Button
     document.getElementById('cal-sidebar-clear-btn')?.addEventListener('click', async () => {
-      if (confirm('Clear all events from this calendar for a clean slate? This action cannot be undone.')) {
+      const confirmMsg = this.isId()
+        ? 'Hapus semua acara dari kalender ini untuk memulai dari awal? Tindakan ini tidak dapat dibatalkan.'
+        : 'Clear all events from this calendar for a clean slate? This action cannot be undone.';
+      if (confirm(confirmMsg)) {
         if (window.aetheraDB) {
           await window.aetheraDB.clearAllCalendarEvents();
         }
@@ -354,20 +371,21 @@ class AetheraCalendarApp {
   updateHeaderTitle() {
     const titleEl = document.getElementById('cal-current-date-title');
     if (!titleEl) return;
+    const locale = this.getLocale();
 
     if (this.currentView === 'week') {
       const weekDays = this.getWeekDays(this.currentDate);
       const start = weekDays[0];
       const end = weekDays[6];
-      const startMonth = start.toLocaleDateString([], { month: 'short' });
-      const endMonth = end.toLocaleDateString([], { month: 'short' });
+      const startMonth = start.toLocaleDateString(locale, { month: 'short' });
+      const endMonth = end.toLocaleDateString(locale, { month: 'short' });
       if (startMonth === endMonth) {
         titleEl.textContent = `${startMonth} ${start.getDate()} – ${end.getDate()}, ${start.getFullYear()}`;
       } else {
         titleEl.textContent = `${startMonth} ${start.getDate()} – ${endMonth} ${end.getDate()}, ${start.getFullYear()}`;
       }
     } else {
-      titleEl.textContent = this.currentDate.toLocaleDateString([], { month: 'long', year: 'numeric' });
+      titleEl.textContent = this.currentDate.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     }
   }
 
@@ -463,7 +481,7 @@ class AetheraCalendarApp {
     if (dayEvents.length > maxChips) {
       const more = document.createElement('div');
       more.className = 'cal-more-chip';
-      more.textContent = `+${dayEvents.length - maxChips} more`;
+      more.textContent = this.isId() ? `+${dayEvents.length - maxChips} lainnya` : `+${dayEvents.length - maxChips} more`;
       eventsContainer.appendChild(more);
     }
 
@@ -502,7 +520,7 @@ class AetheraCalendarApp {
     // 1. Build Day Column Headers
     headerContainer.innerHTML = `
       <div style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); display:flex; align-items:center; justify-content:center;">
-        TIME
+        ${this.isId() ? 'WAKTU' : 'TIME'}
       </div>
     `;
 
@@ -515,7 +533,7 @@ class AetheraCalendarApp {
       colTitle.className = `cal-week-col-title${isToday ? ' is-today' : ''}${isSelected ? ' is-selected' : ''}`;
       colTitle.style.cursor = 'pointer';
       colTitle.innerHTML = `
-        <span class="cal-week-col-name">${day.toLocaleDateString([], { weekday: 'short' })}</span>
+        <span class="cal-week-col-name">${day.toLocaleDateString(this.getLocale(), { weekday: 'short' })}</span>
         <span class="cal-week-col-date">${day.getDate()}</span>
       `;
       colTitle.addEventListener('click', () => {
@@ -658,38 +676,43 @@ class AetheraCalendarApp {
     });
 
     // Empty states with clean, professional quadrant design
+    const isId = this.isId();
     const quadrantMeta = [
       {
         list: q1List,
         quadrant: 'Q1',
-        title: 'No Urgent Crises',
-        desc: 'Pressing deadlines & emergencies appear here',
+        title: isId ? 'Tidak Ada Krisis Mendesak' : 'No Urgent Crises',
+        desc: isId ? 'Tenggat waktu mendesak & keadaan darurat muncul di sini' : 'Pressing deadlines & emergencies appear here',
+        btnText: isId ? '+ Tambah ke Q1' : '+ Add to Q1',
         icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
       },
       {
         list: q2List,
         quadrant: 'Q2',
-        title: 'Deep Work & Growth',
-        desc: 'Strategic planning, study & high-impact projects',
+        title: isId ? 'Fokus & Pertumbuhan' : 'Deep Work & Growth',
+        desc: isId ? 'Perencanaan strategis, belajar & proyek penting' : 'Strategic planning, study & high-impact projects',
+        btnText: isId ? '+ Tambah ke Q2' : '+ Add to Q2',
         icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
       },
       {
         list: q3List,
         quadrant: 'Q3',
-        title: 'No Urgent Interruptions',
-        desc: 'Delegated tasks, quick syncs & batch items',
+        title: isId ? 'Tanpa Gangguan Mendesak' : 'No Urgent Interruptions',
+        desc: isId ? 'Tugas delegasi, sinkronisasi cepat & tugas berkala' : 'Delegated tasks, quick syncs & batch items',
+        btnText: isId ? '+ Tambah ke Q3' : '+ Add to Q3',
         icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>'
       },
       {
         list: q4List,
         quadrant: 'Q4',
-        title: 'Backlog Clear',
-        desc: 'Routine maintenance & personal recharge',
+        title: isId ? 'Daftar Bersih' : 'Backlog Clear',
+        desc: isId ? 'Pemeliharaan rutin & pemulihan pribadi' : 'Routine maintenance & personal recharge',
+        btnText: isId ? '+ Tambah ke Q4' : '+ Add to Q4',
         icon: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>'
       }
     ];
 
-    quadrantMeta.forEach(({ list, quadrant, title, desc, icon }) => {
+    quadrantMeta.forEach(({ list, quadrant, title, desc, btnText, icon }) => {
       if (list.children.length === 0) {
         const empty = document.createElement('div');
         empty.className = 'cal-quadrant-empty-state';
@@ -697,7 +720,7 @@ class AetheraCalendarApp {
           <div class="cal-quadrant-empty-icon">${icon}</div>
           <div class="cal-quadrant-empty-title">${title}</div>
           <div class="cal-quadrant-empty-desc">${desc}</div>
-          <button type="button" class="cal-quadrant-quick-add-btn">+ Add to ${quadrant}</button>
+          <button type="button" class="cal-quadrant-quick-add-btn">${btnText}</button>
         `;
         empty.querySelector('.cal-quadrant-quick-add-btn').addEventListener('click', (e) => {
           e.stopPropagation();
@@ -717,22 +740,23 @@ class AetheraCalendarApp {
     container.innerHTML = '';
 
     const events = this.getFilteredEvents();
+    const isId = this.isId();
     if (events.length === 0) {
       container.innerHTML = `
         <div class="cal-agenda-empty-state">
           <div class="cal-agenda-empty-icon-wrap">
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </div>
-          <h3 class="cal-agenda-empty-title">Your Schedule is Clean</h3>
-          <p class="cal-agenda-empty-desc">No events or tasks scheduled. Click below to schedule an event or let the Cortex AI Assistant plan your day automatically.</p>
+          <h3 class="cal-agenda-empty-title">${isId ? 'Jadwal Anda Bersih' : 'Your Schedule is Clean'}</h3>
+          <p class="cal-agenda-empty-desc">${isId ? 'Tidak ada acara atau tugas terjadwal. Klik di bawah untuk menjadwalkan acara atau biarkan Asisten Cortex AI merencanakan hari Anda secara otomatis.' : 'No events or tasks scheduled. Click below to schedule an event or let the Cortex AI Assistant plan your day automatically.'}</p>
           <div class="cal-agenda-empty-actions">
             <button type="button" id="agenda-empty-add-btn" class="cal-btn-add-event">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span>Schedule New Event</span>
+              <span>${isId ? 'Jadwalkan Acara Baru' : 'Schedule New Event'}</span>
             </button>
             <button type="button" id="agenda-empty-ai-btn" class="btn-ai-plan-today" style="width: auto; padding: 0.5rem 1.15rem;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>Auto-Plan with AI</span>
+              <span>${isId ? 'Rencanakan Otomatis dengan AI' : 'Auto-Plan with AI'}</span>
             </button>
           </div>
         </div>
@@ -761,8 +785,8 @@ class AetheraCalendarApp {
 
       groupEl.innerHTML = `
         <div class="cal-agenda-date-heading">
-          <span>${d.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</span>
-          ${isToday ? `<span class="cal-agenda-date-badge">TODAY</span>` : ''}
+          <span>${d.toLocaleDateString(this.getLocale(), { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          ${isToday ? `<span class="cal-agenda-date-badge">${isId ? 'HARI INI' : 'TODAY'}</span>` : ''}
         </div>
         <div class="cal-agenda-items" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
       `;
@@ -824,17 +848,10 @@ class AetheraCalendarApp {
 
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
-    title.textContent = this.currentDate.toLocaleDateString([], { month: 'short', year: 'numeric' });
+    title.textContent = this.currentDate.toLocaleDateString(this.getLocale(), { month: 'short', year: 'numeric' });
 
-    grid.innerHTML = `
-      <div class="cal-mini-day-label">M</div>
-      <div class="cal-mini-day-label">T</div>
-      <div class="cal-mini-day-label">W</div>
-      <div class="cal-mini-day-label">T</div>
-      <div class="cal-mini-day-label">F</div>
-      <div class="cal-mini-day-label">S</div>
-      <div class="cal-mini-day-label">S</div>
-    `;
+    const dayLabels = this.isId() ? ['S', 'S', 'R', 'K', 'J', 'S', 'M'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    grid.innerHTML = dayLabels.map(l => `<div class="cal-mini-day-label">${l}</div>`).join('');
 
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
@@ -881,10 +898,11 @@ class AetheraCalendarApp {
     if (!dateLabel || !tasksList) return;
 
     const d = new Date(this.selectedDate + 'T12:00:00');
-    dateLabel.textContent = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+    dateLabel.textContent = d.toLocaleDateString(this.getLocale(), { weekday: 'short', month: 'short', day: 'numeric' });
 
     tasksList.innerHTML = '';
     const dayEvents = this.getEventsForDate(this.selectedDate);
+    const isId = this.isId();
 
     if (dayEvents.length === 0) {
       tasksList.innerHTML = `
@@ -892,10 +910,10 @@ class AetheraCalendarApp {
           <div class="cal-inspector-empty-icon-wrap">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
           </div>
-          <div class="cal-inspector-empty-title">Schedule Clear</div>
-          <div class="cal-inspector-empty-desc">No events scheduled for ${d.toLocaleDateString([], { month: 'short', day: 'numeric' })}.</div>
+          <div class="cal-inspector-empty-title">${isId ? 'Jadwal Bersih' : 'Schedule Clear'}</div>
+          <div class="cal-inspector-empty-desc">${isId ? `Tidak ada acara terjadwal untuk ${d.toLocaleDateString(this.getLocale(), { month: 'short', day: 'numeric' })}.` : `No events scheduled for ${d.toLocaleDateString([], { month: 'short', day: 'numeric' })}.`}</div>
           <button type="button" class="cal-inspector-empty-add-btn" id="inspector-empty-add-btn">
-            + Schedule Event
+            ${isId ? '+ Jadwalkan Acara' : '+ Schedule Event'}
           </button>
         </div>
       `;
@@ -974,9 +992,14 @@ class AetheraCalendarApp {
     const totalDay = dayEvents.length;
     const completedDay = dayEvents.filter(e => e.completed).length;
     const pct = totalDay > 0 ? Math.round((completedDay / totalDay) * 100) : 0;
+    const isId = this.isId();
 
     if (ratioEl) {
-      ratioEl.textContent = totalDay === 0 ? 'Schedule Clear' : `${completedDay} / ${totalDay} Done (${pct}%)`;
+      if (totalDay === 0) {
+        ratioEl.textContent = isId ? 'Jadwal Bersih' : 'Schedule Clear';
+      } else {
+        ratioEl.textContent = isId ? `${completedDay} / ${totalDay} Selesai (${pct}%)` : `${completedDay} / ${totalDay} Done (${pct}%)`;
+      }
     }
     if (pctLabel) {
       pctLabel.textContent = `${pct}%`;
@@ -996,7 +1019,11 @@ class AetheraCalendarApp {
     });
     const hrs = (deepMins / 60).toFixed(1);
     if (deepworkHoursEl) {
-      deepworkHoursEl.textContent = totalDay === 0 ? 'No tasks today' : `${hrs} hrs Deep Work`;
+      if (totalDay === 0) {
+        deepworkHoursEl.textContent = isId ? 'Tidak ada tugas hari ini' : 'No tasks today';
+      } else {
+        deepworkHoursEl.textContent = isId ? `${hrs} jam Fokus Mendalam` : `${hrs} hrs Deep Work`;
+      }
     }
   }
 
@@ -1064,7 +1091,8 @@ class AetheraCalendarApp {
   }
 
   async deleteEvent(eventId) {
-    if (confirm('Delete this event from your calendar?')) {
+    const confirmMsg = this.isId() ? 'Hapus acara ini dari kalender Anda?' : 'Delete this event from your calendar?';
+    if (confirm(confirmMsg)) {
       if (window.aetheraDB) {
         await window.aetheraDB.deleteCalendarEvent(eventId);
       }
@@ -1089,7 +1117,7 @@ class AetheraCalendarApp {
     const modalTitle = document.getElementById('cal-modal-title');
 
     if (event) {
-      modalTitle.textContent = 'Edit Calendar Event';
+      modalTitle.textContent = this.isId() ? 'Edit Acara Kalender' : 'Edit Calendar Event';
       idInput.value = event.id;
       titleInput.value = event.title;
       dateInput.value = event.date;
@@ -1099,7 +1127,7 @@ class AetheraCalendarApp {
       quadInput.value = event.priority || 'Q2';
       notesInput.value = event.notes || '';
     } else {
-      modalTitle.textContent = 'Create Calendar Event';
+      modalTitle.textContent = this.isId() ? 'Buat Acara Kalender' : 'Create Calendar Event';
       idInput.value = '';
       titleInput.value = '';
       dateInput.value = defaultDate || this.selectedDate;
@@ -1312,13 +1340,13 @@ class AetheraCalendarApp {
     const targetDate = document.getElementById('ai-schedule-target-date')?.value || this.selectedDate;
 
     if (!promptText) {
-      alert('Please describe your to-dos, meetings, or daily goals.');
+      alert(this.isId() ? 'Harap jelaskan tugas, rapat, atau tujuan harian Anda.' : 'Please describe your to-dos, meetings, or daily goals.');
       return;
     }
 
     this.isGeneratingAI = true;
     const btnText = document.getElementById('ai-generate-btn-text');
-    if (btnText) btnText.textContent = 'Formulating Schedule...';
+    if (btnText) btnText.textContent = this.isId() ? 'Menyusun Jadwal...' : 'Formulating Schedule...';
 
     const hasValidKey = this.hasValidCloudKey();
     if (!hasValidKey) {
@@ -1330,7 +1358,7 @@ class AetheraCalendarApp {
         }
         this.displayParsedAIEvents(parsed, targetDate);
         this.isGeneratingAI = false;
-        if (btnText) btnText.textContent = 'Generate Schedule';
+        if (btnText) btnText.textContent = this.isId() ? 'Buat Jadwal' : 'Generate Schedule';
       }, 400);
       return;
     }
@@ -1346,9 +1374,10 @@ class AetheraCalendarApp {
       targetModel = 'gemini-3.6-flash';
     }
 
+    const langInstruction = this.isId() ? '\nIMPORTANT: Respond and generate all event and task titles/descriptions in natural Indonesian (Bahasa Indonesia).' : '';
     const systemInstruction = `You are master productivity planner. Organize the user's tasks into:
 1) Eisenhower Matrix Priorities (Q1 Urgent & Important, Q2 Deep Work, Q3 Delegate, Q4 Personal/Eliminate).
-2) Time-blocked schedule from 08:00 to 22:00 with realistic start and end times (format: HH:MM - HH:MM: Task Description).`;
+2) Time-blocked schedule from 08:00 to 22:00 with realistic start and end times (format: HH:MM - HH:MM: Task Description).${langInstruction}`;
 
     const payload = {
       model: targetModel,
@@ -1396,7 +1425,7 @@ class AetheraCalendarApp {
       this.displayParsedAIEvents(fallbackParsed, targetDate);
     } finally {
       this.isGeneratingAI = false;
-      if (btnText) btnText.textContent = 'Generate Schedule';
+      if (btnText) btnText.textContent = this.isId() ? 'Buat Jadwal' : 'Generate Schedule';
     }
   }
 
@@ -1409,7 +1438,7 @@ class AetheraCalendarApp {
     if (!section || !container) return;
 
     if (eventsList.length === 0) {
-      container.innerHTML = `<div style="font-size: 0.78rem; color: var(--text-muted); font-style: italic;">Could not detect specific time blocks. Try specifying times (e.g. 9am to 11am Deep Work).</div>`;
+      container.innerHTML = `<div style="font-size: 0.78rem; color: var(--text-muted); font-style: italic;">${this.isId() ? 'Tidak dapat mendeteksi blok waktu tertentu. Coba tentukan waktu (mis. 09:00 - 11:00 Fokus Mendalam).' : 'Could not detect specific time blocks. Try specifying times (e.g. 9am to 11am Deep Work).'}</div>`;
       section.style.display = 'block';
       return;
     }
@@ -1451,7 +1480,7 @@ class AetheraCalendarApp {
     });
 
     if (selectedEvents.length === 0) {
-      alert('Please select at least one event to import.');
+      alert(this.isId() ? 'Harap pilih minimal satu acara untuk diimpor.' : 'Please select at least one event to import.');
       return;
     }
 

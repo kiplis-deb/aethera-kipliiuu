@@ -2,11 +2,11 @@
   "name": "aethera",
   "version": "4.0.0",
   "description": "Aethera AI Studio & Secure AI Proxy Server",
-  "main": "server/server.js",
+  "main": "Backend/server.js",
   "scripts": {
-    "start": "node server/server.js",
-    "dev": "node server/server.js",
-    "server": "node server/server.js"
+    "start": "node Backend/server.js",
+    "dev": "node Backend/server.js",
+    "server": "node Backend/server.js"
   },
   "keywords": [
     "aethera",
@@ -14,5 +14,8 @@
     "gemini-proxy"
   ],
   "author": "Aethera",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.109.0"
+  }
 }

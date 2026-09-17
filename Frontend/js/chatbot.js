@@ -102,21 +102,16 @@ class AetheraChatbot {
     this.bindImageUpload();
   }
 
+  isId() {
+    return !!(window.aetheraI18n && window.aetheraI18n.currentLang === 'id');
+  }
+
   renderWidget() {
     if (document.getElementById('aethera-chatbot-container')) return;
 
     const container = document.createElement('div');
     container.id = 'aethera-chatbot-container';
     container.innerHTML = `
-      <!-- Floating Launcher Pill Button -->
-      <button id="chatbot-launcher" class="chatbot-launcher-btn" aria-label="Open Aethera AI Chatbot" title="Chat with Aethera AI">
-        <span class="chatbot-status-dot"></span>
-        <div class="chatbot-launcher-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </div>
-        <span>Aethera Chat</span>
-      </button>
-
       <!-- Floating Chatbot Window Dialog -->
       <div id="chatbot-window" class="chatbot-window" role="dialog" aria-modal="true" aria-hidden="true">
         <!-- Header -->
@@ -126,8 +121,8 @@ class AetheraChatbot {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
             </div>
             <div>
-              <div class="chatbot-title">Aethera Assistant</div>
-              <div class="chatbot-status-text" id="chatbot-status-subtext">Active // Gemini AI &amp; Vision</div>
+              <div class="chatbot-title" data-i18n="chatbot.title">Aethera Assistant</div>
+              <div class="chatbot-status-text" id="chatbot-status-subtext" data-i18n="chatbot.status">Active // Gemini AI &amp; Vision</div>
             </div>
           </div>
           <div class="chatbot-header-actions">
@@ -142,7 +137,7 @@ class AetheraChatbot {
 
         <!-- Messenger Style Message Stream -->
         <div id="chatbot-messages" class="chatbot-messages">
-          <div class="chatbot-date-pill">Today</div>
+          <div class="chatbot-date-pill" data-i18n="chatbot.today">Today</div>
           
           <!-- Initial Welcome Message from Bot -->
           <div class="chatbot-msg-row bot">
@@ -150,8 +145,8 @@ class AetheraChatbot {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
             </div>
             <div class="chatbot-bubble">
-              <div class="msg-text">
-                <p>Hey there! 👋 I'm <strong>Aethera</strong>. How's your day going? Feel free to chat about anything on your mind, bounce ideas around, share what you're working on, or drop a picture!</p>
+              <div class="msg-text" id="chatbot-welcome-text">
+                <p data-i18n="chatbot.welcome">Hey there! 👋 I'm <strong>Aethera</strong>. How's your day going? Feel free to chat about anything on your mind, bounce ideas around, share what you're working on, or drop a picture!</p>
               </div>
               <div class="msg-meta">
                 <span>${this.getCurrentTime()}</span>
@@ -162,10 +157,10 @@ class AetheraChatbot {
 
         <!-- Suggestion Chips -->
         <div class="chatbot-suggestions">
-          <div class="chatbot-chip" data-query="Plan tomorrow: 9am deep work & 2pm meeting">📅 Plan Tomorrow</div>
-          <div class="chatbot-chip" data-query="Schedule a study session tomorrow at 3pm">📚 Schedule Study</div>
-          <div class="chatbot-chip" data-query="How's your day going? Let's chat!">How's your day going?</div>
-          <div class="chatbot-chip" data-query="Help me plan some fun, relaxing things to do this weekend">Weekend Ideas</div>
+          <div class="chatbot-chip" data-i18n="chatbot.chip_note" data-query-en="Make a note: Project roadmap with 4 milestones" data-query-id="Buat catatan: Rencana proyek dengan 4 tahapan" data-query="Make a note: Project roadmap with 4 milestones">📝 Make a Note</div>
+          <div class="chatbot-chip" data-i18n="chatbot.chip_plan" data-query-en="Plan tomorrow: 9am deep work & 2pm meeting" data-query-id="Rencanakan besok: 09.00 fokus mendalam & 14.00 rapat" data-query="Plan tomorrow: 9am deep work & 2pm meeting">📅 Plan Tomorrow</div>
+          <div class="chatbot-chip" data-i18n="chatbot.chip_study" data-query-en="Schedule a study session tomorrow at 3pm" data-query-id="Jadwalkan sesi belajar besok jam 15.00" data-query="Schedule a study session tomorrow at 3pm">📚 Schedule Study</div>
+          <div class="chatbot-chip" data-i18n="chatbot.chip_chat" data-query-en="How's your day going? Let's chat!" data-query-id="Bagaimana harimu berjalan? Mari mengobrol!" data-query="How's your day going?">How's your day going?</div>
         </div>
 
         <!-- Chatbot Image Attachment Preview Bar -->
@@ -184,12 +179,12 @@ class AetheraChatbot {
 
         <!-- Input Area -->
         <div class="chatbot-input-area" id="chatbot-drop-zone">
-          <button id="chatbot-attach-btn" class="chatbot-attach-btn" title="Attach Image or Screenshot (or paste with Ctrl+V)" type="button">
+          <button id="chatbot-attach-btn" class="chatbot-attach-btn" title="Attach Image or Screenshot (or paste with Ctrl+V)" data-i18n-title="chatbot.attach_title" type="button">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
           </button>
           <input type="file" id="chatbot-image-input" accept="image/*" style="display: none;">
 
-          <textarea id="chatbot-input" class="chatbot-input" placeholder="Message Aethera..." rows="1"></textarea>
+          <textarea id="chatbot-input" class="chatbot-input" placeholder="Message Aethera..." data-i18n-placeholder="chatbot.placeholder" rows="1"></textarea>
           <button id="chatbot-send-btn" class="chatbot-send-btn" title="Send Message">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
@@ -198,17 +193,18 @@ class AetheraChatbot {
     `;
 
     document.body.appendChild(container);
+    if (window.aetheraI18n) {
+      window.aetheraI18n.applyTranslations(container);
+    }
   }
 
   bindEvents() {
-    const launcher = document.getElementById('chatbot-launcher');
     const closeBtn = document.getElementById('chatbot-close-btn');
     const clearBtn = document.getElementById('chatbot-clear-btn');
     const sendBtn = document.getElementById('chatbot-send-btn');
     const input = document.getElementById('chatbot-input');
     const chips = document.querySelectorAll('.chatbot-chip');
 
-    if (launcher) launcher.addEventListener('click', () => this.toggleWindow());
     if (closeBtn) closeBtn.addEventListener('click', () => this.closeWindow());
     if (clearBtn) clearBtn.addEventListener('click', () => this.clearChat());
 
@@ -228,12 +224,20 @@ class AetheraChatbot {
 
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
-        const query = chip.getAttribute('data-query');
+        const isId = this.isId();
+        const query = (isId ? chip.getAttribute('data-query-id') : chip.getAttribute('data-query-en')) || chip.getAttribute('data-query');
         if (query && input) {
           input.value = query;
           this.sendMessage();
         }
       });
+    });
+
+    window.addEventListener('aethera:language-change', () => {
+      const container = document.getElementById('aethera-chatbot-container');
+      if (container && window.aetheraI18n) {
+        window.aetheraI18n.applyTranslations(container);
+      }
     });
   }
 
@@ -601,6 +605,7 @@ class AetheraChatbot {
 
       // Check for structured calendar plan
       let planEvents = [];
+      let noteToCreate = null;
       let cleanedReply = botReply;
 
       const planMatch = botReply.match(/```(?:calendar_plan|json:calendar_events|calendar_events)\s*([\s\S]*?)```/i);
@@ -612,7 +617,7 @@ class AetheraChatbot {
           } else if (parsed && Array.isArray(parsed.events)) {
             planEvents = parsed.events;
           }
-          cleanedReply = botReply.replace(/```(?:calendar_plan|json:calendar_events|calendar_events)\s*[\s\S]*?```/gi, '').trim();
+          cleanedReply = cleanedReply.replace(/```(?:calendar_plan|json:calendar_events|calendar_events)\s*[\s\S]*?```/gi, '').trim();
         } catch (e) {
           console.warn('[Chatbot] Failed to parse calendar_plan JSON:', e);
         }
@@ -620,6 +625,22 @@ class AetheraChatbot {
         // Fallback schedule extraction if the model formulated a schedule in plain text
         const targetDate = this.parseNaturalDate(text);
         planEvents = this.extractScheduleEvents(botReply, targetDate);
+      }
+
+      // Check for structured note creation
+      const noteMatch = botReply.match(/```(?:note_creation|json:note_creation|notes_create|note)\s*([\s\S]*?)```/i);
+      if (noteMatch) {
+        try {
+          const parsed = JSON.parse(noteMatch[1].trim());
+          if (parsed && (parsed.title || parsed.blocks)) {
+            noteToCreate = parsed;
+          }
+          cleanedReply = cleanedReply.replace(/```(?:note_creation|json:note_creation|notes_create|note)\s*[\s\S]*?```/gi, '').trim();
+        } catch (e) {
+          console.warn('[Chatbot] Failed to parse note_creation JSON:', e);
+        }
+      } else if (this.isNoteCreationQuery(text)) {
+        noteToCreate = this.extractNoteDataFromText(text, botReply);
       }
 
       this.history.push({
@@ -633,6 +654,13 @@ class AetheraChatbot {
         const savedEvents = await this.savePlannedEventsToCalendar(planEvents, this.parseNaturalDate(text));
         if (row && savedEvents.length > 0) {
           this.attachCalendarCard(row, savedEvents);
+        }
+      }
+
+      if (noteToCreate) {
+        const savedNote = await this.createNoteInWorkspace(noteToCreate);
+        if (row && savedNote) {
+          this.attachNoteCard(row, savedNote);
         }
       }
 
@@ -765,6 +793,31 @@ class AetheraChatbot {
         return;
       }
 
+      // Check if user is asking to create a note in Aethera Notes
+      if (this.isNoteCreationQuery(qText)) {
+        const noteResult = this.generateSimulatedNote(qText);
+        let reply = noteResult.reply;
+        if (options.notice) {
+          reply = `> *${options.notice}*\n\n` + reply;
+        }
+
+        this.history.push({
+          role: 'model',
+          parts: [{ text: reply }]
+        });
+
+        const row = this.appendMessage('bot', reply, null, false);
+
+        if (noteResult.note) {
+          this.createNoteInWorkspace(noteResult.note).then(savedNote => {
+            if (row && savedNote) {
+              this.attachNoteCard(row, savedNote);
+            }
+          });
+        }
+        return;
+      }
+
       let reply = "";
       const q = (qText || "").toLowerCase();
 
@@ -876,16 +929,18 @@ class AetheraChatbot {
      AETHERA CALENDAR & AI PLANNER INTEGRATION
      -------------------------------------------------------------------------- */
   getDynamicSystemInstruction() {
+    const isId = this.isId();
     const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const dateStr = now.toLocaleDateString(isId ? 'id-ID' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const isoDate = this.formatDateISO(now);
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const timeStr = now.toLocaleTimeString(isId ? 'id-ID' : 'en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const langDirective = isId ? `\n\nBAHASA DIRECTIVE: The user interface is currently in Bahasa Indonesia. You MUST converse with the user naturally, warmly, and fluently in Bahasa Indonesia. However, keep calendar_plan and note_creation JSON keys standard in English.` : '';
 
     return `${this.systemInstruction}
 
 CURRENT REAL-WORLD DATE & TIME CONTEXT:
 - Today is ${dateStr} (ISO Date: ${isoDate}).
-- Current local time: ${timeStr}.
+- Current local time: ${timeStr}.${langDirective}
 
 INTEGRATED AETHERA CALENDAR & SCHEDULER:
 You are directly connected to the user's interactive Aethera Calendar.
@@ -910,7 +965,31 @@ Rules for calendar_plan:
 - Always resolve relative dates ("tomorrow", "Monday", "next week", "today") to exact YYYY-MM-DD based on today (${isoDate}).
 - Times must be in 24-hour format HH:MM (e.g. "09:00", "14:30"). If only a start time is given, set endTime 1 hour later.
 - Categories: "deep-work" (focus/coding/design), "meeting" (calls/syncs), "study" (learning/homework/exams), "deadline" (deliverables/urgent), "personal" (meals/gym/wellness/rest), "work" (general professional tasks).
-- ONLY output the \`\`\`calendar_plan block if the user specifically asked to plan, schedule, or put events on their calendar.`;
+- ONLY output the \`\`\`calendar_plan block if the user specifically asked to plan, schedule, or put events on their calendar.
+
+INTEGRATED AETHERA NOTES WORKSPACE:
+You are directly connected to the user's interactive Aethera Notes workspace.
+When the user asks, commands, or instructs you to create, make, take, draft, or write a note (e.g. "make a note about X", "create a note called Grocery List with milk, eggs, bread", "take a note: call doctor tomorrow", "draft meeting notes for project sync", "buat catatan tentang ...", "catat ini ..."):
+1. Formulate a rich, well-organized note structure with a clear descriptive title, an appropriate emoji icon, and high-quality structured content blocks.
+2. At the very end of your response, output a structured JSON block tagged with \`\`\`note_creation:
+\`\`\`note_creation
+{
+  "title": "Clear Note Title",
+  "icon": "📄" (or relevant emoji: 💡, 📋, 🛒, 💻, 📐, 🎯, 🚀, 📖, 💰, 🛡️, etc.),
+  "folder": "Private",
+  "blocks": [
+    { "type": "callout", "text": "High-level summary or focus", "icon": "💡" },
+    { "type": "h2", "text": "Key Points" },
+    { "type": "bullet", "text": "First strategic point" },
+    { "type": "bullet", "text": "Second strategic point" },
+    { "type": "h2", "text": "Action Items" },
+    { "type": "todo", "text": "Specific task to complete", "checked": false }
+  ]
+}
+\`\`\`
+Supported block types: "p" (paragraph), "h1", "h2", "h3" (headings), "bullet" (bullet list), "number" (numbered list), "todo" (checklist with checked boolean), "callout" (callout box with emoji icon), "code" (code snippet), "divider" (horizontal line).
+3. Confirm in your conversational reply that you've created the note and placed it directly into their Aethera Notes workspace.
+- ONLY output the \`\`\`note_creation block if the user specifically asked to create or take a note.`;
   }
 
   isPlanningQuery(text) {
@@ -1086,9 +1165,10 @@ Rules for calendar_plan:
   }
 
   generateSimulatedPlan(query) {
+    const isId = this.isId();
     const targetDate = this.parseNaturalDate(query);
     const dateObj = new Date(targetDate + 'T12:00:00');
-    const formattedDate = dateObj.toLocaleDateString('en-US', {
+    const formattedDate = dateObj.toLocaleDateString(isId ? 'id-ID' : 'en-US', {
       weekday: 'long',
       month: 'short',
       day: 'numeric',
@@ -1128,7 +1208,7 @@ Rules for calendar_plan:
               category,
               priority: prio.priority,
               quadrant: prio.quadrant,
-              notes: 'Planned via Aethera Assistant',
+              notes: isId ? 'Direncanakan lewat Asisten Aethera' : 'Planned via Aethera Assistant',
               completed: false,
               createdAt: new Date().toISOString()
             });
@@ -1165,7 +1245,7 @@ Rules for calendar_plan:
           category,
           priority: prio.priority,
           quadrant: prio.quadrant,
-          notes: 'Planned via Aethera Assistant',
+          notes: isId ? 'Direncanakan lewat Asisten Aethera' : 'Planned via Aethera Assistant',
           completed: false,
           createdAt: new Date().toISOString()
         });
@@ -1173,7 +1253,14 @@ Rules for calendar_plan:
     }
 
     if (events.length === 0) {
-      const template = [
+      const template = isId ? [
+        { title: 'Fokus Pagi & Persiapan Hari', start: '08:30', end: '09:30', cat: 'personal', prio: 'Q4', quad: 'Tidak Mendesak, Tidak Penting' },
+        { title: 'Sesi Fokus Mendalam // Target Inti', start: '09:30', end: '12:00', cat: 'deep-work', prio: 'Q2', quad: 'Penting, Tidak Mendesak' },
+        { title: 'Istirahat Siang & Pemulihan Energi', start: '12:00', end: '13:00', cat: 'personal', prio: 'Q4', quad: 'Tidak Mendesak, Tidak Penting' },
+        { title: 'Sinkronisasi Tim & Koordinasi', start: '13:00', end: '14:30', cat: 'meeting', prio: 'Q3', quad: 'Mendesak, Tidak Penting' },
+        { title: 'Eksekusi & Implementasi Tugas', start: '14:30', end: '16:30', cat: 'work', prio: 'Q2', quad: 'Penting, Tidak Mendesak' },
+        { title: 'Evaluasi Harian & Pembelajaran', start: '16:30', end: '17:30', cat: 'study', prio: 'Q2', quad: 'Penting, Tidak Mendesak' }
+      ] : [
         { title: 'Morning Focus & Day Setup', start: '08:30', end: '09:30', cat: 'personal', prio: 'Q4', quad: 'Not Urgent, Not Important' },
         { title: 'Deep Work Session // Core Objectives', start: '09:30', end: '12:00', cat: 'deep-work', prio: 'Q2', quad: 'Important, Not Urgent' },
         { title: 'Lunch Break & Mind Recharge', start: '12:00', end: '13:00', cat: 'personal', prio: 'Q4', quad: 'Not Urgent, Not Important' },
@@ -1191,7 +1278,7 @@ Rules for calendar_plan:
         category: t.cat,
         priority: t.prio,
         quadrant: t.quad,
-        notes: 'Planned via Aethera Assistant',
+        notes: isId ? 'Direncanakan lewat Asisten Aethera' : 'Planned via Aethera Assistant',
         completed: false,
         createdAt: new Date().toISOString()
       }));
@@ -1200,11 +1287,21 @@ Rules for calendar_plan:
     let reply = "";
     if (events.length === 1) {
       const ev = events[0];
-      reply = `I've got you covered! 😊 I planned your **${ev.title}** and put it directly on your calendar for **${formattedDate}** from **${ev.startTime} to ${ev.endTime}**.\n\nYou can click **Open in Calendar** below to check it out or jump straight to your schedule!`;
+      if (isId) {
+        reply = `Tentu saja! 😊 Saya sudah merencanakan **${ev.title}** dan menambahkannya langsung ke kalender Anda untuk tanggal **${formattedDate}** pukul **${ev.startTime} sampai ${ev.endTime}**.\n\nKlik **Buka di Kalender** di bawah untuk melihatnya langsung!`;
+      } else {
+        reply = `I've got you covered! 😊 I planned your **${ev.title}** and put it directly on your calendar for **${formattedDate}** from **${ev.startTime} to ${ev.endTime}**.\n\nYou can click **Open in Calendar** below to check it out or jump straight to your schedule!`;
+      }
     } else {
-      reply = `I've planned out your day for **${formattedDate}** and put **${events.length} schedule blocks** directly on your calendar:\n\n` +
-        events.map(e => `* **${e.startTime} – ${e.endTime}**: ${e.title} *(${e.category.replace('-', ' ')})*`).join('\n') +
-        `\n\nAll tasks have been organized with Eisenhower Matrix priorities. Let me know if you want to make any adjustments!`;
+      if (isId) {
+        reply = `Saya sudah merencanakan jadwal hari Anda untuk tanggal **${formattedDate}** dan menambahkan **${events.length} sesi kegiatan** langsung ke kalender Anda:\n\n` +
+          events.map(e => `* **${e.startTime} – ${e.endTime}**: ${e.title} *(${e.category.replace('-', ' ')})*`).join('\n') +
+          `\n\nSemua tugas telah dikelompokkan dengan prioritas Matriks Eisenhower. Beri tahu saya jika ada yang ingin disesuaikan!`;
+      } else {
+        reply = `I've planned out your day for **${formattedDate}** and put **${events.length} schedule blocks** directly on your calendar:\n\n` +
+          events.map(e => `* **${e.startTime} – ${e.endTime}**: ${e.title} *(${e.category.replace('-', ' ')})*`).join('\n') +
+          `\n\nAll tasks have been organized with Eisenhower Matrix priorities. Let me know if you want to make any adjustments!`;
+      }
     }
 
     return { reply, events };
@@ -1236,7 +1333,7 @@ Rules for calendar_plan:
         category: cat,
         priority: e.priority || prio.priority,
         quadrant: e.quadrant || prio.quadrant,
-        notes: e.notes || 'Planned via Aethera Assistant',
+        notes: e.notes || (this.isId() ? 'Direncanakan lewat Asisten Aethera' : 'Planned via Aethera Assistant'),
         completed: false,
         createdAt: new Date().toISOString()
       };
@@ -1265,13 +1362,14 @@ Rules for calendar_plan:
   }
 
   createCalendarCardElement(events) {
+    const isId = this.isId();
     const card = document.createElement('div');
     card.className = 'chatbot-calendar-card';
 
     const firstEvent = events[0];
     const eventDate = firstEvent.date;
     const dateObj = new Date(eventDate + 'T12:00:00');
-    const friendlyDate = dateObj.toLocaleDateString('en-US', {
+    const friendlyDate = dateObj.toLocaleDateString(isId ? 'id-ID' : 'en-US', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -1297,11 +1395,15 @@ Rules for calendar_plan:
       `;
     }).join('');
 
+    const statusTitle = isPlural
+      ? (isId ? `${events.length} Kegiatan Ditambahkan ke Kalender` : `${events.length} Events Added to Calendar`)
+      : (isId ? 'Ditambahkan ke Kalender' : 'Added to Calendar');
+
     card.innerHTML = `
       <div class="chatbot-cal-card-header">
         <div class="chatbot-cal-status">
           <span class="chatbot-cal-dot"></span>
-          <span>${isPlural ? `${events.length} Events Added to Calendar` : 'Added to Calendar'}</span>
+          <span>${statusTitle}</span>
         </div>
         <span class="chatbot-cal-date-badge">📅 ${friendlyDate}</span>
       </div>
@@ -1313,10 +1415,10 @@ Rules for calendar_plan:
       <div class="chatbot-cal-card-footer">
         <button type="button" class="chatbot-cal-btn-view" data-date="${eventDate}">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span>Open in Calendar</span>
+          <span>${isId ? 'Buka di Kalender' : 'Open in Calendar'}</span>
         </button>
-        <button type="button" class="chatbot-cal-btn-undo" title="Remove from calendar">
-          <span>Undo</span>
+        <button type="button" class="chatbot-cal-btn-undo" title="${isId ? 'Hapus dari kalender' : 'Remove from calendar'}">
+          <span>${isId ? 'Urungkan' : 'Undo'}</span>
         </button>
       </div>
     `;
@@ -1329,11 +1431,11 @@ Rules for calendar_plan:
           window.aetheraCalendar.selectedDate = eventDate;
           window.aetheraCalendar.currentDate = new Date(eventDate + 'T12:00:00');
           window.aetheraCalendar.render();
-          viewBtn.innerHTML = `<span>✓ Showing on Calendar</span>`;
+          viewBtn.innerHTML = `<span>${isId ? '✓ Ditampilkan di Kalender' : '✓ Showing on Calendar'}</span>`;
           setTimeout(() => {
             viewBtn.innerHTML = `
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              <span>Open in Calendar</span>
+              <span>${isId ? 'Buka di Kalender' : 'Open in Calendar'}</span>
             `;
           }, 2000);
         } else {
@@ -1347,7 +1449,7 @@ Rules for calendar_plan:
       undoBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         undoBtn.disabled = true;
-        undoBtn.textContent = 'Removing...';
+        undoBtn.textContent = isId ? 'Menghapus...' : 'Removing...';
 
         if (window.aetheraDB) {
           for (const evt of events) {
@@ -1358,7 +1460,371 @@ Rules for calendar_plan:
         card.classList.add('is-undone');
         const footer = card.querySelector('.chatbot-cal-card-footer');
         if (footer) {
-          footer.innerHTML = `<div class="chatbot-cal-undone-notice">✓ Removed ${events.length > 1 ? 'events' : 'event'} from calendar</div>`;
+          footer.innerHTML = `<div class="chatbot-cal-undone-notice">${isId ? `✓ ${events.length > 1 ? 'Kegiatan' : 'Kegiatan'} telah dihapus dari kalender` : `✓ Removed ${events.length > 1 ? 'events' : 'event'} from calendar`}</div>`;
+        }
+      });
+    }
+
+    return card;
+  }
+
+  /* --------------------------------------------------------------------------
+     AETHERA NOTES WORKSPACE INTEGRATION
+     -------------------------------------------------------------------------- */
+  isNoteCreationQuery(text) {
+    if (!text || typeof text !== 'string') return false;
+    const lower = text.toLowerCase().trim();
+
+    const noteCommands = [
+      /\b(make|create|take|write|draft|start|add|generate|jot\s*down)\s+(me\s+)?(a\s+)?(new\s+)?note\b/i,
+      /\b(make|create|take|write|draft|add|generate)\s+notes?\b/i,
+      /\b(note\s*this|note\s*down|take\s*a\s*note|save\s*(this\s*)?(as\s*)?(a\s*)?note)\b/i,
+      /\bnew\s+note\s*[:\-]/i,
+      /\b(buat|bikin|tulis|buatkan|catat)\s*(kan\s*)?(sebuah\s*)?(catatan|note|notes)\b/i,
+      /\bcatat\s+(ini|tentang)\b/i
+    ];
+
+    return noteCommands.some(rgx => rgx.test(lower));
+  }
+
+  generateSimulatedNote(query, botReply = '') {
+    // 1. Extract Title
+    let title = '';
+    const quoteMatch = query.match(/["']([^"']+)["']/);
+    const titleMatch = quoteMatch ||
+      query.match(/(?:called|titled|named)\s+([^\n,.;]+?)(?:\s+(?:with|containing|including)\s+|[,.;\n]|$)/i) ||
+      query.match(/(?:about|for|on)\s+([^\n,.;]+?)(?:\s+(?:with|containing|including)\s+|[,.;\n]|$)/i) ||
+      query.match(/note\s*[:\-]\s*([^,.;\n]+)/i);
+
+    if (titleMatch && titleMatch[1]) {
+      title = titleMatch[1].trim();
+      title = title.replace(/^(the|a|an|my|our)\s+/i, '');
+    } else {
+      title = query
+        .replace(/^(can you\s+)?(please\s+)?(make|create|take|write|draft|add|generate|buat|bikin|tulis|catat)\s+(me\s+)?(a\s+)?(new\s+)?(note|notes|catatan)\s*(about|for|on|titled|called|:|-)?/gi, '')
+        .replace(/\s+(with|containing|including)\s+.*/i, '')
+        .replace(/^[\s,;:\-–—]+|[\s,;:\-–—?!.]+$/g, '')
+        .trim();
+    }
+
+    if (!title || title.length < 2) {
+      title = 'Quick Note';
+    } else {
+      title = title.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    // 2. Infer Icon
+    let icon = '📄';
+    const lowerTitle = (title + ' ' + query).toLowerCase();
+    if (/\b(meet|meeting|meetings|sync|standup|\bcall\b|agenda|rapat)\b/i.test(lowerTitle)) icon = '📋';
+    else if (/\b(grocer|grocery|shop|shopping|buy|market|supermarket|belanja)\b/i.test(lowerTitle)) icon = '🛒';
+    else if (/\b(code|coding|dev|program|software|api|bug|koding)\b/i.test(lowerTitle)) icon = '💻';
+    else if (/\b(study|studying|math|physics|exam|biology|chemistry|belajar|kuliah)\b/i.test(lowerTitle)) icon = '📐';
+    else if (/\b(project|roadmap|plan|goal|strategy|target)\b/i.test(lowerTitle)) icon = '🎯';
+    else if (/\b(idea|brainstorm|creative|concept|inovasi)\b/i.test(lowerTitle)) icon = '💡';
+    else if (/\b(gym|workout|fitness|diet|health|olahraga)\b/i.test(lowerTitle)) icon = '💪';
+    else if (/\b(music|song|album|audio|lagu)\b/i.test(lowerTitle)) icon = '🎵';
+    else if (/\b(travel|trip|flight|hotel|vacation|liburan)\b/i.test(lowerTitle)) icon = '✈️';
+    else if (/\b(money|budget|finance|expense|crypto|keuangan)\b/i.test(lowerTitle)) icon = '💰';
+    else if (/\b(sec|security|cyber|hack|audit|auth|keamanan)\b/i.test(lowerTitle)) icon = '🛡️';
+
+    // 3. Build Blocks
+    let blocks = [];
+    const commaParts = query.split(/[,;\n]+/).map(p => p.trim()).filter(p => p.length > 1);
+
+    if (commaParts.length >= 3) {
+      blocks.push({
+        id: 'b1',
+        type: 'callout',
+        text: `Items for ${title}`,
+        icon: icon
+      });
+      blocks.push({ id: 'b2', type: 'h2', text: 'Action Items' });
+      commaParts.forEach((part, i) => {
+        let itemText = part
+          .replace(/^(make|create|take|write)\s+(me\s+)?(a\s+)?note\s*(about|called|with|:)?/gi, '')
+          .replace(/^(and\s+|also\s+)/i, '')
+          .trim();
+        if (itemText.length > 1) {
+          blocks.push({
+            id: 'b_' + (i + 3),
+            type: 'todo',
+            text: itemText.charAt(0).toUpperCase() + itemText.slice(1),
+            checked: false
+          });
+        }
+      });
+    } else {
+      blocks = [
+        {
+          id: 'b1',
+          type: 'callout',
+          text: `Structured briefing and action notes on ${title}.`,
+          icon: icon
+        },
+        { id: 'b2', type: 'h2', text: 'Overview' },
+        { id: 'b3', type: 'p', text: `Key context and strategic considerations regarding ${title}.` },
+        { id: 'b4', type: 'h2', text: 'Key Deliverables' },
+        { id: 'b5', type: 'bullet', text: 'Establish core baseline requirements' },
+        { id: 'b6', type: 'bullet', text: 'Validate cross-device execution flow' },
+        { id: 'b7', type: 'bullet', text: 'Ensure milestone alignment across stakeholders' },
+        { id: 'b8', type: 'h2', text: 'Next Steps' },
+        { id: 'b9', type: 'todo', text: `Review ${title} implementation details`, checked: false },
+        { id: 'b10', type: 'todo', text: 'Share updates with collaborators', checked: false }
+      ];
+    }
+
+    const note = {
+      title,
+      icon,
+      folder: 'Private',
+      blocks
+    };
+
+    const isId = this.isId();
+    const reply = isId
+      ? `Saya telah membuat catatan baru untuk Anda berjudul **${title}** dengan ${blocks.length} blok terstruktur! 📝\n\nCatatan tersimpan di ruang kerja Catatan Aethera Anda. Klik **Buka Catatan** di bawah untuk melihat atau mengeditnya kapan saja!`
+      : `I've created a new note for you titled **${title}** with ${blocks.length} structured blocks! 📝\n\nIt's saved and open on your Aethera Notes workspace, synced to your account across all your devices. Click **Open Note** below to view or edit it anytime!`;
+
+    return { reply, note };
+  }
+
+  extractNoteDataFromText(userPrompt, botReply) {
+    if (!botReply) return null;
+
+    let title = '';
+    const headingMatch = botReply.match(/^#+\s+(.+)$/m);
+    if (headingMatch) {
+      title = headingMatch[1].replace(/[*_#]/g, '').trim();
+    } else {
+      const sim = this.generateSimulatedNote(userPrompt, botReply);
+      title = sim.note.title;
+    }
+
+    const sim = this.generateSimulatedNote(userPrompt, botReply);
+    const icon = sim.note.icon || '📄';
+
+    const lines = botReply.split('\n');
+    const blocks = [];
+
+    lines.forEach((line, idx) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+
+      let type = 'p';
+      let text = trimmed;
+      let checked = false;
+
+      if (/^###\s+/.test(trimmed)) {
+        type = 'h3';
+        text = trimmed.replace(/^###\s+/, '');
+      } else if (/^##\s+/.test(trimmed)) {
+        type = 'h2';
+        text = trimmed.replace(/^##\s+/, '');
+      } else if (/^#\s+/.test(trimmed)) {
+        type = 'h1';
+        text = trimmed.replace(/^#\s+/, '');
+      } else if (/^-\s*\[x\]\s+/i.test(trimmed) || /^\*\s*\[x\]\s+/i.test(trimmed)) {
+        type = 'todo';
+        checked = true;
+        text = trimmed.replace(/^[-*]\s*\[x\]\s+/i, '');
+      } else if (/^-\s*\[\s*\]\s+/i.test(trimmed) || /^\*\s*\[\s*\]\s+/i.test(trimmed)) {
+        type = 'todo';
+        checked = false;
+        text = trimmed.replace(/^[-*]\s*\[\s*\]\s+/i, '');
+      } else if (/^[-*]\s+/.test(trimmed)) {
+        type = 'bullet';
+        text = trimmed.replace(/^[-*]\s+/, '');
+      } else if (/^\d+\.\s+/.test(trimmed)) {
+        type = 'number';
+        text = trimmed.replace(/^\d+\.\s+/, '');
+      } else if (/^>\s+/.test(trimmed)) {
+        type = 'callout';
+        text = trimmed.replace(/^>\s+/, '');
+      }
+
+      text = text.replace(/^\*\*(.*?)\*\*$/, '$1').trim();
+
+      if (text.length > 0) {
+        blocks.push({
+          id: 'b_' + Date.now() + '_' + idx,
+          type,
+          text,
+          checked,
+          icon: type === 'callout' ? icon : null
+        });
+      }
+    });
+
+    if (blocks.length === 0) {
+      blocks.push({ id: 'b1', type: 'p', text: botReply.trim() });
+    }
+
+    return {
+      title,
+      icon,
+      folder: 'Private',
+      blocks
+    };
+  }
+
+  async createNoteInWorkspace(noteData) {
+    if (!noteData) return null;
+
+    const noteId = 'note_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+    const title = (noteData.title || 'Untitled Note').trim();
+    const icon = noteData.icon || '📄';
+    const folder = noteData.folder || 'Private';
+
+    let rawBlocks = noteData.blocks || [];
+    if (!Array.isArray(rawBlocks) || rawBlocks.length === 0) {
+      rawBlocks = [{ type: 'p', text: noteData.content || '' }];
+    }
+
+    const validatedBlocks = rawBlocks.map((b, idx) => {
+      let bType = b.type || 'p';
+      if (!['p', 'h1', 'h2', 'h3', 'bullet', 'number', 'todo', 'callout', 'code', 'divider', 'quote'].includes(bType)) {
+        bType = 'p';
+      }
+      return {
+        id: b.id || ('b_' + Date.now() + '_' + idx),
+        type: bType,
+        text: (b.text || '').trim(),
+        checked: !!b.checked,
+        icon: b.icon || (bType === 'callout' ? '💡' : null)
+      };
+    });
+
+    const fullNote = {
+      id: noteId,
+      title: title,
+      icon: icon,
+      cover: noteData.cover || null,
+      folder: folder,
+      favorite: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      blocks: validatedBlocks
+    };
+
+    if (window.aetheraNotesApp) {
+      window.aetheraNotesApp.createNewNoteFromAI(fullNote);
+    } else if (window.aetheraDB) {
+      await window.aetheraDB.ready();
+      window.aetheraDB.saveNote(fullNote);
+      localStorage.setItem('aethera_last_opened_note', fullNote.id);
+    } else {
+      try {
+        const stored = JSON.parse(localStorage.getItem('aethera_user_notes') || '[]');
+        stored.unshift(fullNote);
+        localStorage.setItem('aethera_user_notes', JSON.stringify(stored));
+        localStorage.setItem('aethera_last_opened_note', fullNote.id);
+      } catch (e) {}
+    }
+
+    return fullNote;
+  }
+
+  attachNoteCard(row, note) {
+    if (!row || !note) return;
+    const bubble = row.querySelector('.chatbot-bubble');
+    const meta = row.querySelector('.msg-meta');
+    if (!bubble) return;
+
+    const card = this.createNoteCardElement(note);
+    if (meta) {
+      bubble.insertBefore(card, meta);
+    } else {
+      bubble.appendChild(card);
+    }
+    this.scrollToBottom();
+  }
+
+  createNoteCardElement(note) {
+    const isId = this.isId();
+    const card = document.createElement('div');
+    card.className = 'chatbot-note-card';
+
+    const snippetBlocks = (note.blocks || []).slice(0, 3);
+    const snippetHtml = snippetBlocks.map(b => {
+      let prefix = '• ';
+      if (b.type === 'todo') prefix = b.checked ? '☑ ' : '☐ ';
+      else if (b.type === 'h1' || b.type === 'h2' || b.type === 'h3') prefix = '# ';
+      else if (b.type === 'callout') prefix = `${b.icon || '💡'} `;
+      return `<div class="chatbot-note-preview-item">${prefix}${this.escapeHtml(b.text || '')}</div>`;
+    }).join('');
+
+    const statusTitle = isId ? 'Dibuat di Catatan Aethera' : 'Created in Aethera Notes';
+    const folderText = note.folder === 'Private' || !note.folder ? (isId ? 'Pribadi' : 'Private') : note.folder;
+    const metaText = isId
+      ? `${note.blocks ? note.blocks.length : 0} blok • ${folderText} • Tersinkronisasi ke Cloud`
+      : `${note.blocks ? note.blocks.length : 0} blocks • ${folderText} • Synced to Cloud`;
+
+    card.innerHTML = `
+      <div class="chatbot-note-card-header">
+        <div class="chatbot-note-status">
+          <span class="chatbot-note-dot"></span>
+          <span>${statusTitle}</span>
+        </div>
+        <span class="chatbot-note-icon-badge">${note.icon || '📄'}</span>
+      </div>
+
+      <div class="chatbot-note-body">
+        <div class="chatbot-note-title">
+          <span>${note.icon || '📄'}</span>
+          <span>${this.escapeHtml(note.title || (isId ? 'Halaman Baru' : 'Untitled'))}</span>
+        </div>
+        <div class="chatbot-note-meta">${metaText}</div>
+        ${snippetHtml ? `<div class="chatbot-note-preview-list">${snippetHtml}</div>` : ''}
+      </div>
+
+      <div class="chatbot-note-card-footer">
+        <button type="button" class="chatbot-note-btn-open">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>${isId ? 'Buka Catatan' : 'Open Note'}</span>
+        </button>
+        <button type="button" class="chatbot-note-btn-undo" title="${isId ? 'Hapus catatan' : 'Delete note'}">
+          <span>${isId ? 'Urungkan' : 'Undo'}</span>
+        </button>
+      </div>
+    `;
+
+    const openBtn = card.querySelector('.chatbot-note-btn-open');
+    if (openBtn) {
+      openBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (window.aetheraNotesApp) {
+          window.aetheraNotesApp.openNote(note.id);
+          openBtn.innerHTML = `<span>${isId ? '✓ Catatan Dibuka' : '✓ Opened Note'}</span>`;
+          setTimeout(() => {
+            openBtn.innerHTML = `
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>${isId ? 'Buka Catatan' : 'Open Note'}</span>
+            `;
+          }, 2000);
+        } else {
+          window.location.href = `notes.html?id=${encodeURIComponent(note.id)}`;
+        }
+      });
+    }
+
+    const undoBtn = card.querySelector('.chatbot-note-btn-undo');
+    if (undoBtn) {
+      undoBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        undoBtn.disabled = true;
+        undoBtn.textContent = isId ? 'Menghapus...' : 'Removing...';
+
+        if (window.aetheraNotesApp) {
+          window.aetheraNotesApp.deleteNote(note.id, false);
+        } else if (window.aetheraDB) {
+          await window.aetheraDB.deleteNote(note.id);
+        }
+
+        card.classList.add('is-undone');
+        const footer = card.querySelector('.chatbot-note-card-footer');
+        if (footer) {
+          footer.innerHTML = `<div class="chatbot-cal-undone-notice">${isId ? '✓ Catatan dihapus dari ruang kerja' : '✓ Removed note from workspace'}</div>`;
         }
       });
     }

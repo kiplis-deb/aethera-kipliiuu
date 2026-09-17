@@ -52,12 +52,19 @@
       this.init();
     }
 
+    isId() {
+      return !!(window.aetheraI18n && window.aetheraI18n.getLang() === 'id');
+    }
+
     init() {
       if (document.getElementById('aethera-music-wrapper')) return;
       this.render();
       this.bindElements();
       this.bindEvents();
       this.initYouTube();
+      if (window.aetheraI18n && this.card) {
+        window.aetheraI18n.applyTranslations(this.card);
+      }
     }
 
     render() {
@@ -77,7 +84,7 @@
                   <circle cx="6" cy="18" r="3"></circle>
                   <circle cx="18" cy="16" r="3"></circle>
                 </svg>
-                <span id="music-header-text">Play a music</span>
+                <span id="music-header-text" data-i18n="music.title">Play a music</span>
               </span>
             </div>
             <div class="music-card-header-actions">
@@ -103,19 +110,20 @@
                   id="music-prompt-input" 
                   class="music-prompt-input" 
                   placeholder="Type any music title from YouTube Music..." 
+                  data-i18n-placeholder="music.placeholder"
                   value=""
                   autocomplete="off"
                   spellcheck="false"
                 />
                 <button type="submit" id="music-play-btn" class="music-submit-btn">
-                  <span>Play</span>
+                  <span data-i18n="music.play">Play</span>
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                     <polygon points="5 3 19 12 5 21 5 3"/>
                   </svg>
                 </button>
                 <button type="button" id="music-add-queue-btn" class="music-queue-input-btn" title="Add to Queue">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  <span>Queue</span>
+                  <span data-i18n="music.queue">Queue</span>
                 </button>
               </div>
             </form>
@@ -129,7 +137,7 @@
                 <img id="music-art-img" class="music-art-img" src="" alt="Album Artwork" />
               </div>
               <div class="music-info-meta">
-                <div id="music-now-playing-title" class="music-now-playing-text">No track selected</div>
+                <div id="music-now-playing-title" class="music-now-playing-text" data-i18n="music.no_track">No track selected</div>
                 <div id="music-artist-name" class="music-artist-name">YouTube Music</div>
               </div>
               <div class="music-sound-waves" id="music-sound-waves" title="Audio Visualizer">
@@ -172,17 +180,17 @@
                     <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"/>
                     <line x1="19" y1="4" x2="19" y2="20" stroke="currentColor"/>
                   </svg>
-                  <span>Autoplay</span>
+                  <span data-i18n="music.autoplay">Autoplay</span>
                   <span id="music-autoplay-badge" class="music-autoplay-badge active">ON</span>
                 </button>
                 <button id="music-queue-btn" class="music-queue-toggle-btn" title="View / Manage Music Queue">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                  <span>Queue</span>
+                  <span data-i18n="music.queue">Queue</span>
                   <span id="music-queue-counter" class="music-queue-badge">0</span>
                 </button>
                 <button id="music-switch-btn" class="music-change-track-btn" title="Search another song">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                  <span>Search</span>
+                  <span data-i18n="music.search">Search</span>
                 </button>
               </div>
             </div>
@@ -191,29 +199,29 @@
             <div id="music-queue-drawer" class="music-queue-drawer" style="display: none;">
               <div class="music-queue-drawer-header">
                 <div class="music-queue-drawer-title">
-                  <span>Up Next in Queue</span>
+                  <span data-i18n="music.up_next">Up Next in Queue</span>
                   <span id="music-queue-subcount" class="music-queue-subcount">(0 songs)</span>
                 </div>
                 <div class="music-queue-header-actions">
                   <button type="button" id="music-drawer-autoplay-btn" class="music-drawer-autoplay-btn active" title="Toggle Autoplay">
                     Autoplay: <span id="music-drawer-autoplay-status">ON</span>
                   </button>
-                  <button type="button" id="music-queue-clear-btn" class="music-queue-clear-btn" title="Clear all queued songs">Clear</button>
+                  <button type="button" id="music-queue-clear-btn" class="music-queue-clear-btn" title="Clear all queued songs" data-i18n="music.clear">Clear</button>
                 </div>
               </div>
 
               <!-- Inline Quick Add Input inside Drawer -->
               <form id="music-queue-quick-add-form" class="music-queue-quick-add-form" onsubmit="return false;">
-                <input type="text" id="music-queue-quick-input" class="music-queue-quick-input" placeholder="Queue next song..." autocomplete="off" spellcheck="false" />
+                <input type="text" id="music-queue-quick-input" class="music-queue-quick-input" placeholder="Queue next song..." data-i18n-placeholder="music.queue_placeholder" autocomplete="off" spellcheck="false" />
                 <button type="submit" id="music-queue-quick-submit" class="music-queue-quick-submit" title="Add to Queue">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  <span>Add</span>
+                  <span data-i18n="music.add">Add</span>
                 </button>
               </form>
 
               <!-- Dynamic Queue Items -->
               <div id="music-queue-items" class="music-queue-items">
-                <div class="music-queue-empty">Queue is empty. Add songs above!</div>
+                <div class="music-queue-empty" data-i18n="music.queue_empty">Queue is empty. Add songs above!</div>
               </div>
             </div>
 
@@ -567,6 +575,27 @@
       this.audio.addEventListener('play', () => this.setPlayingUIState(true));
       this.audio.addEventListener('pause', () => this.setPlayingUIState(false));
       this.audio.addEventListener('error', () => this.onAudioError());
+
+      // Language change reactive listener
+      window.addEventListener('aethera:language-change', () => {
+        if (window.aetheraI18n && this.card) {
+          window.aetheraI18n.applyTranslations(this.card);
+        }
+        const isPlaying = this.playingView && this.playingView.style.display !== 'none';
+        if (isPlaying) {
+          if (this.headerText) {
+            this.headerText.textContent = this.isId() ? 'Sedang Diputar' : 'Now Playing';
+          }
+          if (this.currentTrack && this.currentTrack.title) {
+            const prefix = this.isId() ? 'Memutar' : 'Playing';
+            this.nowPlayingTitle.textContent = `${prefix} ${this.currentTrack.title}`;
+            if (this.islandLabel) this.islandLabel.textContent = `${prefix} ${this.currentTrack.title}`;
+          }
+        } else if (this.headerText) {
+          this.headerText.textContent = this.isId() ? 'Putar Musik' : 'Play a music';
+        }
+        this.updateQueueUI();
+      });
     }
 
     /* --- NOTIFICATION IDLE & ANIMATION CONTROLLER --- */
@@ -948,10 +977,11 @@
       this.hasEnforcedBeginning = false;
 
       // Update UI matching "Example two: Playing [Song Name]"
-      this.nowPlayingTitle.textContent = `Playing ${track.title}`;
+      const playPrefix = this.isId() ? 'Memutar' : 'Playing';
+      this.nowPlayingTitle.textContent = `${playPrefix} ${track.title}`;
       this.artistName.textContent = track.artist || 'YouTube Music';
       this.artImg.src = track.art || track.thumbnail;
-      this.islandLabel.textContent = `Playing ${track.title}`;
+      this.islandLabel.textContent = `${playPrefix} ${track.title}`;
       this.curTime.textContent = '0:00';
       this.totTime.textContent = '--:--';
       this.progressFill.style.width = '0%';
@@ -994,10 +1024,11 @@
       this.lastPlayedTrack = track;
 
       // Update UI matching "Example two: Playing [Song Name]"
-      this.nowPlayingTitle.textContent = `Playing ${track.title}`;
+      const playPrefix = this.isId() ? 'Memutar' : 'Playing';
+      this.nowPlayingTitle.textContent = `${playPrefix} ${track.title}`;
       this.artistName.textContent = track.artist || 'Aethera Music';
       this.artImg.src = track.art;
-      this.islandLabel.textContent = `Playing ${track.title}`;
+      this.islandLabel.textContent = `${playPrefix} ${track.title}`;
 
       // Switch to Playing View
       this.showPlayingView();
@@ -1030,10 +1061,11 @@
         query: songName
       };
 
-      this.nowPlayingTitle.textContent = `Playing ${songName}`;
+      const playPrefix = this.isId() ? 'Memutar' : 'Playing';
+      this.nowPlayingTitle.textContent = `${playPrefix} ${songName}`;
       this.artistName.textContent = 'Aethera Ambient Harmonic Flow';
       this.artImg.src = this.currentTrack.art;
-      this.islandLabel.textContent = `Playing ${songName}`;
+      this.islandLabel.textContent = `${playPrefix} ${songName}`;
       this.curTime.textContent = '0:00';
       this.totTime.textContent = '∞';
       this.progressFill.style.width = '100%';
@@ -1091,7 +1123,7 @@
     showPlayingView() {
       this.inputView.style.display = 'none';
       this.playingView.style.display = 'flex';
-      this.headerText.textContent = 'Now Playing';
+      this.headerText.textContent = this.isId() ? 'Sedang Diputar' : 'Now Playing';
       this.resetIdleTimer();
       setTimeout(() => this.updateControlsScroll(), 60);
     }
@@ -1123,7 +1155,7 @@
     showInputView() {
       this.inputView.style.display = 'flex';
       this.playingView.style.display = 'none';
-      this.headerText.textContent = 'Play a music';
+      this.headerText.textContent = this.isId() ? 'Putar Musik' : 'Play a music';
       this.promptInput.focus();
       this.isTyping = true;
       this.clearIdleTimer();
@@ -1447,25 +1479,26 @@
           this.nextBtn.disabled = false;
           this.nextBtn.style.opacity = '1';
           this.nextBtn.style.cursor = 'pointer';
-          this.nextBtn.title = `Skip to next song (${this.queue[0].title})`;
+          this.nextBtn.title = this.isId() ? `Lanjut ke lagu berikutnya (${this.queue[0].title})` : `Skip to next song (${this.queue[0].title})`;
         } else {
           this.nextBtn.disabled = true;
           this.nextBtn.style.opacity = '0.4';
           this.nextBtn.style.cursor = 'not-allowed';
-          this.nextBtn.title = 'Queue is empty';
+          this.nextBtn.title = this.isId() ? 'Antrean kosong' : 'Queue is empty';
         }
       }
 
       // Render queue items list
       if (!this.queueItems) return;
       if (count === 0) {
+        const emptyMsg = this.isId() ? 'Antrean kosong. Tambahkan lagu di atas!' : 'Queue is empty. Add songs above!';
         this.queueItems.innerHTML = `
-          <div class="music-queue-empty">
+          <div class="music-queue-empty" data-i18n="music.queue_empty">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
               <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
               <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
             </svg>
-            <span>Queue is empty. Add songs above!</span>
+            <span>${emptyMsg}</span>
           </div>
         `;
         return;

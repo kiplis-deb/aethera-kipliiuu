@@ -15,9 +15,10 @@
   <link rel="stylesheet" href="css/style.css?v=3.9.9">
   <link rel="stylesheet" href="css/components.css?v=3.9.9">
   <link rel="stylesheet" href="css/ai-studio.css?v=3.9.7">
-  <link rel="stylesheet" href="css/chatbot.css?v=3.9.7">
+  <link rel="stylesheet" href="css/chatbot.css?v=4.0.1">
   <link rel="stylesheet" href="css/music-player.css?v=1.0.0">
-  <link rel="stylesheet" href="css/quick-access.css?v=1.0.0">
+  <link rel="stylesheet" href="css/quick-access.css?v=1.0.2">
+  <link rel="stylesheet" href="css/i18n.css?v=1.0.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
   <!-- KaTeX Math Rendering Engine -->
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
@@ -39,11 +40,19 @@
     <div class="studio-header-left">
       <a href="index.html" class="studio-back-link" title="Return to Homepage">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        <span>Overview</span>
+        <span data-i18n="studio.overview">Overview</span>
       </a>
       <a href="calendar.html" class="studio-back-link" title="Interactive Calendar" style="margin-left: 0.35rem;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span>Calendar</span>
+        <span data-i18n="studio.calendar">Calendar</span>
+      </a>
+      <a href="notes.html" class="studio-back-link" title="Smart Notes Workspace" style="margin-left: 0.35rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span data-i18n="nav.notes">Notes</span>
+      </a>
+      <a href="news.html" class="studio-back-link" title="Tech & Business News" style="margin-left: 0.35rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+        <span data-i18n="nav.news">Tech News</span>
       </a>
       <div class="header-divider"></div>
       <div class="nav-brand">
@@ -55,12 +64,12 @@
         </div>
         <span>Aethera Cortex</span>
       </div>
-      <span class="studio-free-badge">100% FREE ACCESS</span>
+      <span class="studio-free-badge" data-i18n="studio.free_badge">100% FREE ACCESS</span>
 
       <!-- Mobile Tool Selector Drawer Trigger -->
       <button id="mobile-tool-btn" class="mobile-tool-btn" aria-label="Open Tool Selector" aria-expanded="false" title="Switch AI Tool">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        <span>Tools</span>
+        <span data-i18n="studio.tools">Tools</span>
       </button>
     </div>
 
@@ -73,7 +82,7 @@
     <div class="studio-header-right">
       <!-- API Status HUD -->
       <div class="studio-status-item">
-        <span style="color: var(--text-muted);">API STATUS:</span>
+        <span style="color: var(--text-muted);" data-i18n="studio.api_status">API STATUS:</span>
         <span class="hud-value" style="color: var(--text-primary);" id="studio-api-status-val">CONNECTED // LIVE</span>
       </div>
       <div id="navbar-auth-slot"></div>
@@ -82,7 +91,7 @@
         <svg class="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
       </button>
       <button id="clear-chat-btn" class="btn btn-secondary" style="padding: 0.4rem 0.9rem; font-size: 0.78rem;">
-        <span>Clear Session</span>
+        <span data-i18n="studio.clear_session">Clear Session</span>
       </button>
     </div>
   </header>
@@ -98,7 +107,7 @@
       
       <!-- Mobile Drawer Header -->
       <div class="mobile-sidebar-header">
-        <span class="mobile-sidebar-title">Select AI Tool (14+)</span>
+        <span class="mobile-sidebar-title" data-i18n="studio.select_tool">Select AI Tool (14+)</span>
         <button id="mobile-sidebar-close" class="mobile-sidebar-close-btn" aria-label="Close tools menu">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -110,7 +119,7 @@
       <!-- Section 1: General Assistant -->
       <div class="sidebar-category-accordion is-open" data-category="chatbot">
         <button class="sidebar-category-header" type="button" aria-expanded="true">
-          <span class="category-header-title">CONVERSATIONAL AI</span>
+          <span class="category-header-title" data-i18n="studio.cat_conversational">CONVERSATIONAL AI</span>
           <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -121,8 +130,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Friendly Chat</span>
-              <span class="mode-sub">Talk about anything on your mind</span>
+              <span class="mode-title" data-i18n="studio.tool_chatbot_title">Friendly Chat</span>
+              <span class="mode-sub" data-i18n="studio.tool_chatbot_sub">Talk about anything on your mind</span>
             </div>
           </button>
         </div>
@@ -131,7 +140,7 @@
       <!-- Section 2: Daily Life & Workers -->
       <div class="sidebar-category-accordion" data-category="daily">
         <button class="sidebar-category-header" type="button" aria-expanded="false">
-          <span class="category-header-title">DAILY LIFE &amp; WORK</span>
+          <span class="category-header-title" data-i18n="studio.cat_daily">DAILY LIFE &amp; WORK</span>
           <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -142,8 +151,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Email &amp; Message Helper</span>
-              <span class="mode-sub">Kind, clear messages &amp; quick replies</span>
+              <span class="mode-title" data-i18n="studio.tool_email_title">Email &amp; Message Helper</span>
+              <span class="mode-sub" data-i18n="studio.tool_email_sub">Kind, clear messages &amp; quick replies</span>
             </div>
           </button>
 
@@ -152,8 +161,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Quick Summarizer</span>
-              <span class="mode-sub">Turn long reads into easy takeaways</span>
+              <span class="mode-title" data-i18n="studio.tool_doc_title">Quick Summarizer</span>
+              <span class="mode-sub" data-i18n="studio.tool_doc_sub">Turn long reads into easy takeaways</span>
             </div>
           </button>
 
@@ -162,8 +171,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Day &amp; Routine Planner</span>
-              <span class="mode-sub">Organize your to-dos with calm focus</span>
+              <span class="mode-title" data-i18n="studio.tool_task_title">Day &amp; Routine Planner</span>
+              <span class="mode-sub" data-i18n="studio.tool_task_sub">Organize your to-dos with calm focus</span>
             </div>
           </button>
 
@@ -172,8 +181,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Job &amp; Resume Coach</span>
-              <span class="mode-sub">Polished resumes &amp; warm cover letters</span>
+              <span class="mode-title" data-i18n="studio.tool_resume_title">Job &amp; Resume Coach</span>
+              <span class="mode-sub" data-i18n="studio.tool_resume_sub">Polished resumes &amp; warm cover letters</span>
             </div>
           </button>
 
@@ -182,8 +191,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Language &amp; Grammar Friend</span>
-              <span class="mode-sub">Natural translations &amp; friendly phrasing</span>
+              <span class="mode-title" data-i18n="studio.tool_trans_title">Language &amp; Grammar Friend</span>
+              <span class="mode-sub" data-i18n="studio.tool_trans_sub">Natural translations &amp; friendly phrasing</span>
             </div>
           </button>
         </div>
@@ -192,7 +201,7 @@
       <!-- Section 3: Students & Academic -->
       <div class="sidebar-category-accordion" data-category="student">
         <button class="sidebar-category-header" type="button" aria-expanded="false">
-          <span class="category-header-title">STUDY &amp; LEARNING</span>
+          <span class="category-header-title" data-i18n="studio.cat_study">STUDY &amp; LEARNING</span>
           <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -203,8 +212,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19L9 4l4 16 7-14"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Step-by-Step Math Tutor</span>
-              <span class="mode-sub">Clear explanations that make sense</span>
+              <span class="mode-title" data-i18n="studio.tool_math_title">Step-by-Step Math Tutor</span>
+              <span class="mode-sub" data-i18n="studio.tool_math_sub">Clear explanations that make sense</span>
             </div>
           </button>
 
@@ -213,8 +222,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Essay &amp; Writing Partner</span>
-              <span class="mode-sub">Brainstorm ideas, outlines &amp; drafts</span>
+              <span class="mode-title" data-i18n="studio.tool_essay_title">Essay &amp; Writing Partner</span>
+              <span class="mode-sub" data-i18n="studio.tool_essay_sub">Brainstorm ideas, outlines &amp; drafts</span>
             </div>
           </button>
 
@@ -223,8 +232,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Study Buddy &amp; Flashcards</span>
-              <span class="mode-sub">Bite-sized quizzes &amp; practice cards</span>
+              <span class="mode-title" data-i18n="studio.tool_exam_title">Study Buddy &amp; Flashcards</span>
+              <span class="mode-sub" data-i18n="studio.tool_exam_sub">Bite-sized quizzes &amp; practice cards</span>
             </div>
           </button>
 
@@ -233,8 +242,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/><path d="M12 6v12"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Curious Explorer &amp; Research</span>
-              <span class="mode-sub">Explore any topic in plain language</span>
+              <span class="mode-title" data-i18n="studio.tool_research_title">Curious Explorer &amp; Research</span>
+              <span class="mode-sub" data-i18n="studio.tool_research_sub">Explore any topic in plain language</span>
             </div>
           </button>
         </div>
@@ -243,7 +252,7 @@
       <!-- Section 4: Developers & Programmers -->
       <div class="sidebar-category-accordion" data-category="developer">
         <button class="sidebar-category-header" type="button" aria-expanded="false">
-          <span class="category-header-title">CODING &amp; TECH HELP</span>
+          <span class="category-header-title" data-i18n="studio.cat_developer">CODING &amp; TECH HELP</span>
           <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -254,8 +263,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Code Explainer</span>
-              <span class="mode-sub">Understand any snippet simply &amp; clearly</span>
+              <span class="mode-title" data-i18n="studio.tool_code_title">Code Explainer</span>
+              <span class="mode-sub" data-i18n="studio.tool_code_sub">Understand any snippet simply &amp; clearly</span>
             </div>
           </button>
 
@@ -264,8 +273,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M12 6v14M8 10h8M6 14h12M7 18h10"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Bug Doctor &amp; Fixer</span>
-              <span class="mode-sub">Find and solve errors without stress</span>
+              <span class="mode-title" data-i18n="studio.tool_bug_title">Bug Doctor &amp; Fixer</span>
+              <span class="mode-sub" data-i18n="studio.tool_bug_sub">Find and solve errors without stress</span>
             </div>
           </button>
 
@@ -274,8 +283,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Code Translator</span>
-              <span class="mode-sub">Switch between languages smoothly</span>
+              <span class="mode-title" data-i18n="studio.tool_converter_title">Code Translator</span>
+              <span class="mode-sub" data-i18n="studio.tool_converter_sub">Switch between languages smoothly</span>
             </div>
           </button>
 
@@ -284,8 +293,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Database &amp; SQL Helper</span>
-              <span class="mode-sub">Simple queries &amp; organized tables</span>
+              <span class="mode-title" data-i18n="studio.tool_sql_title">Database &amp; SQL Helper</span>
+              <span class="mode-sub" data-i18n="studio.tool_sql_sub">Simple queries &amp; organized tables</span>
             </div>
           </button>
 
@@ -294,8 +303,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Pattern &amp; API Guide</span>
-              <span class="mode-sub">Build text patterns &amp; test web calls</span>
+              <span class="mode-title" data-i18n="studio.tool_regex_title">Pattern &amp; API Guide</span>
+              <span class="mode-sub" data-i18n="studio.tool_regex_sub">Build text patterns &amp; test web calls</span>
             </div>
           </button>
 
@@ -304,8 +313,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">System &amp; App Blueprint</span>
-              <span class="mode-sub">Plan clean apps &amp; visual diagrams</span>
+              <span class="mode-title" data-i18n="studio.tool_arch_title">System &amp; App Blueprint</span>
+              <span class="mode-sub" data-i18n="studio.tool_arch_sub">Plan clean apps &amp; visual diagrams</span>
             </div>
           </button>
         </div>
@@ -314,7 +323,7 @@
       <!-- Section 5: Cybersecurity & SecOps -->
       <div class="sidebar-category-accordion" data-category="cybersecurity">
         <button class="sidebar-category-header" id="cyber-category-header" type="button" aria-expanded="false">
-          <span class="category-header-title">ONLINE SAFETY &amp; SECURITY</span>
+          <span class="category-header-title" data-i18n="studio.cat_cybersecurity">ONLINE SAFETY &amp; SECURITY</span>
           <svg class="category-chevron-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -325,8 +334,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Security Checkup</span>
-              <span class="mode-sub">Spot safety risks &amp; easy fixes</span>
+              <span class="mode-title" data-i18n="studio.tool_vuln_title">Security Checkup</span>
+              <span class="mode-sub" data-i18n="studio.tool_vuln_sub">Spot safety risks &amp; easy fixes</span>
             </div>
           </button>
 
@@ -335,8 +344,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 0 1 9-9"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Threat &amp; Phishing Shield</span>
-              <span class="mode-sub">Analyze suspicious emails &amp; alerts</span>
+              <span class="mode-title" data-i18n="studio.tool_threat_title">Threat &amp; Phishing Shield</span>
+              <span class="mode-sub" data-i18n="studio.tool_threat_sub">Analyze suspicious emails &amp; alerts</span>
             </div>
           </button>
 
@@ -345,8 +354,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Code Safety &amp; Contract Audit</span>
-              <span class="mode-sub">Keep web apps &amp; contracts secure</span>
+              <span class="mode-title" data-i18n="studio.tool_payload_title">Code Safety &amp; Contract Audit</span>
+              <span class="mode-sub" data-i18n="studio.tool_payload_sub">Keep web apps &amp; contracts secure</span>
             </div>
           </button>
 
@@ -355,8 +364,8 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Network &amp; Traffic Guard</span>
-              <span class="mode-sub">Review traffic &amp; simple firewalls</span>
+              <span class="mode-title" data-i18n="studio.tool_net_title">Network &amp; Traffic Guard</span>
+              <span class="mode-sub" data-i18n="studio.tool_net_sub">Review traffic &amp; simple firewalls</span>
             </div>
           </button>
 
@@ -365,14 +374,14 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
             </div>
             <div class="mode-btn-text">
-              <span class="mode-title">Encryption &amp; Privacy Vault</span>
-              <span class="mode-sub">Keep passwords &amp; private data safe</span>
+              <span class="mode-title" data-i18n="studio.tool_crypto_title">Encryption &amp; Privacy Vault</span>
+              <span class="mode-sub" data-i18n="studio.tool_crypto_sub">Keep passwords &amp; private data safe</span>
             </div>
           </button>
         </div>
       </div>
 
-      <div class="sidebar-section-title" style="margin-top: 1.25rem;">QUICK TEMPLATES</div>
+      <div class="sidebar-section-title" style="margin-top: 1.25rem;" data-i18n="studio.quick_templates">QUICK TEMPLATES</div>
       <div id="studio-presets-container" class="studio-presets-list">
         <!-- Injected dynamically based on active tool -->
       </div>
@@ -387,11 +396,11 @@
             <div class="bubble-avatar">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
             </div>
-            <span class="bubble-author">Aethera Assistant // Here to Help</span>
+            <span class="bubble-author" data-i18n="studio.welcome_author">Aethera Assistant // Here to Help</span>
             <span class="bubble-time">100% FREE // ONLINE</span>
           </div>
           <div class="bubble-content">
-            <p>Welcome to <strong>Aethera Free AI Studio</strong>! Pick any helper on the left to get started—whether you want a <strong>friendly chat</strong>, help writing <strong>kind emails &amp; resumes</strong>, a patient <strong>math tutor &amp; study buddy</strong>, quick <strong>coding tips &amp; bug fixes</strong>, or easy <strong>privacy &amp; security checkups</strong>. We're here to help!</p>
+            <p data-i18n="studio.welcome_text">Welcome to <strong>Aethera Free AI Studio</strong>! Pick any helper on the left to get started—whether you want a <strong>friendly chat</strong>, help writing <strong>kind emails &amp; resumes</strong>, a patient <strong>math tutor &amp; study buddy</strong>, quick <strong>coding tips &amp; bug fixes</strong>, or easy <strong>privacy &amp; security checkups</strong>. We're here to help!</p>
           </div>
         </div>
       </div>
@@ -413,27 +422,27 @@
             </button>
           </div>
 
-          <textarea id="studio-prompt-input" placeholder="Type your request, paste notes, or attach/paste an image (diagrams, math formulas, screenshots, homework)..." rows="2"></textarea>
+          <textarea id="studio-prompt-input" data-i18n-placeholder="studio.input_ph" placeholder="Type your request, paste notes, or attach/paste an image (diagrams, math formulas, screenshots, homework)..." rows="2"></textarea>
           
           <div class="studio-input-footer">
             <div class="input-telemetry-tags">
               <button id="studio-attach-btn" class="studio-attach-btn" title="Attach Image or Screenshot (or paste with Ctrl+V)" type="button">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                <span>Attach Image</span>
+                <span data-i18n="studio.attach_btn">Attach Image</span>
               </button>
               <input type="file" id="studio-image-input" accept="image/*" style="display: none;">
 
-              <span class="input-tag" id="current-tool-tag">FRIENDLY CHAT</span>
-              <span class="input-tag">VISION AI</span>
-              <span class="input-tag">100% FREE</span>
+              <span class="input-tag" id="current-tool-tag" data-i18n="studio.tag_chat">FRIENDLY CHAT</span>
+              <span class="input-tag" data-i18n="studio.tag_vision">VISION AI</span>
+              <span class="input-tag" data-i18n="studio.tag_free">100% FREE</span>
             </div>
 
             <div style="display: flex; gap: 0.5rem; align-items: center;">
               <button id="studio-copy-btn" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.78rem;" title="Copy Latest Output">
-                <span>Copy</span>
+                <span data-i18n="studio.copy_btn">Copy</span>
               </button>
               <button id="studio-run-btn" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.82rem;">
-                <span id="run-btn-text">Run AI</span>
+                <span id="run-btn-text" data-i18n="studio.run_btn">Run AI</span>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               </button>
             </div>
@@ -450,26 +459,26 @@
       <div class="cal-modal-header">
         <div class="cal-modal-title">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-          <span>Gemini AI Engine &amp; API Key</span>
+          <span data-i18n="studio.modal_title">Gemini AI Engine &amp; API Key</span>
         </div>
         <button id="api-key-modal-close" class="cal-modal-close" aria-label="Close modal">&times;</button>
       </div>
       <div class="cal-modal-body">
-        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+        <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;" data-i18n="studio.modal_desc">
           Aethera connects to Google Gemini (Gemini 2.5 Flash &amp; 2.0 Flash) for live multimodal vision, code generation, and LaTeX math. Enter your free Google AI Studio API key below to enable direct live inference.
         </p>
 
         <div style="margin-bottom: 1rem;">
-          <label class="cal-form-label" for="user-gemini-key-input">Google AI Studio API Key</label>
+          <label class="cal-form-label" for="user-gemini-key-input" data-i18n="studio.modal_key_lbl">Google AI Studio API Key</label>
           <input type="password" id="user-gemini-key-input" class="cal-form-input" placeholder="AIzaSy..." style="width: 100%; box-sizing: border-box;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.35rem;">
-            <span style="font-size: 0.72rem; color: var(--text-muted);">Saved in local storage on your device</span>
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="font-size: 0.75rem; color: var(--accent-cyan, #06B6D4); text-decoration: none; font-weight: 600;">Get Free Key &rarr;</a>
+            <span style="font-size: 0.72rem; color: var(--text-muted);" data-i18n="studio.modal_saved_hint">Saved in local storage on your device</span>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="font-size: 0.75rem; color: var(--accent-cyan, #06B6D4); text-decoration: none; font-weight: 600;" data-i18n="studio.modal_get_key">Get Free Key &rarr;</a>
           </div>
         </div>
 
         <div style="margin-bottom: 1rem;">
-          <label class="cal-form-label" for="user-gemini-model-select">Target Gemini Model</label>
+          <label class="cal-form-label" for="user-gemini-model-select" data-i18n="studio.modal_model_lbl">Target Gemini Model</label>
           <select id="user-gemini-model-select" class="cal-form-input" style="width: 100%; box-sizing: border-box;">
             <option value="gemini-3.6-flash" selected>Gemini 3.6 Flash (Recommended // SOTA Speed &amp; Accuracy)</option>
             <option value="gemini-2.5-flash">Gemini 2.5 Flash (Hybrid Reasoning)</option>
@@ -480,20 +489,21 @@
         <div id="key-test-status" style="font-size: 0.78rem; padding: 0.5rem 0.75rem; border-radius: 6px; display: none; margin-bottom: 0.75rem;"></div>
       </div>
       <div class="cal-modal-footer">
-        <button type="button" id="clear-api-key-btn" class="btn btn-secondary" style="margin-right: auto; padding: 0.45rem 0.9rem; font-size: 0.78rem;">Clear Key</button>
-        <button type="button" id="test-api-key-btn" class="btn btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.78rem;">Test Key</button>
-        <button type="button" id="save-api-key-btn" class="btn btn-primary" style="padding: 0.45rem 1.15rem; font-size: 0.8rem;">Save &amp; Apply</button>
+        <button type="button" id="clear-api-key-btn" class="btn btn-secondary" style="margin-right: auto; padding: 0.45rem 0.9rem; font-size: 0.78rem;" data-i18n="studio.modal_clear">Clear Key</button>
+        <button type="button" id="test-api-key-btn" class="btn btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.78rem;" data-i18n="studio.modal_test">Test Key</button>
+        <button type="button" id="save-api-key-btn" class="btn btn-primary" style="padding: 0.45rem 1.15rem; font-size: 0.8rem;" data-i18n="studio.modal_save">Save &amp; Apply</button>
       </div>
     </div>
   </div>
 
   <!-- Scripts -->
   <script src="js/data.js?v=3.9.3"></script>
-  <script src="js/background-engine.js?v=4.0.0"></script>
-  <script src="js/user-db.js?v=3.9.3"></script>
+  <script src="js/background-engine.js?v=4.1.3"></script>
+  <script src="js/user-db.js?v=3.9.6"></script>
+  <script src="js/i18n.js?v=1.0.0"></script>
   <script src="js/ai-studio.js?v=3.9.3"></script>
-  <script src="js/chatbot.js?v=3.9.5"></script>
+  <script src="js/chatbot.js?v=4.0.0"></script>
   <script src="js/music-player.js?v=1.0.0"></script>
-  <script src="js/quick-access.js?v=1.0.0"></script>
+  <script src="js/quick-access.js?v=1.0.2"></script>
 </body>
 </html>

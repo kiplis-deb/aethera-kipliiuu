@@ -9,7 +9,7 @@
 
 class AetheraApp {
   constructor() {
-    this.currentTheme = localStorage.getItem('aethera-theme') || 'dark';
+    this.currentTheme = localStorage.getItem('aethera-theme') || localStorage.getItem('aethera_theme') || 'dark';
     this.activeHeroTab = 'email';
     this.activeScenario = 'notes';
     
@@ -78,25 +78,49 @@ class AetheraApp {
 
     // Transformation Scenarios Data
     this.transformationScenarios = {
-      "notes": {
-        title: "1. Raw Meeting Notes ➔ Executive Memo",
-        before: "met with dev team. talked about q3 goals. mark said database is slow we need caching redis maybe. sarah wants deadline pushed 2 weeks for frontend auth. budget approved for 3 new engineers next month.",
-        after: "EXECUTIVE MEMORANDUM // Q3 ENGINEERING\n\n1. Infrastructure: Deploy Redis caching to resolve database latency bottlenecks (Assignee: Mark).\n2. Timeline: Approved 2-week frontend authentication buffer (Assignee: Sarah).\n3. Headcount: Budget greenlit for 3 new engineering hires in Q3."
+      en: {
+        "notes": {
+          title: "1. Quick Notes ➔ Clear Team Summary",
+          before: "met with dev team. talked about q3 goals. mark said database is slow we need caching redis maybe. sarah wants deadline pushed 2 weeks for frontend auth. budget approved for 3 new engineers next month.",
+          after: "TEAM SUMMARY & ACTION ITEMS // Q3 GOALS\n\n1. Performance: Set up fast caching to keep the app quick and responsive (Lead: Mark).\n2. Schedule: Adjusted frontend login timeline by 2 weeks for extra polish (Lead: Sarah).\n3. Team Growth: Approved welcome plan for 3 new team members joining next month."
+        },
+        "math": {
+          title: "2. Difficult Calculus ➔ Step-by-Step Solution",
+          before: "solve integral e^(-x^2) dx from 0 to infinity and show why it equals sqrt(pi)/2",
+          after: "Gaussian Probability Integral (Step-by-Step):\nLet $I = \\int_0^\\infty e^{-x^2} dx$. We convert the problem into polar coordinates:\n$$I^2 = \\int_0^{\\pi/2} d\\theta \\int_0^\\infty r e^{-r^2} dr = \\frac{\\pi}{2} \\left[ -\\frac{e^{-r^2}}{2} \\right]_0^\\infty = \\frac{\\pi}{4}$$\nTaking the square root gives us the clean, exact answer:\n$$I = \\frac{\\sqrt{\\pi}}{2}$$"
+        },
+        "code": {
+          title: "3. Buggy Code ➔ Clean & Modern Fix",
+          before: "function getData(id, cb) { db.query('select * from users where id=' + id, function(e, r) { if(e) { cb(e); } else { cb(null, r); } }); }",
+          after: "export async function getUserById(id: string): Promise<User> {\n  // Safe parameterized query that protects against errors\n  const user = await prisma.user.findUnique({\n    where: { id },\n    select: { id: true, email: true, role: true }\n  });\n  if (!user) throw new NotFoundError(`User ${id} was not found`);\n  return user;\n}"
+        },
+        "cyber": {
+          title: "4. Login Security ➔ Safe & Simple Fix",
+          before: "contract Vault { mapping(address => uint) public balances; function withdraw() public { uint b = balances[msg.sender]; (bool s,) = msg.sender.call{value: b}(''); balances[msg.sender] = 0; } }",
+          after: "// Safe Balance Withdrawal (Protects user funds with safe check order)\ncontract SecureVault is ReentrancyGuard {\n  mapping(address => uint256) public balances;\n  function withdraw() external nonReentrant {\n    uint256 amount = balances[msg.sender];\n    require(amount > 0, 'No balance to withdraw');\n    balances[msg.sender] = 0;\n    (bool sent, ) = msg.sender.call{value: amount}('');\n    require(sent, 'Withdrawal transfer failed');\n  }\n}"
+        }
       },
-      "math": {
-        title: "2. Difficult Calculus ➔ Step-by-Step KaTeX Proof",
-        before: "solve integral e^(-x^2) dx from 0 to infinity and show why it equals sqrt(pi)/2",
-        after: "Gaussian Probability Integral Proof:\nLet $I = \\int_0^\\infty e^{-x^2} dx$. Squaring both sides in polar coordinates:\n$$I^2 = \\int_0^{\\pi/2} d\\theta \\int_0^\\infty r e^{-r^2} dr = \\frac{\\pi}{2} \\left[ -\\frac{e^{-r^2}}{2} \\right]_0^\\infty = \\frac{\\pi}{4}$$\nTaking the square root yields the exact closed form:\n$$I = \\frac{\\sqrt{\\pi}}{2}$$"
-      },
-      "code": {
-        title: "3. Spaghetti Code ➔ Type-Safe Idiomatic Patch",
-        before: "function getData(id, cb) { db.query('select * from users where id=' + id, function(e, r) { if(e) { cb(e); } else { cb(null, r); } }); }",
-        after: "export async function getUserById(id: string): Promise<User> {\n  const user = await prisma.user.findUnique({\n    where: { id },\n    select: { id: true, email: true, role: true }\n  });\n  if (!user) throw new NotFoundError(`User ${id} does not exist`);\n  return user;\n}"
-      },
-      "cyber": {
-        title: "4. Vulnerability Audit ➔ CVSS & Remediation Patch",
-        before: "contract Vault { mapping(address => uint) public balances; function withdraw() public { uint b = balances[msg.sender]; (bool s,) = msg.sender.call{value: b}(''); balances[msg.sender] = 0; } }",
-        after: "// Hardened Vault (Checks-Effects-Interactions + ReentrancyGuard)\ncontract SecureVault is ReentrancyGuard {\n  mapping(address => uint256) public balances;\n  function withdraw() external nonReentrant {\n    uint256 amount = balances[msg.sender];\n    require(amount > 0, 'No balance');\n    balances[msg.sender] = 0;\n    (bool sent, ) = msg.sender.call{value: amount}('');\n    require(sent, 'Transfer failed');\n  }\n}"
+      id: {
+        "notes": {
+          title: "1. Catatan Cepat ➔ Ringkasan Tim Jelas",
+          before: "rapat dgn tim dev. bahas target q3. mark bilang database lambat perlu redis cache mungkin. sarah minta deadline diundur 2 minggu utk auth frontend. anggaran disetujui utk 3 engineer baru bulan depan.",
+          after: "RINGKASAN TIM & TINDAK LANJUT // TARGET Q3\n\n1. Performa: Pasang cache cepat agar aplikasi gesit dan responsif (Penanggung jawab: Mark).\n2. Jadwal: Mundurkan batas waktu login frontend 2 minggu untuk pemolesan (Penanggung jawab: Sarah).\n3. Ekspansi Tim: Rencana sambutan disetujui untuk 3 rekan baru bulan depan."
+        },
+        "math": {
+          title: "2. Soal Kalkulus ➔ Solusi Langkah demi Langkah",
+          before: "selesaikan integral e^(-x^2) dx dari 0 ke tak hingga dan buktikan hasilnya sama dengan sqrt(pi)/2",
+          after: "Integral Probabilitas Gauss (Langkah demi Langkah):\nMisalkan $I = \\int_0^\\infty e^{-x^2} dx$. Kita ubah ke koordinat polar:\n$$I^2 = \\int_0^{\\pi/2} d\\theta \\int_0^\\infty r e^{-r^2} dr = \\frac{\\pi}{2} \\left[ -\\frac{e^{-r^2}}{2} \\right]_0^\\infty = \\frac{\\pi}{4}$$\nMengambil akar kuadrat menghasilkan jawaban eksak yang rapi:\n$$I = \\frac{\\sqrt{\\pi}}{2}$$"
+        },
+        "code": {
+          title: "3. Kode Bermasalah ➔ Perbaikan Bersih & Modern",
+          before: "function getData(id, cb) { db.query('select * from users where id=' + id, function(e, r) { if(e) { cb(e); } else { cb(null, r); } }); }",
+          after: "export async function getUserById(id: string): Promise<User> {\n  // Kueri berparameter aman yang melindungi dari kesalahan\n  const user = await prisma.user.findUnique({\n    where: { id },\n    select: { id: true, email: true, role: true }\n  });\n  if (!user) throw new NotFoundError(`Pengguna ${id} tidak ditemukan`);\n  return user;\n}"
+        },
+        "cyber": {
+          title: "4. Keamanan Login ➔ Solusi Aman & Sederhana",
+          before: "contract Vault { mapping(address => uint) public balances; function withdraw() public { uint b = balances[msg.sender]; (bool s,) = msg.sender.call{value: b}(''); balances[msg.sender] = 0; } }",
+          after: "// Penarikan Saldo Aman (Melindungi dana pengguna dengan urutan pemeriksaan yang benar)\ncontract SecureVault is ReentrancyGuard {\n  mapping(address => uint256) public balances;\n  function withdraw() external nonReentrant {\n    uint256 amount = balances[msg.sender];\n    require(amount > 0, 'Tidak ada saldo untuk ditarik');\n    balances[msg.sender] = 0;\n    (bool sent, ) = msg.sender.call{value: amount}('');\n    require(sent, 'Transfer penarikan gagal');\n  }\n}"
+        }
       }
     };
 
@@ -128,8 +152,19 @@ class AetheraApp {
         this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', this.currentTheme);
         localStorage.setItem('aethera-theme', this.currentTheme);
+        localStorage.setItem('aethera_theme', this.currentTheme);
       });
     }
+
+    // Sync in real-time when theme is updated from notes page or another tab
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'aethera-theme' || e.key === 'aethera_theme') {
+        if (e.newValue && (e.newValue === 'light' || e.newValue === 'dark')) {
+          this.currentTheme = e.newValue;
+          document.documentElement.setAttribute('data-theme', e.newValue);
+        }
+      }
+    });
   }
 
   /* ==========================================================================
@@ -278,21 +313,44 @@ class AetheraApp {
     const el = document.getElementById('hero-rotator');
     if (!el) return;
 
-    const words = [
-      "For Daily Productivity.",
-      "For Calculus & Math.",
-      "For Instant Debugging.",
-      "For Everyday Workers.",
-      "100% Free Forever."
-    ];
+    const wordsMap = {
+      en: [
+        "For Daily Productivity.",
+        "For Calculus & Math.",
+        "For Instant Debugging.",
+        "For Everyday Workers.",
+        "100% Free Forever."
+      ],
+      id: [
+        "Untuk Produktivitas Harian.",
+        "Untuk Kalkulus & Matematika.",
+        "Untuk Debugging Cepat.",
+        "Untuk Semua Orang.",
+        "100% Gratis Selamanya."
+      ]
+    };
 
+    const getLang = () => {
+      if (window.aetheraI18n && typeof window.aetheraI18n.getLanguage === 'function') {
+        return window.aetheraI18n.getLanguage();
+      }
+      if (window.AetheraI18n && typeof window.AetheraI18n.getLanguage === 'function') {
+        return window.AetheraI18n.getLanguage();
+      }
+      return localStorage.getItem('aethera_language') || localStorage.getItem('aethera_lang') || 'en';
+    };
+
+    let currentWords = wordsMap[getLang()] || wordsMap.en;
     let wordIdx = 0;
     let charIdx = 0;
     let isDeleting = false;
     let typingSpeed = 70;
+    let typeTimer = null;
 
     const typeLoop = () => {
-      const currentWord = words[wordIdx];
+      const lang = getLang();
+      const activeWords = wordsMap[lang] || wordsMap.en;
+      const currentWord = activeWords[wordIdx % activeWords.length];
       
       if (isDeleting) {
         el.textContent = currentWord.substring(0, charIdx - 1);
@@ -304,19 +362,32 @@ class AetheraApp {
         typingSpeed = 75;
       }
 
-      if (!isDeleting && charIdx === currentWord.length) {
+      if (!isDeleting && charIdx >= currentWord.length) {
         typingSpeed = 2000; // Pause at end of word
         isDeleting = true;
-      } else if (isDeleting && charIdx === 0) {
+      } else if (isDeleting && charIdx <= 0) {
         isDeleting = false;
-        wordIdx = (wordIdx + 1) % words.length;
+        charIdx = 0;
+        wordIdx = (wordIdx + 1) % activeWords.length;
         typingSpeed = 400; // Pause before typing next word
       }
 
-      setTimeout(typeLoop, typingSpeed);
+      typeTimer = setTimeout(typeLoop, typingSpeed);
     };
 
-    setTimeout(typeLoop, 800);
+    typeTimer = setTimeout(typeLoop, 800);
+
+    // React immediately when the user changes language (EN <-> ID)
+    window.addEventListener('aethera:language-change', (e) => {
+      const newLang = e.detail?.lang || getLang();
+      currentWords = wordsMap[newLang] || wordsMap.en;
+      wordIdx = 0;
+      charIdx = 0;
+      isDeleting = false;
+      if (typeTimer) clearTimeout(typeTimer);
+      el.textContent = '';
+      typeTimer = setTimeout(typeLoop, 100);
+    });
   }
 
   /* ==========================================================================
@@ -455,174 +526,340 @@ class AetheraApp {
     const showcaseWindow = document.getElementById('hero-ai-showcase');
     if (!showcaseWindow) return;
 
-    const showcaseData = {
-      chatbot: {
-        badge: "CONVERSATIONAL // CASUAL FRIEND",
-        userPrompt: "Hey! How can I make my weekends feel more relaxing and less stressful?",
-        model: "Gemini 3.5 Flash",
-        metrics: "12.4ms • 142 T/s",
-        htmlResponse: `
-          <p>Hey there! Honestly, the secret to a genuinely relaxing weekend is protecting your peace of mind before Saturday even hits. Here's what works wonders:</p>
-          <div class="showcase-code-snippet">
-            <div class="snippet-header">
-              <span>weekend_unwind_guide.md</span>
-              <span class="snippet-tag">Zero Stress Plan</span>
-            </div>
-            <pre><code>✨ 1. Friday Brain Dump: Write down pending tasks so they stop looping in your head.
+    const getLang = () => {
+      if (window.aetheraI18n && typeof window.aetheraI18n.getLanguage === 'function') {
+        return window.aetheraI18n.getLanguage();
+      }
+      if (window.AetheraI18n && typeof window.AetheraI18n.getLanguage === 'function') {
+        return window.AetheraI18n.getLanguage();
+      }
+      return localStorage.getItem('aethera_language') || localStorage.getItem('aethera_lang') || 'en';
+    };
+
+    const showcaseDataMap = {
+      en: {
+        chatbot: {
+          badge: "CONVERSATIONAL // CASUAL FRIEND",
+          userPrompt: "Hey! How can I make my weekends feel more relaxing and less stressful?",
+          model: "Gemini 3.5 Flash",
+          metrics: "12.4ms • 142 T/s",
+          htmlResponse: `
+            <p>Hey there! Honestly, the secret to a genuinely relaxing weekend is protecting your peace of mind before Saturday even hits. Here's what works wonders:</p>
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>weekend_unwind_guide.md</span>
+                <span class="snippet-tag">Zero Stress Plan</span>
+              </div>
+              <pre><code>✨ 1. Friday Brain Dump: Write down pending tasks so they stop looping in your head.
 ☕ 2. Slow Morning: No social media or email for the first hour after waking up.
 🌿 3. Unstructured Hours: Keep at least one afternoon free with zero planned obligations.</code></pre>
-          </div>
-          <div class="showcase-followups">
-            <span class="followup-chip">Quick digital detox tips</span>
-            <span class="followup-chip">Fun low-energy hobbies</span>
-            <span class="followup-chip">Sunday evening reset</span>
-          </div>
-        `,
-        placeholder: "Chat freely about anything, brainstorm, or chat like a friend...",
-        toolLink: "chatbot"
-      },
-      email: {
-        badge: "EMAIL DRAFTER // POLISHED",
-        userPrompt: "Draft an executive follow-up email after an enterprise demo proposing a pilot rollout with SLA terms.",
-        model: "Executive Drafter v3",
-        metrics: "9.8ms • 165 T/s",
-        htmlResponse: `
-          <p><strong>Subject:</strong> Follow-up: Aethera Enterprise Pilot Architecture &amp; SLA Milestones</p>
-          <p>Hi Sarah,<br><br>Thank you for the productive discussion during yesterday's architecture demo. Our team is confident that deploying Aethera's zero-retention local nodes will satisfy your compliance mandates while reducing API latency by 68%.</p>
-          <div class="showcase-code-snippet">
-            <div class="snippet-header">
-              <span>proposed_rollout_timeline.txt</span>
-              <span class="snippet-tag">Phase 1 Pilot</span>
             </div>
-            <pre><code>1. Provision Isolated VPC Sandbox ........ [3 Business Days]
+            <div class="showcase-followups">
+              <span class="followup-chip">Quick digital detox tips</span>
+              <span class="followup-chip">Fun low-energy hobbies</span>
+              <span class="followup-chip">Sunday evening reset</span>
+            </div>
+          `,
+          placeholder: "Chat freely about anything, brainstorm, or chat like a friend...",
+          toolLink: "chatbot"
+        },
+        email: {
+          badge: "EMAIL DRAFTER // POLISHED",
+          userPrompt: "Draft an executive follow-up email after an enterprise demo proposing a pilot rollout with SLA terms.",
+          model: "Executive Drafter v3",
+          metrics: "9.8ms • 165 T/s",
+          htmlResponse: `
+            <p><strong>Subject:</strong> Follow-up: Aethera Enterprise Pilot Architecture &amp; SLA Milestones</p>
+            <p>Hi Sarah,<br><br>Thank you for the productive discussion during yesterday's architecture demo. Our team is confident that deploying Aethera's zero-retention local nodes will satisfy your compliance mandates while reducing API latency by 68%.</p>
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>proposed_rollout_timeline.txt</span>
+                <span class="snippet-tag">Phase 1 Pilot</span>
+              </div>
+              <pre><code>1. Provision Isolated VPC Sandbox ........ [3 Business Days]
 2. Dual-Run Benchmark vs Existing Stack .. [2 Weeks]
 3. SLA Target: 99.99% Availability, &lt;20ms P99 Latency</code></pre>
-          </div>
-          <div class="showcase-followups">
-            <span class="followup-chip">Add Pricing Matrix</span>
-            <span class="followup-chip">Shorten to 3 sentences</span>
-            <span class="followup-chip">Tone: Formal Board</span>
-          </div>
-        `,
-        placeholder: "Enter recipient, bullet points, or purpose to draft message...",
-        toolLink: "email-drafter"
-      },
-      code: {
-        badge: "BUG DOCTOR // EASY FIX",
-        userPrompt: "Audit this TypeScript function for a memory leak and race condition, then provide a thread-safe fix.",
-        model: "Bug Doctor & Fixer",
-        metrics: "14.1ms • 138 T/s",
-        htmlResponse: `
-          <p><strong>Analysis:</strong> Identified 2 critical issues:</p>
-          <p>1. <code>Map</code> grows unboundedly without TTL or eviction, causing OOM leaks under sustained traffic.<br>2. Non-atomic check-then-act creates concurrency race conditions.</p>
-          <div class="showcase-code-snippet">
-            <div class="snippet-header">
-              <span>safe_rate_limiter.ts</span>
-              <span class="snippet-tag">Thread-Safe &bull; Zero Leak</span>
             </div>
-            <pre><code>export class SafeTokenBucket {
+            <div class="showcase-followups">
+              <span class="followup-chip">Add Pricing Matrix</span>
+              <span class="followup-chip">Shorten to 3 sentences</span>
+              <span class="followup-chip">Tone: Formal Board</span>
+            </div>
+          `,
+          placeholder: "Enter recipient, bullet points, or purpose to draft message...",
+          toolLink: "email-drafter"
+        },
+        code: {
+          badge: "BUG DOCTOR // EASY FIX",
+          userPrompt: "Audit this TypeScript function for a memory leak and race condition, then provide a thread-safe fix.",
+          model: "Bug Doctor & Fixer",
+          metrics: "14.1ms • 138 T/s",
+          htmlResponse: `
+            <p><strong>Analysis:</strong> Identified 2 critical issues:</p>
+            <p>1. <code>Map</code> grows unboundedly without TTL or eviction, causing OOM leaks under sustained traffic.<br>2. Non-atomic check-then-act creates concurrency race conditions.</p>
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>safe_rate_limiter.ts</span>
+                <span class="snippet-tag">Thread-Safe &bull; Zero Leak</span>
+              </div>
+              <pre><code>export class SafeTokenBucket {
   private readonly tokens = new QuickLRU&lt;string, number&gt;({ maxSize: 10_000 });
   private readonly lock = new AsyncMutex();
 
   async consume(key: string, cost = 1): Promise&lt;boolean&gt; {
     return this.lock.runExclusive(() =&gt; {
       const current = this.tokens.get(key) ?? this.capacity;
-      if (current &lt; cost) return false;
-      this.tokens.set(key, current - cost);
-      return true;
+      if (current &gt;= cost) {
+        this.tokens.set(key, current - cost);
+        return true;
+      }
+      return false;
     });
   }
 }</code></pre>
-          </div>
-          <div class="showcase-followups">
-            <span class="followup-chip">Add Redis Distributed Lock</span>
-            <span class="followup-chip">Benchmark Throughput</span>
-            <span class="followup-chip">Write Unit Tests</span>
-          </div>
-        `,
-        placeholder: "Paste broken snippet, stack trace, or SQL query to debug...",
-        toolLink: "bug-hunter"
-      },
-      math: {
-        badge: "CALCULUS & LATEX // CLOSED FORM",
-        userPrompt: "Compute the gradient vector and Hessian matrix of f(x, y) = x^2 + 3xy + 2y^2, and classify all critical points.",
-        model: "Step-by-Step Math Tutor",
-        metrics: "11.2ms • 155 T/s",
-        htmlResponse: `
-          <p><strong>Step 1: Compute Gradient Vector:</strong></p>
-          <p><code>&nabla;f(x, y) = [&part;f/&part;x, &part;f/&part;y]^T = [2x + 3y, 3x + 4y]^T</code></p>
-          <p>Setting <code>&nabla;f = [0, 0]^T</code> yields a unique critical point at <code>(0, 0)</code>.</p>
-          <div class="showcase-code-snippet">
-            <div class="snippet-header">
-              <span>hessian_matrix_evaluation.py</span>
-              <span class="snippet-tag">Saddle Point Confirmed</span>
             </div>
-            <pre><code>H = [[2, 3], 
-     [3, 4]]
-det(H) = (2)(4) - (3)(3) = 8 - 9 = -1 &lt; 0
-# Conclusion: det(H) &lt; 0 strictly proves (0, 0) is a Saddle Point.</code></pre>
-          </div>
-          <div class="showcase-followups">
-            <span class="followup-chip">Plot 3D Surface</span>
-            <span class="followup-chip">Compute Eigenvalues</span>
-            <span class="followup-chip">Newton-Raphson Step</span>
-          </div>
-        `,
-        placeholder: "Enter formula, derivative, or differential equation...",
-        toolLink: "math-solver"
-      },
-      cve: {
-        badge: "SAFETY CHECKUP // SIMPLE FIX",
-        userPrompt: "Analyze CVE-2024-3094 (XZ Utils backdoor) attack vector and provide immediate mitigation command.",
-        model: "Security Checkup",
-        metrics: "8.9ms • 170 T/s",
-        htmlResponse: `
-          <p><strong>Threat Intel:</strong> CVE-2024-3094 (CVSS 10.0) introduces an obfuscated payload through modified m4 macro files during tarball generation, hijacking OpenSSH's <code>RSA_public_decrypt</code> routine.</p>
-          <div class="showcase-code-snippet">
-            <div class="snippet-header">
-              <span>remediation_terminal.sh</span>
-              <span class="snippet-tag">High Priority Patch</span>
+            <div class="showcase-followups">
+              <span class="followup-chip">Explain Line-by-Line</span>
+              <span class="followup-chip">Generate Jest Unit Test</span>
+              <span class="followup-chip">Redis Token Bucket Alt</span>
             </div>
-            <pre><code># 1. Audit affected versions (5.6.0 / 5.6.1):
-dpkg -l | grep -E "xz-utils|liblzma5"
-# 2. Downgrade immediately to trusted baseline 5.4.5:
-sudo apt-get install --allow-downgrades liblzma5=5.4.5-0.1
-# 3. Restart SSH daemon:
-sudo systemctl restart ssh</code></pre>
-          </div>
-          <div class="showcase-followups">
-            <span class="followup-chip">Audit Auth Logs</span>
-            <span class="followup-chip">Mitre ATT&CK: T1195</span>
-            <span class="followup-chip">PCAP Signature</span>
-          </div>
-        `,
-        placeholder: "Enter CVE ID, suspicious script, or paste PCAP logs...",
-        toolLink: "vuln-scanner"
-      },
-      resume: {
-        badge: "CAREER // GOOGLE XYZ POLISH",
-        userPrompt: "Rewrite weak resume bullet 'Sped up website database queries' using Google XYZ impact formula.",
-        model: "Resume Polish",
-        metrics: "10.5ms • 150 T/s",
-        htmlResponse: `
-          <p><strong>Google XYZ Transformation:</strong> [Accomplished X] as measured by [Y], by doing [Z].</p>
-          <div class="showcase-code-snippet">
-            <div class="snippet-header">
-              <span>quantified_bullet_points.txt</span>
-              <span class="snippet-tag">High Hiring Impact</span>
+          `,
+          placeholder: "Paste buggy code or error stack trace...",
+          toolLink: "code-explainer"
+        },
+        math: {
+          badge: "MATH TUTOR // STEP-BY-STEP",
+          userPrompt: "Evaluate the Gaussian integral step-by-step: \\int_0^\\infty e^{-x^2} dx",
+          model: "Math & LaTeX Pro",
+          metrics: "11.2ms • 155 T/s",
+          htmlResponse: `
+            <p>Here is an elegant step-by-step derivation using polar coordinates:</p>
+            <p>Let $I = \\int_0^\\infty e^{-x^2} dx$. We square the integral and transition to a double integral:</p>
+            <p>$$I^2 = \\int_0^\\infty e^{-x^2} dx \\int_0^\\infty e^{-y^2} dy = \\int_0^\\infty \\int_0^\\infty e^{-(x^2+y^2)} dx dy$$</p>
+            <p>Switching to polar coordinates ($x = r\\cos\\theta, y = r\\sin\\theta, dx dy = r dr d\\theta$):</p>
+            <p>$$I^2 = \\int_0^{\\pi/2} d\\theta \\int_0^\\infty r e^{-r^2} dr = \\frac{\\pi}{2} \\left[ -\\frac{1}{2} e^{-r^2} \\right]_0^\\infty = \\frac{\\pi}{4}$$</p>
+            <p>Taking the positive square root gives the exact solution:</p>
+            <p>$$I = \\frac{\\sqrt{\\pi}}{2} \\approx 0.8862$$</p>
+            <div class="showcase-followups">
+              <span class="followup-chip">Show alternative method</span>
+              <span class="followup-chip">Gamma function relation</span>
+              <span class="followup-chip">Plot bell curve</span>
             </div>
-            <pre><code>&bull; Architected Redis read-through caching and connection pooling, 
+          `,
+          placeholder: "Type math equations, calculus integrals, or homework questions...",
+          toolLink: "math-solver"
+        },
+        cve: {
+          badge: "SECOPS // CVE INTELLIGENCE",
+          userPrompt: "Audit npm dependencies for critical CVE vulnerabilities and generate remediation patch.",
+          model: "Security Advisor Pro",
+          metrics: "8.5ms • 170 T/s",
+          htmlResponse: `
+            <p><strong>Automated SecOps Scan Report:</strong></p>
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>security_audit_report.log</span>
+                <span class="snippet-tag">Automated Scan</span>
+              </div>
+              <pre><code>[INFO] 1,428 packages audited in 42ms
+[WARNING] CVE-2024-3094 detected in upstream xz-utils dependency
+[REMEDY] Run: npm audit fix --force to update to stable patch</code></pre>
+            </div>
+            <div class="showcase-followups">
+              <span class="followup-chip">Export PDF Report</span>
+              <span class="followup-chip">SOC2 Checklist</span>
+              <span class="followup-chip">Hardening Guide</span>
+            </div>
+          `,
+          placeholder: "Paste package.json or dependency list...",
+          toolLink: "vuln-scanner"
+        },
+        resume: {
+          badge: "CAREER COACH // HIGH IMPACT",
+          userPrompt: "Rewrite this resume bullet point to sound confident, impactful, and metric-driven for tech recruiters.",
+          model: "Career Coach AI",
+          metrics: "9.1ms • 160 T/s",
+          htmlResponse: `
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>quantified_bullet_points.txt</span>
+                <span class="snippet-tag">High Hiring Impact</span>
+              </div>
+              <pre><code>&bull; Architected Redis read-through caching and connection pooling, 
   reducing P95 database query latency from 420ms to 28ms for 1.4M DAU.
 &bull; Re-indexed 18 composite PostgreSQL tables, saving $24,000/year in RDS read replicas.</code></pre>
-          </div>
-          <div class="showcase-followups">
-            <span class="followup-chip">Add Leadership Metrics</span>
-            <span class="followup-chip">Format for FAANG ATS</span>
-            <span class="followup-chip">Cover Letter Intro</span>
-          </div>
-        `,
-        placeholder: "Paste rough resume bullet or job description...",
-        toolLink: "resume-builder"
+            </div>
+            <div class="showcase-followups">
+              <span class="followup-chip">Add Leadership Metrics</span>
+              <span class="followup-chip">Format for FAANG ATS</span>
+              <span class="followup-chip">Cover Letter Intro</span>
+            </div>
+          `,
+          placeholder: "Paste rough resume bullet or job description...",
+          toolLink: "resume-builder"
+        }
+      },
+      id: {
+        chatbot: {
+          badge: "PERCAKAPAN // TEMAN RAMAH",
+          userPrompt: "Hai! Bagaimana cara membuat akhir pekan saya terasa lebih santai dan tidak stres?",
+          model: "Gemini 3.5 Flash",
+          metrics: "12.4ms • 142 T/s",
+          htmlResponse: `
+            <p>Halo! Sejujurnya, rahasia akhir pekan yang benar-benar santai adalah menjaga ketenangan pikiran bahkan sebelum hari Sabtu tiba. Inilah yang sangat membantu:</p>
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>panduan_santai_akhir_pekan.md</span>
+                <span class="snippet-tag">Rencana Bebas Stres</span>
+              </div>
+              <pre><code>✨ 1. Tumpahkan Pikiran Jumat: Tulis tugas tertunda agar berhenti berputar di kepala Anda.
+☕ 2. Pagi yang Tenang: Tanpa media sosial atau email selama satu jam pertama setelah bangun tidur.
+🌿 3. Jam Bebas: Luangkan setidaknya satu sore bebas tanpa kewajiban terencana.</code></pre>
+            </div>
+            <div class="showcase-followups">
+              <span class="followup-chip">Tips detoks digital cepat</span>
+              <span class="followup-chip">Hobi santai menyenangkan</span>
+              <span class="followup-chip">Penyegaran Minggu malam</span>
+            </div>
+          `,
+          placeholder: "Bebas mengobrol tentang apa saja, bertukar ide, atau belajar...",
+          toolLink: "chatbot"
+        },
+        email: {
+          badge: "PENYUSUN EMAIL // RAPI & ELEGAN",
+          userPrompt: "Susun draf email tindak lanjut eksekutif setelah demo arsitektur untuk mengajukan uji coba pilot dengan ketentuan SLA.",
+          model: "Executive Drafter v3",
+          metrics: "9.8ms • 165 T/s",
+          htmlResponse: `
+            <p><strong>Subjek:</strong> Tindak Lanjut: Arsitektur Pilot Perusahaan Aethera &amp; Target SLA</p>
+            <p>Halo Sarah,<br><br>Terima kasih atas diskusi produktif selama demo arsitektur kemarin. Tim kami yakin bahwa penerapan node lokal tanpa retensi data Aethera akan memenuhi standar kepatuhan Anda sekaligus memangkas latensi API sebesar 68%.</p>
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>jadwal_peluncuran_usulan.txt</span>
+                <span class="snippet-tag">Uji Coba Tahap 1</span>
+              </div>
+              <pre><code>1. Penyediaan Sandbox VPC Terisolasi ....... [3 Hari Kerja]
+2. Tolok Ukur Ganda vs Sistem yang Ada ..... [2 Minggu]
+3. Target SLA: Ketersediaan 99.99%, Latensi P99 &lt;20ms</code></pre>
+            </div>
+            <div class="showcase-followups">
+              <span class="followup-chip">Tambahkan Matriks Harga</span>
+              <span class="followup-chip">Persingkat jadi 3 kalimat</span>
+              <span class="followup-chip">Gaya: Dewan Formal</span>
+            </div>
+          `,
+          placeholder: "Ketik penerima, poin-poin penting, atau tujuan pesan...",
+          toolLink: "email-drafter"
+        },
+        code: {
+          badge: "DOKTER BUG // PERBAIKAN MUDAH",
+          userPrompt: "Audit fungsi TypeScript ini untuk kebocoran memori dan race condition, lalu berikan solusi thread-safe.",
+          model: "Dokter Bug & Perbaikan",
+          metrics: "14.1ms • 138 T/s",
+          htmlResponse: `
+            <p><strong>Analisis:</strong> Ditemukan 2 masalah penting:</p>
+            <p>1. <code>Map</code> bertambah tanpa batas tanpa TTL atau penggusuran, menyebabkan kebocoran OOM.<br>2. Pengecekan non-atomik memicu kondisi race condition saat konkuren.</p>
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>safe_rate_limiter.ts</span>
+                <span class="snippet-tag">Aman Concurrency &bull; Nol Bocor</span>
+              </div>
+              <pre><code>export class SafeTokenBucket {
+  private readonly tokens = new QuickLRU&lt;string, number&gt;({ maxSize: 10_000 });
+  private readonly lock = new AsyncMutex();
+
+  async consume(key: string, cost = 1): Promise&lt;boolean&gt; {
+    return this.lock.runExclusive(() =&gt; {
+      const current = this.tokens.get(key) ?? this.capacity;
+      if (current &gt;= cost) {
+        this.tokens.set(key, current - cost);
+        return true;
+      }
+      return false;
+    });
+  }
+}</code></pre>
+            </div>
+            <div class="showcase-followups">
+              <span class="followup-chip">Jelaskan Baris demi Baris</span>
+              <span class="followup-chip">Buat Unit Test Jest</span>
+              <span class="followup-chip">Alternatif Redis Token Bucket</span>
+            </div>
+          `,
+          placeholder: "Tempel kode yang bermasalah atau pesan error...",
+          toolLink: "code-explainer"
+        },
+        math: {
+          badge: "TUTOR MATEMATIKA // TERTATA RAPI",
+          userPrompt: "Evaluasi integral Gauss Gaussian berikut langkah demi langkah: \\int_0^\\infty e^{-x^2} dx",
+          model: "Matematika & Kalkulus Pro",
+          metrics: "11.2ms • 155 T/s",
+          htmlResponse: `
+            <p>Berikut pembuktian bertahap yang elegan menggunakan koordinat kutub:</p>
+            <p>Misalkan $I = \\int_0^\\infty e^{-x^2} dx$. Kita kuadratkan integral tersebut dan ubah ke integral lipat dua:</p>
+            <p>$$I^2 = \\int_0^\\infty e^{-x^2} dx \\int_0^\\infty e^{-y^2} dy = \\int_0^\\infty \\int_0^\\infty e^{-(x^2+y^2)} dx dy$$</p>
+            <p>Beralih ke koordinat kutub ($x = r\\cos\\theta, y = r\\sin\\theta, dx dy = r dr d\\theta$):</p>
+            <p>$$I^2 = \\int_0^{\\pi/2} d\\theta \\int_0^\\infty r e^{-r^2} dr = \\frac{\\pi}{2} \\left[ -\\frac{1}{2} e^{-r^2} \\right]_0^\\infty = \\frac{\\pi}{4}$$</p>
+            <p>Mengambil akar kuadrat positif menghasilkan hasil pasti:</p>
+            <p>$$I = \\frac{\\sqrt{\\pi}}{2} \\approx 0.8862$$</p>
+            <div class="showcase-followups">
+              <span class="followup-chip">Tampilkan metode alternatif</span>
+              <span class="followup-chip">Hubungan fungsi Gamma</span>
+              <span class="followup-chip">Grafik fungsi lonceng</span>
+            </div>
+          `,
+          placeholder: "Ketik persamaan matematika, integral, atau soal PR...",
+          toolLink: "math-solver"
+        },
+        cve: {
+          badge: "AUDIT KEAMANAN // SECOPS",
+          userPrompt: "Periksa dependensi npm untuk kerentanan CVE kritis dan buat laporan remediasi.",
+          model: "Pemeriksa Keamanan Pro",
+          metrics: "8.5ms • 170 T/s",
+          htmlResponse: `
+            <p><strong>Hasil Pemindaian Kepatuhan Keamanan:</strong></p>
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>laporan_audit_keamanan.log</span>
+                <span class="snippet-tag">Pemeriksaan Otomatis</span>
+              </div>
+              <pre><code>[INFO] 1,428 paket dipindai dalam 42ms
+[PERINGATAN] CVE-2024-3094 terdeteksi pada dependensi xz-utils
+[SOLUSI] Jalankan: npm audit fix --force untuk memperbarui ke patch stabil</code></pre>
+            </div>
+            <div class="showcase-followups">
+              <span class="followup-chip">Ekspor laporan PDF</span>
+              <span class="followup-chip">Cek kebijakan SOC2</span>
+              <span class="followup-chip">Panduan hardening server</span>
+            </div>
+          `,
+          placeholder: "Tempel package.json atau daftar dependensi...",
+          toolLink: "vuln-scanner"
+        },
+        resume: {
+          badge: "PELATIH KARIR // TINGGI DAMPAK",
+          userPrompt: "Tulis ulang poin resume ini agar terdengar alami, percaya diri, dan berdampak bagi perekrut.",
+          model: "Pelatih Karir AI",
+          metrics: "9.1ms • 160 T/s",
+          htmlResponse: `
+            <div class="showcase-code-snippet">
+              <div class="snippet-header">
+                <span>poin_resume_berkualitas.txt</span>
+                <span class="snippet-tag">Dampak Perekrutan Tinggi</span>
+              </div>
+              <pre><code>&bull; Merancang caching read-through Redis dan pooling koneksi, 
+  memangkas latensi kueri database P95 dari 420ms ke 28ms untuk 1.4M DAU.
+&bull; Mengindeks ulang 18 tabel komposit PostgreSQL, menghemat $24.000/tahun pada replika baca RDS.</code></pre>
+            </div>
+            <div class="showcase-followups">
+              <span class="followup-chip">Tambahkan Metrik Kepemimpinan</span>
+              <span class="followup-chip">Format untuk ATS FAANG</span>
+              <span class="followup-chip">Pengantar Surat Lamaran</span>
+            </div>
+          `,
+          placeholder: "Tempel poin resume kasar atau deskripsi pekerjaan...",
+          toolLink: "resume-builder"
+        }
       }
     };
 
@@ -633,8 +870,13 @@ sudo systemctl restart ssh</code></pre>
     const inputBar = document.querySelector('.mac-showcase-input-bar');
     const tabBtns = showcaseWindow.querySelectorAll('[data-showcase-tab]');
 
+    let activeTab = 'chatbot';
+
     const selectTab = (key) => {
-      const data = showcaseData[key];
+      activeTab = key;
+      const lang = getLang();
+      const langGroup = showcaseDataMap[lang] || showcaseDataMap.en;
+      const data = langGroup[key] || showcaseDataMap.en[key];
       if (!data) return;
 
       tabBtns.forEach(btn => {
@@ -644,11 +886,7 @@ sudo systemctl restart ssh</code></pre>
       if (statusBadge) statusBadge.textContent = data.badge;
       if (userPromptEl) userPromptEl.textContent = data.userPrompt;
       if (aiResponseEl) {
-        aiResponseEl.style.opacity = '0';
-        setTimeout(() => {
-          aiResponseEl.innerHTML = data.htmlResponse;
-          aiResponseEl.style.opacity = '1';
-        }, 100);
+        aiResponseEl.innerHTML = data.htmlResponse;
       }
       if (inputPlaceholderEl) inputPlaceholderEl.textContent = data.placeholder;
       if (inputBar) {
@@ -674,6 +912,14 @@ sudo systemctl restart ssh</code></pre>
         }
       });
     }
+
+    // Initialize with active language
+    selectTab('chatbot');
+
+    // React immediately when language switches
+    window.addEventListener('aethera:language-change', () => {
+      selectTab(activeTab);
+    });
   }
 
   /* ==========================================================================
@@ -722,9 +968,21 @@ sudo systemctl restart ssh</code></pre>
     const afterBox = document.getElementById('scenario-after-content');
     const openInStudioBtn = document.getElementById('scenario-launch-btn');
 
+    const getLang = () => {
+      if (window.aetheraI18n && typeof window.aetheraI18n.getLanguage === 'function') {
+        return window.aetheraI18n.getLanguage();
+      }
+      if (window.AetheraI18n && typeof window.AetheraI18n.getLanguage === 'function') {
+        return window.AetheraI18n.getLanguage();
+      }
+      return localStorage.getItem('aethera_language') || localStorage.getItem('aethera_lang') || 'en';
+    };
+
     const renderScenario = (key) => {
       this.activeScenario = key;
-      const scen = this.transformationScenarios[key];
+      const lang = getLang();
+      const scenGroup = this.transformationScenarios[lang] || this.transformationScenarios.en || this.transformationScenarios;
+      const scen = scenGroup[key] || (this.transformationScenarios.en && this.transformationScenarios.en[key]);
       if (!scen) return;
 
       scenarioBtns.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-scenario') === key));
@@ -746,6 +1004,10 @@ sudo systemctl restart ssh</code></pre>
     });
 
     renderScenario('notes');
+
+    window.addEventListener('aethera:language-change', () => {
+      renderScenario(this.activeScenario || 'notes');
+    });
   }
 
   /* ==========================================================================

@@ -28,6 +28,8 @@ class AetheraClientDB {
       } else {
         this.renderNavAuth();
       }
+      // Re-render when language changes
+      window.addEventListener('aethera:language-change', () => this.renderNavAuth());
     }
   }
 
@@ -39,6 +41,11 @@ class AetheraClientDB {
   get chatsKey() {
     const uid = (this.token && this.currentUser?.username) ? this.currentUser.username : 'guest';
     return `aethera_chats_${uid}`;
+  }
+
+  get notesKey() {
+    const uid = (this.token && this.currentUser?.username) ? this.currentUser.username : 'guest';
+    return `aethera_notes_${uid}`;
   }
 
   _loadUser() {
@@ -58,8 +65,16 @@ class AetheraClientDB {
     return !!this.token;
   }
 
+  isAuthenticated() {
+    return this.isLoggedIn();
+  }
+
   getUser() {
     return this.currentUser;
+  }
+
+  getCurrentUser() {
+    return this.getUser();
   }
 
   setSession(token, user) {
@@ -119,6 +134,14 @@ class AetheraClientDB {
           localStorage.setItem(this.chatsKey, JSON.stringify(data.chats));
           window.dispatchEvent(new CustomEvent('aethera:chats-synced', { detail: data.chats }));
         }
+        if (Array.isArray(data.notes)) {
+          const cleanNotes = data.notes.filter(n => {
+            const title = (n.title || '').trim().toLowerCase();
+            return title !== 'jadwal mapel' && title !== 'nerdy coding competition';
+          });
+          localStorage.setItem(this.notesKey, JSON.stringify(cleanNotes));
+          window.dispatchEvent(new CustomEvent('aethera:notes-synced', { detail: cleanNotes }));
+        }
       }
     } catch (e) {
       console.warn('[AetheraDB] Sync notice:', e.message);
@@ -132,13 +155,14 @@ class AetheraClientDB {
     try {
       const calendar = this._getLocalCalendar();
       const chats = this._getLocalChats();
+      const notes = this._getLocalNotes();
       await fetch('/api/user/data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.token}`
         },
-        body: JSON.stringify({ calendar, chats })
+        body: JSON.stringify({ calendar, chats, notes })
       });
     } catch (e) {
       console.warn('[AetheraDB] Push sync notice:', e.message);
@@ -155,7 +179,7 @@ class AetheraClientDB {
     } catch { return []; }
   }
 
-  async getCalendarEvents() {
+  getCalendarEvents() {
     return this._getLocalCalendar();
   }
 
@@ -327,7 +351,7 @@ class AetheraClientDB {
     } catch { return []; }
   }
 
-  async getUserChats() {
+  getUserChats() {
     return this._getLocalChats();
   }
 
@@ -350,25 +374,146 @@ class AetheraClientDB {
   }
 
   /* --------------------------------------------------------------------------
+     NOTES (NOTION-STYLE WORKSPACE)
+     -------------------------------------------------------------------------- */
+  _getLocalNotes() {
+    try {
+      const raw = localStorage.getItem(this.notesKey);
+      let notes = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(notes) && notes.length > 0) {
+        const filtered = notes.filter(n => {
+          const title = (n.title || '').trim().toLowerCase();
+          return title !== 'jadwal mapel' && title !== 'nerdy coding competition';
+        });
+        if (filtered.length !== notes.length) {
+          notes = filtered;
+          localStorage.setItem(this.notesKey, JSON.stringify(notes));
+          this._pushToServer();
+        }
+      }
+      return notes;
+    } catch { return []; }
+  }
+
+  getNotes() {
+    let notes = this._getLocalNotes();
+    if (!notes || notes.length === 0) {
+      notes = this._getDefaultStarterNotes();
+      localStorage.setItem(this.notesKey, JSON.stringify(notes));
+    }
+    return notes;
+  }
+
+  getNoteById(id) {
+    const notes = this.getNotes();
+    return notes.find(n => n.id === id) || null;
+  }
+
+  saveNote(note) {
+    if (!note || typeof note !== 'object') return null;
+    const notes = this._getLocalNotes();
+    const now = new Date().toISOString();
+    const id = note.id || 'note_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+    const idx = notes.findIndex(n => n.id === id);
+    const existing = idx >= 0 ? notes[idx] : null;
+
+    const fullNote = {
+      id,
+      title: note.title !== undefined ? note.title : (existing ? existing.title : 'Untitled'),
+      icon: note.icon || (existing ? existing.icon : '📝'),
+      cover: note.cover !== undefined ? note.cover : (existing ? existing.cover : ''),
+      folder: note.folder || (existing ? existing.folder : 'Private'),
+      tags: Array.isArray(note.tags) ? note.tags : (existing && Array.isArray(existing.tags) ? existing.tags : []),
+      pinned: note.pinned !== undefined ? !!note.pinned : (existing ? !!existing.pinned : false),
+      favorite: note.favorite !== undefined ? !!note.favorite : (existing ? !!existing.favorite : false),
+      blocks: Array.isArray(note.blocks) && note.blocks.length > 0 ? note.blocks : (existing && Array.isArray(existing.blocks) && existing.blocks.length > 0 ? existing.blocks : [{ id: 'b_' + Math.random().toString(36).slice(2, 7), type: 'p', text: '' }]),
+      createdAt: note.createdAt || (existing && existing.createdAt ? existing.createdAt : now),
+      updatedAt: now,
+      lastOpenedAt: note.lastOpenedAt || (existing && existing.lastOpenedAt ? existing.lastOpenedAt : now)
+    };
+
+    if (idx >= 0) {
+      notes[idx] = fullNote;
+    } else {
+      notes.unshift(fullNote);
+    }
+
+    localStorage.setItem(this.notesKey, JSON.stringify(notes));
+    window.dispatchEvent(new CustomEvent('aethera:note-saved', { detail: fullNote }));
+    this._pushToServer();
+    return fullNote;
+  }
+
+  deleteNote(id) {
+    let notes = this._getLocalNotes();
+    notes = notes.filter(n => n.id !== id);
+    localStorage.setItem(this.notesKey, JSON.stringify(notes));
+    window.dispatchEvent(new CustomEvent('aethera:note-deleted', { detail: { id } }));
+    this._pushToServer();
+    return true;
+  }
+
+  setNotes(notes) {
+    if (!Array.isArray(notes)) return;
+    localStorage.setItem(this.notesKey, JSON.stringify(notes));
+    window.dispatchEvent(new CustomEvent('aethera:notes-synced', { detail: notes }));
+    this._pushToServer();
+  }
+
+  _getDefaultStarterNotes() {
+    const now = new Date().toISOString();
+    return [
+      {
+        id: 'note_welcome_' + Date.now().toString(36),
+        title: 'Welcome to Aethera Notes',
+        icon: '✨',
+        cover: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+        folder: 'Private',
+        tags: ['Guide', 'Getting Started'],
+        pinned: true,
+        favorite: true,
+        blocks: [
+          { id: 'b1', type: 'callout', icon: '💡', text: 'Welcome to your synced workspace! Everything you write here syncs automatically across all your devices logged into Aethera.' },
+          { id: 'b2', type: 'h1', text: 'Quick Start Features' },
+          { id: 'b3', type: 'todo', text: 'Type / anywhere in a note to open the Notion slash menu', checked: true },
+          { id: 'b4', type: 'todo', text: 'Try creating to-do items, code blocks, or callouts', checked: true },
+          { id: 'b5', type: 'todo', text: 'Click "AI Assistant" to generate summaries or brainstorm ideas', checked: false },
+          { id: 'b6', type: 'todo', text: 'Check the left sidebar for your synced upcoming calendar events', checked: false },
+          { id: 'b7', type: 'h2', text: 'Keyboard Shortcuts' },
+          { id: 'b8', type: 'bullet', text: 'Ctrl + K: Quick search across all notes' },
+          { id: 'b9', type: 'bullet', text: 'Ctrl + S: Instant force cloud sync' },
+          { id: 'b10', type: 'bullet', text: '/ : Open block command palette' }
+        ],
+        createdAt: now,
+        updatedAt: now
+      }
+    ];
+  }
+
+  /* --------------------------------------------------------------------------
      NAVBAR AUTH WIDGET
      -------------------------------------------------------------------------- */
   renderNavAuth() {
-    const slots = document.querySelectorAll('#navbar-auth-slot');
+    const slots = document.querySelectorAll('#navbar-auth-slot, #auth-status-slot');
     if (!slots.length) return;
 
     const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+    const isId = !!(window.aetheraI18n && window.aetheraI18n.getLang() === 'id');
+    const signOutLabel = isId ? 'Keluar' : 'Sign Out';
+    const signInLabel = isId ? 'Masuk' : 'Sign In';
 
     slots.forEach(slot => {
       if (this.isLoggedIn() && this.currentUser) {
         const username = this.currentUser.username || 'User';
         slot.innerHTML = `
-          <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
-            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.06); padding: 0.35rem 0.65rem; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div style="display: inline-flex; align-items: center; gap: 0.45rem; flex-shrink: 0;">
+            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.06); padding: 0.32rem 0.6rem; border-radius: 8px; border: 1px solid var(--border-glass); white-space: nowrap; flex-shrink: 0;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               <span>${username}</span>
             </span>
-            <button type="button" class="btn btn-secondary" id="btn-logout" title="Sign Out" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
-              Sign Out
+            <button type="button" class="btn btn-secondary" id="btn-logout" title="${signOutLabel}" data-i18n="nav.sign_out" data-i18n-title="nav.sign_out" style="padding: 0.32rem 0.6rem; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; height: 32px;">
+              ${signOutLabel}
             </button>
           </div>
         `;
@@ -378,11 +523,14 @@ class AetheraClientDB {
         }
       } else {
         slot.innerHTML = `
-          <a href="login.html?redirect=${encodeURIComponent(currentPath)}" class="btn btn-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.82rem; gap: 0.4rem;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            <span>Sign In</span>
+          <a href="login.html?redirect=${encodeURIComponent(currentPath)}" class="btn btn-secondary" title="${signInLabel}" data-i18n-title="nav.sign_in" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; gap: 0.35rem; white-space: nowrap; flex-shrink: 0; height: 32px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span data-i18n="nav.sign_in">${signInLabel}</span>
           </a>
         `;
+      }
+      if (window.aetheraI18n) {
+        window.aetheraI18n.applyTranslations(slot);
       }
     });
   }

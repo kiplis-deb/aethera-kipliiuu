@@ -10,12 +10,32 @@
      4. Aethera Chat (toggles floating assistant chat)
    ========================================================================== */
 
+/* Outer Container: Stays docked on the right side of the screen */
+.quick-access-container {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9995;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   1. PERMANENTLY VISIBLE QUICK ACCESS DOCK (Always Shown)
+   ========================================================================== */
+.quick-access-handle {
+  display: none !important;
+}
+
 .quick-access-dock {
   position: fixed;
   right: 18px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 9995;
+  z-index: 9997;
   background: rgba(12, 14, 20, 0.92);
   border: 1.5px solid rgba(255, 255, 255, 0.16);
   border-radius: 22px;
@@ -28,19 +48,16 @@
   -webkit-backdrop-filter: blur(28px);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
   user-select: none;
-  animation: quick-access-slide 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes quick-access-slide {
-  from {
-    opacity: 0;
-    transform: translateY(-50%) translateX(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(-50%) translateX(0);
-  }
+.quick-access-dock:hover {
+  border-color: rgba(255, 255, 255, 0.24);
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.75), 0 0 24px rgba(255, 255, 255, 0.06);
 }
 
 /* Light Theme Support */
@@ -48,6 +65,11 @@
   background: rgba(255, 255, 255, 0.94);
   border-color: rgba(0, 0, 0, 0.14);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .quick-access-dock:hover {
+  border-color: rgba(0, 0, 0, 0.26);
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.2), 0 0 24px rgba(0, 0, 0, 0.05);
 }
 
 /* Header label */

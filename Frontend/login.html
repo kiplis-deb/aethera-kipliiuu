@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="css/style.css?v=3.9.9">
   <link rel="stylesheet" href="css/components.css?v=3.9.9">
+  <link rel="stylesheet" href="css/i18n.css?v=1.0.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'><path d='M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'/></svg>">
   <style>
     .auth-page-container {
@@ -142,6 +143,7 @@
   </div>
 
   <div class="auth-page-container">
+    <div class="navbar-lang-slot" id="navbar-lang-slot" style="position: absolute; top: 1.5rem; right: 1.5rem; z-index: 20;"></div>
     <div class="auth-card">
       <a href="index.html" class="auth-brand">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
@@ -149,37 +151,38 @@
       </a>
 
       <div class="auth-tabs" role="tablist">
-        <button type="button" class="auth-tab-btn active" id="tab-login" role="tab">Sign In</button>
-        <button type="button" class="auth-tab-btn" id="tab-register" role="tab">Create Account</button>
+        <button type="button" class="auth-tab-btn active" id="tab-login" role="tab" data-i18n="auth.tab_signin">Sign In</button>
+        <button type="button" class="auth-tab-btn" id="tab-register" role="tab" data-i18n="auth.tab_register">Create Account</button>
       </div>
 
       <div id="auth-alert" class="auth-alert"></div>
 
       <form id="auth-form" novalidate>
         <div class="auth-form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" class="auth-input" placeholder="e.g. alex99" autocomplete="username" required minlength="3">
+          <label for="username" data-i18n="auth.username_label">Username</label>
+          <input type="text" id="username" class="auth-input" placeholder="e.g. alex99" data-i18n-placeholder="auth.username_placeholder" autocomplete="username" required minlength="3">
         </div>
 
         <div class="auth-form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" class="auth-input" placeholder="••••••••" autocomplete="current-password" required minlength="6">
+          <label for="password" data-i18n="auth.password_label">Password</label>
+          <input type="password" id="password" class="auth-input" placeholder="••••••••" data-i18n-placeholder="auth.password_placeholder" autocomplete="current-password" required minlength="6">
         </div>
 
         <button type="submit" id="auth-submit" class="btn btn-primary auth-submit-btn">
-          <span>Sign In</span>
+          <span data-i18n="auth.btn_signin">Sign In</span>
         </button>
       </form>
 
       <div class="auth-footer-text">
-        <span id="auth-switch-prompt">Need an account?</span>
-        <a href="#" id="auth-switch-link">Create one</a>
+        <span id="auth-switch-prompt" data-i18n="auth.prompt_no_account">Need an account?</span>
+        <a href="#" id="auth-switch-link" data-i18n="auth.link_register">Create one</a>
       </div>
     </div>
   </div>
 
-  <script src="js/background-engine.js"></script>
+  <script src="js/background-engine.js?v=4.1.3"></script>
   <script src="js/user-db.js"></script>
+  <script src="js/i18n.js?v=1.0.0"></script>
   <script>
     let mode = 'login';
     const tabLogin = document.getElementById('tab-login');
@@ -199,20 +202,25 @@
       mode = newMode;
       alertBox.className = 'auth-alert';
       alertBox.textContent = '';
+      const t = (k, fb) => (window.aetheraI18n ? window.aetheraI18n.t(k) || fb : fb);
       if (mode === 'login') {
         tabLogin.classList.add('active');
         tabRegister.classList.remove('active');
-        submitBtn.innerHTML = '<span>Sign In</span>';
+        submitBtn.innerHTML = `<span data-i18n="auth.btn_signin">${t('auth.btn_signin', 'Sign In')}</span>`;
         passwordInput.autocomplete = 'current-password';
-        switchPrompt.textContent = 'Need an account?';
-        switchLink.textContent = 'Create one';
+        switchPrompt.textContent = t('auth.prompt_no_account', 'Need an account?');
+        switchPrompt.setAttribute('data-i18n', 'auth.prompt_no_account');
+        switchLink.textContent = t('auth.link_register', 'Create one');
+        switchLink.setAttribute('data-i18n', 'auth.link_register');
       } else {
         tabRegister.classList.add('active');
         tabLogin.classList.remove('active');
-        submitBtn.innerHTML = '<span>Create Account</span>';
+        submitBtn.innerHTML = `<span data-i18n="auth.btn_register">${t('auth.btn_register', 'Create Account')}</span>`;
         passwordInput.autocomplete = 'new-password';
-        switchPrompt.textContent = 'Already have an account?';
-        switchLink.textContent = 'Sign in';
+        switchPrompt.textContent = t('auth.prompt_have_account', 'Already have an account?');
+        switchPrompt.setAttribute('data-i18n', 'auth.prompt_have_account');
+        switchLink.textContent = t('auth.link_signin', 'Sign In');
+        switchLink.setAttribute('data-i18n', 'auth.link_signin');
       }
     }
 
@@ -223,24 +231,30 @@
       setMode(mode === 'login' ? 'register' : 'login');
     });
 
+    window.addEventListener('aethera:language-change', () => {
+      setMode(mode);
+    });
+
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const username = usernameInput.value.trim();
       const password = passwordInput.value;
 
+      const t = (k, fb) => (window.aetheraI18n ? window.aetheraI18n.t(k) || fb : fb);
+
       if (!username || username.length < 3) {
         alertBox.className = 'auth-alert error';
-        alertBox.textContent = 'Username must be at least 3 characters.';
+        alertBox.textContent = t('auth.err_user_len', 'Username must be at least 3 characters.');
         return;
       }
       if (!password || password.length < 6) {
         alertBox.className = 'auth-alert error';
-        alertBox.textContent = 'Password must be at least 6 characters.';
+        alertBox.textContent = t('auth.err_pass_len', 'Password must be at least 6 characters.');
         return;
       }
 
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span>Processing...</span>';
+      submitBtn.innerHTML = `<span>${t('auth.processing', 'Processing...')}</span>`;
       alertBox.className = 'auth-alert';
 
       try {
@@ -264,7 +278,7 @@
         }
 
         alertBox.className = 'auth-alert success';
-        alertBox.textContent = mode === 'login' ? 'Signed in! Syncing data...' : 'Account created! Loading...';
+        alertBox.textContent = mode === 'login' ? t('auth.signed_in_sync', 'Signed in! Syncing data...') : t('auth.registered_loading', 'Account created! Loading...');
 
         setTimeout(() => {
           window.location.href = redirectUrl;
@@ -273,7 +287,7 @@
         alertBox.className = 'auth-alert error';
         alertBox.textContent = err.message;
         submitBtn.disabled = false;
-        submitBtn.innerHTML = `<span>${mode === 'login' ? 'Sign In' : 'Create Account'}</span>`;
+        submitBtn.innerHTML = `<span>${mode === 'login' ? t('auth.btn_signin', 'Sign In') : t('auth.btn_register', 'Create Account')}</span>`;
       }
     });
   </script>

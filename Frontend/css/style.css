@@ -282,6 +282,8 @@ select optgroup {
   filter: var(--canvas-filter);
   transition: filter 0.4s ease;
   pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .bg-overlay-gradient {
@@ -478,28 +480,31 @@ select optgroup {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
-  padding: 0.6rem 1.25rem;
+  gap: clamp(0.75rem, 1.4vw, 1.75rem);
+  padding: 0.45rem 0.85rem 0.45rem 1.25rem;
   background: var(--bg-glass);
   border: 1px solid var(--border-glass);
   border-radius: 16px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: var(--shadow-md);
-  max-width: 1100px;
-  width: calc(100% - 3rem);
+  max-width: min(1360px, calc(100% - 2.5rem));
+  width: 100%;
+  box-sizing: border-box;
   transition: var(--transition-theme);
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text-primary);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .brand-symbol {
@@ -519,16 +524,21 @@ select optgroup {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 1.75rem;
+  gap: clamp(0.4rem, 1vw, 1.25rem);
   list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 1;
 }
 
 .nav-link {
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: color 0.2s ease;
   position: relative;
+  white-space: nowrap;
+  padding: 0.25rem 0.35rem;
 }
 
 .nav-link:hover {
@@ -538,13 +548,34 @@ select optgroup {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+#navbar-auth-slot {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.nav-desktop-cta {
+  padding: 0.45rem 1rem;
+  font-size: 0.82rem;
+  height: 36px;
+  border-radius: 9px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  box-sizing: border-box;
 }
 
 .theme-toggle-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -552,6 +583,7 @@ select optgroup {
   border: 1px solid var(--border-glass);
   color: var(--text-primary);
   transition: all 0.25s ease;
+  flex-shrink: 0;
 }
 
 .theme-toggle-btn:hover {
@@ -1231,29 +1263,24 @@ select optgroup {
   }
 }
 
-/* Snug desktop navbar for intermediate tablet / split-screen desktop */
-@media (max-width: 992px) and (min-width: 769px) {
+/* Responsive navbar adaptations */
+@media (max-width: 1240px) {
+  .nav-item-secondary {
+    display: none !important;
+  }
   .nav-links {
-    gap: 0.65rem;
+    gap: clamp(0.35rem, 0.8vw, 0.85rem);
   }
   .nav-link {
     font-size: 0.82rem;
-    padding: 0.2rem 0.35rem;
-  }
-  .nav-dropdown-trigger {
-    padding: 0.32rem 0.65rem;
-    font-size: 0.82rem;
-  }
-  .nav-desktop-cta {
-    padding: 0.38rem 0.75rem;
-    font-size: 0.8rem;
+    padding: 0.2rem 0.3rem;
   }
 }
 
-/* Mobile screens: switch to mobile drawer */
-@media (max-width: 768px) {
+/* Tablet & Mobile: switch cleanly to mobile drawer */
+@media (max-width: 1024px) {
   .nav-links {
-    display: none;
+    display: none !important;
   }
 
   .mobile-menu-btn {

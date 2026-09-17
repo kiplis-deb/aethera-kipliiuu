@@ -31,7 +31,7 @@ echo [Server] Using Node:
 "%NODE_BIN%" -v
 
 :: Launch the server
-"%NODE_BIN%" server\server.js
+"%NODE_BIN%" Backend\server.js
 
 if %ERRORLEVEL% neq 0 (
     echo.

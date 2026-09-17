@@ -571,18 +571,8 @@ class BackgroundUniverseEngine {
     // Trees relocated to outer mountain flanks to keep hero content & buttons clear
     // ------------------------------------------------------------------------
     const treeConfigs = [
-      // Far Left Alpine Edge (Deep framing grove along the extreme left border)
-      { xRatio: 0.008, yRatio: 1.02, height: 160, scale: 1.25, type: 'pine', parallax: 0.72, swayAmp: 10, swaySpeed: 1.10, lean: 5 },
-      { xRatio: 0.022, yRatio: 0.99, height: 145, scale: 1.15, type: 'sakura', parallax: 0.65, swayAmp: 12, swaySpeed: 1.05, lean: 6 },
-      { xRatio: 0.042, yRatio: 0.98, height: 130, scale: 1.05, type: 'willow', parallax: 0.60, swayAmp: 14, swaySpeed: 1.10, lean: 4 },
-      { xRatio: 0.065, yRatio: 0.97, height: 115, scale: 0.92, type: 'pine', parallax: 0.52, swayAmp: 8, swaySpeed: 1.25, lean: -3 },
-      { xRatio: 0.088, yRatio: 1.00, height: 105, scale: 0.84, type: 'oak', parallax: 0.48, swayAmp: 9, swaySpeed: 1.20, lean: 3 },
-
-      // Left Midground Mountain Ridge Grove (Tiered ridge trees nestled on the hills)
-      { xRatio: 0.115, yRatio: 0.96, height: 90, scale: 0.72, type: 'pine', parallax: 0.42, swayAmp: 7, swaySpeed: 1.30, lean: 2 },
-      { xRatio: 0.145, yRatio: 0.94, height: 80, scale: 0.62, type: 'oak', parallax: 0.38, swayAmp: 6, swaySpeed: 1.20, lean: -3 },
-      { xRatio: 0.178, yRatio: 0.92, height: 72, scale: 0.55, type: 'sakura', parallax: 0.35, swayAmp: 7, swaySpeed: 1.15, lean: 2 },
-      { xRatio: 0.208, yRatio: 0.90, height: 65, scale: 0.48, type: 'pine', parallax: 0.32, swayAmp: 5, swaySpeed: 1.35, lean: -1 },
+      // Central-Right Majestic Grand Tree (Positioned in the circle on the Eastern Hill)
+      { xRatio: 0.675, yRatio: 0.725, height: 220, scale: 1.68, type: 'grand-oak', parallax: 0.45, swayAmp: 7, swaySpeed: 0.95, lean: -2.5, branchCount: 9 },
 
       // Right Midground Mountain Ridge Grove (Tiered ridge trees nestled on the eastern hills)
       { xRatio: 0.792, yRatio: 0.91, height: 68, scale: 0.50, type: 'pine', parallax: 0.33, swayAmp: 5, swaySpeed: 1.35, lean: 2 },
@@ -600,22 +590,22 @@ class BackgroundUniverseEngine {
 
     this.natureTrees = treeConfigs.map((t, idx) => {
       const branches = [];
-      const branchCount = t.type === 'pine' ? 8 : (t.type === 'willow' ? 7 : (t.type === 'sakura' ? 7 : 6));
+      const branchCount = t.branchCount || (t.type === 'pine' ? 8 : (t.type === 'willow' ? 7 : (t.type === 'sakura' ? 7 : 6)));
 
       for (let b = 0; b < branchCount; b++) {
         const side = (b % 2 === 0 ? 1 : -1) * (0.85 + (b % 3) * 0.15);
         const tHeight = 0.28 + (b / branchCount) * 0.62;
-        const bLen = (1 - (b / branchCount) * 0.32) * (t.height * (t.type === 'willow' ? 0.45 : 0.40));
+        const bLen = (1 - (b / branchCount) * 0.28) * (t.height * (t.type === 'grand-oak' ? 0.52 : (t.type === 'willow' ? 0.45 : 0.40)));
         
         let bAngle = 0.35 * side;
         if (t.type === 'pine') bAngle = (-0.18 + (b / branchCount) * 0.12) * side;
         else if (t.type === 'willow') bAngle = (0.42 - (b / branchCount) * 0.15) * side;
         else if (t.type === 'sakura') bAngle = (0.48 - (b / branchCount) * 0.20) * side;
-        else if (t.type === 'oak') bAngle = (0.52 - (b / branchCount) * 0.25) * side;
+        else if (t.type === 'oak' || t.type === 'grand-oak') bAngle = (0.52 - (b / branchCount) * 0.25) * side;
 
         // Realistic Secondary Sub-branches
         const subBranches = [];
-        const subCount = t.type === 'pine' ? 2 : (t.type === 'willow' ? 3 : 2);
+        const subCount = t.type === 'grand-oak' ? 3 : (t.type === 'pine' ? 2 : (t.type === 'willow' ? 3 : 2));
         for (let s = 0; s < subCount; s++) {
           const subTPos = 0.45 + (s / subCount) * 0.45;
           const subSide = (s % 2 === 0 ? 1 : -1) * (side > 0 ? 1 : -1);
@@ -634,7 +624,11 @@ class BackgroundUniverseEngine {
         let folColorMid = '#10B981';
         let folColorHigh = '#6EE7B7';
 
-        if (t.type === 'sakura') {
+        if (t.type === 'grand-oak') {
+          folColorDeep = 'rgba(4, 120, 87, 0.94)';     // Deep Lush Forest Emerald (#047857)
+          folColorMid = 'rgba(16, 185, 129, 0.90)';    // Bright Vibrant Mint (#10B981)
+          folColorHigh = 'rgba(110, 231, 183, 0.95)';  // Sunlit Celadon Amber-Mint (#6EE7B7)
+        } else if (t.type === 'sakura') {
           folColorDeep = 'rgba(219, 39, 119, 0.85)';
           folColorMid = 'rgba(244, 114, 182, 0.88)';
           folColorHigh = 'rgba(255, 241, 242, 0.95)';
@@ -657,7 +651,7 @@ class BackgroundUniverseEngine {
           side: side,
           length: bLen,
           angle: bAngle,
-          foliageRadius: (t.height * 0.22) * (1 - (b / branchCount) * 0.25),
+          foliageRadius: (t.height * (t.type === 'grand-oak' ? 0.26 : 0.22)) * (1 - (b / branchCount) * 0.22),
           folColorDeep: folColorDeep,
           folColorMid: folColorMid,
           folColorHigh: folColorHigh,
@@ -1475,9 +1469,9 @@ class BackgroundUniverseEngine {
     }
 
     // =========================================================================
-    // UPDATE EARTH'S NATURE (LIGHT MODE / TRANSITION ONLY)
+    // UPDATE EARTH'S NATURE (LIGHT MODE ONLY)
     // =========================================================================
-    if (this.themeMorphProgress > 0.001) {
+    if (this.isLightMode && this.themeMorphProgress > 0.001) {
       // 1. Drifting Petals & Leaves
       const windTurbulence = Math.sin(this.time * 1.2) * 0.4;
       for (const leaf of this.natureLeaves) {
@@ -1642,7 +1636,7 @@ class BackgroundUniverseEngine {
     // UPDATE THEME MORPHING & CELESTIAL DRAG TRANSITION (SUN <-> SATURN)
     // =========================================================================
     const targetMorph = this.isLightMode ? 1.0 : 0.0;
-    const morphRate = 0.054; // Fast, snappy, responsive (~320ms transition)
+    const morphRate = 0.082; // Snappy, ultra-responsive ~200ms transition without lag
     const prevMorph = this.themeMorphProgress;
 
     if (this.isLightMode) {
@@ -1653,10 +1647,10 @@ class BackgroundUniverseEngine {
 
     const isTransitioning = Math.abs(this.themeMorphProgress - prevMorph) > 0.0001;
 
-    // Spawn dense stardust sparks trailing the dragging celestial hero
+    // Spawn elegant stardust sparks trailing the dragging celestial hero
     if (isTransitioning && this.currentHeroX !== undefined) {
       const isSunToSaturn = targetMorph < 0.5;
-      const spawnCount = 3;
+      const spawnCount = isSunToSaturn ? 1 : 2;
       for (let k = 0; k < spawnCount; k++) {
         this.morphTrailParticles.push({
           x: this.currentHeroX + (Math.random() - 0.5) * (this.currentHeroRadius * 0.85),
@@ -1708,10 +1702,10 @@ class BackgroundUniverseEngine {
       this.ctx.restore();
     }
 
-    // 2. Draw Earth's Nature Environment (Mountains, Waterfall, Trees, Reeds, Leaves) when Light Mode is active or morphing
-    if (easedT > 0.001) {
+    // 2. Draw Earth's Nature Environment (Mountains, Trees, Reeds, Leaves) strictly when Light Mode is active
+    if (this.isLightMode && easedT > 0.001) {
       this.ctx.save();
-      this.ctx.globalAlpha = easedT;
+      this.ctx.globalAlpha = Math.min(1.0, Math.max(0.0, easedT));
       this.drawEarthNatureTheme(cx, cy, mouseNormX, mouseNormY);
       this.ctx.restore();
     }
@@ -1729,6 +1723,7 @@ class BackgroundUniverseEngine {
      EARTH'S NATURE THEME (LIGHT MODE - LUSH, ETHEREAL, TRANQUIL ECOSYSTEM)
      ========================================================================== */
   drawEarthNatureTheme(cx, cy, mouseNormX, mouseNormY) {
+    if (!this.isLightMode) return;
     // 0a. Soft Morning Azure Sky Gradient with Parallax Atmosphere
     this.drawNatureSky(cx, cy, mouseNormX, mouseNormY);
 
@@ -1780,6 +1775,7 @@ class BackgroundUniverseEngine {
 
   /* 0a. Soft Morning Azure Sky Gradient with Parallax Atmosphere (Light Mode) */
   drawNatureSky(cx, cy, mouseNormX, mouseNormY) {
+    if (!this.isLightMode) return;
     this.ctx.save();
     
     // Smooth, luminous sky gradient: soft cornflower / azure sky at top, melting into morning light
@@ -1819,6 +1815,7 @@ class BackgroundUniverseEngine {
 
   /* 0b. Ethereal Atmospheric Golden Hour Vignette & Depth Haze (Light Mode) */
   drawAtmosphericVignette(cx, cy, mouseNormX, mouseNormY) {
+    if (!this.isLightMode) return;
     this.ctx.save();
     const vigRadius = Math.max(this.width, this.height) * 0.95;
     const vigCx = cx + mouseNormX * 25;
@@ -1839,6 +1836,7 @@ class BackgroundUniverseEngine {
 
   /* 1. Golden Crepuscular Sunbeams / God Rays */
   drawNatureSunbeams() {
+    if (!this.isLightMode) return;
     this.ctx.save();
     const beamCount = 6;
     // Origin shifts subtly with cursor for immersive parallax
@@ -1890,6 +1888,7 @@ class BackgroundUniverseEngine {
 
   /* 2. Soft Morning Mist & Drifting Clouds with Parallax Depth */
   drawNatureClouds(cx, cy, mouseNormX, mouseNormY) {
+    if (!this.isLightMode) return;
     this.ctx.save();
     for (const c of this.natureClouds) {
       const pScale = (1.0 - (c.depth || 0.5)) * 40;
@@ -2047,6 +2046,7 @@ class BackgroundUniverseEngine {
 
   /* 3. Rolling Mountain Ridges with Parallax & Watercolor Layers + Alpine Snow Peaks */
   drawNatureMountains(cx, cy, mouseNormX, mouseNormY) {
+    if (!this.isLightMode) return;
     this.ctx.save();
 
     // =========================================================================
@@ -2585,6 +2585,7 @@ class BackgroundUniverseEngine {
 
   /* 6. Botanical Procedural Trees with Realistic Bark, Sub-Branching & Volumetric Foliage */
   drawNatureTrees(cx, cy, mouseNormX, mouseNormY) {
+    if (!this.isLightMode) return;
     if (!this.natureTrees || this.natureTrees.length === 0) return;
     this.ctx.save();
 
@@ -2603,11 +2604,11 @@ class BackgroundUniverseEngine {
       // =========================================================================
       if (this.isLightMode) {
         // Soft Ground Occlusion Shadow
-        const shadowW = tree.scale * 38;
-        const shadowH = tree.scale * 10;
+        const shadowW = tree.scale * (tree.type === 'grand-oak' ? 52 : 38);
+        const shadowH = tree.scale * (tree.type === 'grand-oak' ? 14 : 10);
         const sGrad = this.ctx.createRadialGradient(rootX + 4, rootY + 2, 2, rootX + 4, rootY + 2, shadowW);
-        sGrad.addColorStop(0, 'rgba(15, 23, 42, 0.22)');
-        sGrad.addColorStop(0.5, 'rgba(5, 150, 105, 0.12)');
+        sGrad.addColorStop(0, 'rgba(15, 23, 42, 0.25)');
+        sGrad.addColorStop(0.5, 'rgba(5, 150, 105, 0.14)');
         sGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
         this.ctx.beginPath();
         this.ctx.ellipse(rootX + 4, rootY + 2, shadowW, shadowH, 0, 0, Math.PI * 2);
@@ -2615,11 +2616,11 @@ class BackgroundUniverseEngine {
         this.ctx.fill();
 
         // Spreading Anchor Roots (Left & Right Buttresses)
-        const rootSpread = tree.scale * 14;
+        const rootSpread = tree.scale * (tree.type === 'grand-oak' ? 22 : 14);
         this.ctx.beginPath();
         this.ctx.moveTo(rootX - rootSpread, rootY + 3);
-        this.ctx.quadraticCurveTo(rootX - rootSpread * 0.4, rootY - 6, rootX - tree.scale * 4, rootY - tree.scale * 12);
-        this.ctx.lineTo(rootX + tree.scale * 4, rootY - tree.scale * 12);
+        this.ctx.quadraticCurveTo(rootX - rootSpread * 0.4, rootY - 6, rootX - tree.scale * (tree.type === 'grand-oak' ? 6 : 4), rootY - tree.scale * 12);
+        this.ctx.lineTo(rootX + tree.scale * (tree.type === 'grand-oak' ? 6 : 4), rootY - tree.scale * 12);
         this.ctx.quadraticCurveTo(rootX + rootSpread * 0.4, rootY - 6, rootX + rootSpread, rootY + 3);
         this.ctx.closePath();
         this.ctx.fillStyle = tree.type === 'sakura' ? 'rgba(39, 39, 42, 0.95)' : 
@@ -2628,7 +2629,8 @@ class BackgroundUniverseEngine {
 
         // Lush Base Grass Tufts & Wildflower Scatter
         this.ctx.beginPath();
-        for (let g = -4; g <= 4; g++) {
+        const gCount = tree.type === 'grand-oak' ? 6 : 4;
+        for (let g = -gCount; g <= gCount; g++) {
           const grassH = (6 + (Math.abs(g * 3) % 7)) * tree.scale;
           const grassSway = sway * 0.2 + Math.sin(this.time * 2.8 + g * 1.2) * 2.5;
           const gx = rootX + g * (tree.scale * 3.8);
@@ -2655,8 +2657,8 @@ class BackgroundUniverseEngine {
       // =========================================================================
       // 2. TRUNK & PRIMARY LIMBS CALCULATION
       // =========================================================================
-      const baseW = Math.max(4.5, tree.scale * 8.5);
-      const tipW = Math.max(1.8, tree.scale * 2.8);
+      const baseW = Math.max(4.5, tree.scale * (tree.type === 'grand-oak' ? 12.5 : 8.5));
+      const tipW = Math.max(1.8, tree.scale * (tree.type === 'grand-oak' ? 4.2 : 2.8));
       const tipX = rootX + lean + sway;
       const tipY = rootY - treeH;
       const ctrlX = rootX + (lean * 0.4) + (sway * 0.35);
@@ -2679,6 +2681,11 @@ class BackgroundUniverseEngine {
         barkGrad.addColorStop(0.4, '#543310'); // Rich Sienna
         barkGrad.addColorStop(0.75, '#78350F'); // Amber Wood
         barkGrad.addColorStop(1, '#9A3412');
+      } else if (tree.type === 'grand-oak') {
+        barkGrad.addColorStop(0, '#1E120B'); // Deep Gnarled Ancient Bark
+        barkGrad.addColorStop(0.35, '#3D1F0E'); // Rich Umber
+        barkGrad.addColorStop(0.7, '#6E3A18'); // Sunlit Warm Sienna
+        barkGrad.addColorStop(1, '#9A3412'); // Golden Amber Edge
       } else {
         // Sturdy Oak
         barkGrad.addColorStop(0, '#26150B'); // Dark Forest Earth
@@ -2874,14 +2881,14 @@ class BackgroundUniverseEngine {
           }
 
         } else {
-          // Sakura & Oak: Billowing Multi-Lobed Cloud Clusters
-          const puffCount = tree.type === 'sakura' ? 4 : 5;
+          // Sakura, Oak & Grand Oak: Billowing Multi-Lobed Cloud Clusters
+          const puffCount = tree.type === 'sakura' ? 4 : (tree.type === 'grand-oak' ? 7 : 5);
           for (let p = 0; p < puffCount; p++) {
             const pAngle = (p / puffCount) * Math.PI * 2;
-            const pDist = folRad * 0.42;
+            const pDist = folRad * (tree.type === 'grand-oak' ? 0.46 : 0.42);
             const px = folX + Math.cos(pAngle) * pDist;
             const py = folY + Math.sin(pAngle) * (pDist * 0.65);
-            const pRad = folRad * (0.68 + (p % 2) * 0.22);
+            const pRad = folRad * (0.68 + (p % 2) * (tree.type === 'grand-oak' ? 0.28 : 0.22));
 
             const fGrad = this.ctx.createRadialGradient(px - pRad * 0.25, py - pRad * 0.25, pRad * 0.15, px, py, pRad);
             fGrad.addColorStop(0, br.folColorHigh);
@@ -2895,12 +2902,13 @@ class BackgroundUniverseEngine {
 
             // Subtle textured outer leaf contour scalloping
             if (p % 2 === 0) {
+              this.ctx.save();
               this.ctx.beginPath();
               this.ctx.arc(px + Math.cos(pAngle) * pRad * 0.8, py + Math.sin(pAngle) * pRad * 0.8, pRad * 0.35, 0, Math.PI * 2);
               this.ctx.fillStyle = br.folColorHigh;
-              this.ctx.globalAlpha = 0.65;
+              this.ctx.globalAlpha = (this.ctx.globalAlpha || 1.0) * 0.65;
               this.ctx.fill();
-              this.ctx.globalAlpha = 1.0;
+              this.ctx.restore();
             }
           }
         }
@@ -2912,7 +2920,7 @@ class BackgroundUniverseEngine {
       const crownSway = sway + Math.sin(this.time * 3.2 + tree.swayPhase) * 3.5;
       const crownX = tipX;
       const crownY = tipY;
-      const crownRad = (treeH * 0.26) * tree.scale;
+      const crownRad = (treeH * (tree.type === 'grand-oak' ? 0.30 : 0.26)) * tree.scale;
 
       const crownGrad = this.ctx.createRadialGradient(
         crownX - crownRad * 0.3 + crownSway * 0.2,
@@ -2928,6 +2936,11 @@ class BackgroundUniverseEngine {
         crownGrad.addColorStop(0.35, 'rgba(255, 241, 242, 0.95)');
         crownGrad.addColorStop(0.7, 'rgba(244, 114, 182, 0.90)');
         crownGrad.addColorStop(1, 'rgba(219, 39, 119, 0.2)');
+      } else if (tree.type === 'grand-oak') {
+        crownGrad.addColorStop(0, '#FFFFFF'); // Radiant Sunlight Reflection
+        crownGrad.addColorStop(0.25, 'rgba(187, 247, 208, 0.98)'); // Sunlit Golden Mint (#BBF7D0)
+        crownGrad.addColorStop(0.65, 'rgba(16, 185, 129, 0.92)');  // Emerald Canopy (#10B981)
+        crownGrad.addColorStop(1, 'rgba(4, 120, 87, 0.25)');
       } else if (tree.type === 'pine') {
         // Conical Spire Top
         crownGrad.addColorStop(0, '#A7F3D0');
@@ -2985,11 +2998,11 @@ class BackgroundUniverseEngine {
     const isMobile = this.isMobile || (this.width && this.width < 768);
     const w = this.width || 1200;
     this.natureWildlife = [
-      // 1. Majestic Antlered Stag: Patrols and walks across the left valley meadow
+      // 1. Majestic Antlered Stag: Patrols and walks across the open central meadow (strictly clear of the left squared area)
       {
         id: 'stag',
         type: 'stag',
-        x: w * 0.16,
+        x: w * 0.42,
         yRatio: 0.85,
         scale: isMobile ? 0.85 : 1.25,
         speed: 0.44,
@@ -2997,15 +3010,15 @@ class BackgroundUniverseEngine {
         state: 'walking', // 'walking', 'grazing', 'alert'
         stateTimer: 180 + Math.random() * 100,
         walkPhase: 0,
-        minXRatio: 0.04,
-        maxXRatio: 0.42,
+        minXRatio: 0.34,
+        maxXRatio: 0.65,
         parallax: 18
       },
-      // 2. Mother Doe: Walks and grazes peacefully in the center meadow
+      // 2. Mother Doe: Walks and grazes peacefully in the middle meadow
       {
         id: 'doe-1',
         type: 'doe-grazing',
-        x: w * 0.36,
+        x: w * 0.50,
         yRatio: 0.87,
         scale: isMobile ? 0.75 : 1.10,
         speed: 0.38,
@@ -3013,15 +3026,15 @@ class BackgroundUniverseEngine {
         state: 'walking',
         stateTimer: 160 + Math.random() * 100,
         walkPhase: 1.4,
-        minXRatio: 0.18,
-        maxXRatio: 0.58,
+        minXRatio: 0.36,
+        maxXRatio: 0.72,
         parallax: 22
       },
       // 3. Playful Spotted Fawn: Trots and gambols near mother doe
       {
         id: 'fawn-1',
         type: 'fawn',
-        x: w * 0.41,
+        x: w * 0.55,
         yRatio: 0.88,
         scale: isMobile ? 0.48 : 0.70,
         speed: 0.52,
@@ -3029,15 +3042,15 @@ class BackgroundUniverseEngine {
         state: 'walking',
         stateTimer: 140 + Math.random() * 80,
         walkPhase: 0.6,
-        minXRatio: 0.22,
-        maxXRatio: 0.62,
+        minXRatio: 0.39,
+        maxXRatio: 0.75,
         parallax: 24
       },
-      // 4. Alert Doe: Roams and gazes gracefully across the right clearing
+      // 4. Alert Doe: Roams and gazes gracefully across the eastern meadow near the grand tree
       {
         id: 'doe-2',
         type: 'doe-alert',
-        x: w * 0.76,
+        x: w * 0.78,
         yRatio: 0.86,
         scale: isMobile ? 0.75 : 1.10,
         speed: 0.38,
@@ -3045,15 +3058,15 @@ class BackgroundUniverseEngine {
         state: 'walking',
         stateTimer: 200 + Math.random() * 100,
         walkPhase: 2.2,
-        minXRatio: 0.52,
+        minXRatio: 0.55,
         maxXRatio: 0.88,
         parallax: 22
       },
-      // 5. Meadow Hare 1 (Rabbit): Hops playfully along the western prairie
+      // 5. Meadow Hare 1 (Rabbit): Hops playfully in the central prairie
       {
         id: 'hare-1',
         type: 'hare',
-        x: w * 0.26,
+        x: w * 0.44,
         yRatio: 0.895,
         scale: isMobile ? 0.60 : 0.92,
         speed: 0.88,
@@ -3061,15 +3074,15 @@ class BackgroundUniverseEngine {
         state: 'hopping', // 'hopping', 'grazing', 'pause'
         stateTimer: 140 + Math.random() * 80,
         hopPhase: 0,
-        minXRatio: 0.10,
-        maxXRatio: 0.48,
+        minXRatio: 0.35,
+        maxXRatio: 0.62,
         parallax: 26
       },
       // 6. Meadow Hare 2: Hops and nibbles clover in the eastern prairie
       {
         id: 'hare-2',
         type: 'hare',
-        x: w * 0.66,
+        x: w * 0.68,
         yRatio: 0.90,
         scale: isMobile ? 0.55 : 0.85,
         speed: 0.92,
@@ -3077,7 +3090,7 @@ class BackgroundUniverseEngine {
         state: 'grazing',
         stateTimer: 160 + Math.random() * 80,
         hopPhase: 1.8,
-        minXRatio: 0.42,
+        minXRatio: 0.50,
         maxXRatio: 0.86,
         parallax: 25
       }
@@ -3090,6 +3103,10 @@ class BackgroundUniverseEngine {
       this.initNatureWildlife();
       return;
     }
+
+    // Excluded Sanctuary Boundary: The bottom-left area (x <= 0.34) is strictly excluded
+    // Faunas will never enter, move, or walk through this squared region
+    const restrictedLeftX = this.width * 0.34;
 
     for (const w of this.natureWildlife) {
       w.stateTimer--;
@@ -3119,11 +3136,12 @@ class BackgroundUniverseEngine {
       }
 
       // Check patrol territory boundaries and smoothly turn around
-      const minX = this.width * w.minXRatio;
-      const maxX = this.width * w.maxXRatio;
+      const minX = Math.max(restrictedLeftX, this.width * (w.minXRatio || 0.34));
+      const maxX = this.width * (w.maxXRatio || 0.88);
+
       if (w.x <= minX) {
         w.x = minX;
-        w.facing = 1;
+        w.facing = 1; // Always face right, walking away from the left squared area
         w.state = (w.type === 'hare') ? 'hopping' : 'walking';
         w.stateTimer = 140 + Math.random() * 100;
       } else if (w.x >= maxX) {
@@ -3140,6 +3158,12 @@ class BackgroundUniverseEngine {
       } else if (w.state === 'hopping') {
         w.x += w.speed * w.facing;
         w.hopPhase += 0.13;
+      }
+
+      // Hard clamp after movement to guarantee zero penetration into squared area
+      if (w.x < minX) {
+        w.x = minX;
+        w.facing = 1;
       }
     }
   }
@@ -4038,6 +4062,12 @@ class BackgroundUniverseEngine {
      CELESTIAL COSMOS THEME (DARK MODE - DEEP SPACE SIMULATOR)
      ========================================================================== */
   drawCelestialCosmosTheme(cx, cy, mouseNormX, mouseNormY) {
+    if (this.isLightMode) {
+      // In Light Mode / transitioning to Light Mode, skip invisible heavy deep-space rendering.
+      // Only render fading stars for a lightweight, buttery-smooth 60 FPS dawn!
+      this.drawStarfield(cx, cy, mouseNormX, mouseNormY);
+      return;
+    }
     // 0. Volumetric 3D Depth Fog — creates infinite tunnel perspective
     this.drawDepthFog(cx, cy, mouseNormX, mouseNormY);
 
@@ -6489,8 +6519,6 @@ class BackgroundUniverseEngine {
       this.ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
       this.ctx.fillStyle = pt.color;
       this.ctx.globalAlpha = pt.alpha;
-      this.ctx.shadowColor = pt.color;
-      this.ctx.shadowBlur = 8;
       this.ctx.fill();
     }
     this.ctx.restore();

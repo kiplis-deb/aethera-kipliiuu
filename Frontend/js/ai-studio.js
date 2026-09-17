@@ -141,10 +141,16 @@ class AetheraStudio {
       const toolData = AETHERA_DATA.tools[toolKey] || AETHERA_DATA.tools['chatbot'];
       if (!toolData) return;
 
+      const isId = (typeof window !== 'undefined' && window.aetheraI18n && typeof window.aetheraI18n.getLanguage === 'function' && window.aetheraI18n.getLanguage() === 'id');
+      const toolTitle = (isId && toolData.title_id) ? toolData.title_id : toolData.title;
+      const toolTag = (isId && toolData.tag_id) ? toolData.tag_id : toolData.tag;
+      const toolPlaceholder = (isId && toolData.placeholder_id) ? toolData.placeholder_id : toolData.placeholder;
+      const toolPresets = (isId && toolData.presets_id) ? toolData.presets_id : (toolData.presets || []);
+
       // Always maintain current theme (dark or light) — never force green cyber theme
       document.documentElement.setAttribute('data-theme', this.currentTheme);
       if (activeToolDisplay) {
-        activeToolDisplay.textContent = `TOOL: ${toolData.title.toUpperCase()}`;
+        activeToolDisplay.textContent = isId ? `ALAT: ${toolTitle.toUpperCase()}` : `TOOL: ${toolTitle.toUpperCase()}`;
       }
 
       toolBtns.forEach(btn => btn.classList.toggle('active', btn.getAttribute('data-tool') === toolKey));
@@ -162,8 +168,8 @@ class AetheraStudio {
         }
       }
       
-      if (currentToolTag) currentToolTag.textContent = toolData.tag;
-      if (promptInput) promptInput.placeholder = toolData.placeholder;
+      if (currentToolTag) currentToolTag.textContent = toolTag;
+      if (promptInput) promptInput.placeholder = toolPlaceholder;
 
       // Reset chat history and attached image when switching tools
       this.chatHistory = [];
@@ -172,7 +178,7 @@ class AetheraStudio {
       // Populate Presets
       if (presetsContainer) {
         presetsContainer.innerHTML = '';
-        toolData.presets.forEach(preset => {
+        toolPresets.forEach(preset => {
           const chip = document.createElement('div');
           chip.className = 'studio-preset-item';
           chip.textContent = preset;
@@ -194,6 +200,13 @@ class AetheraStudio {
         const key = btn.getAttribute('data-tool');
         selectTool(key);
       });
+    });
+
+    // Listen to reactive language change to immediately update active tool details & presets
+    window.addEventListener('aethera:language-change', () => {
+      if (this.activeToolKey) {
+        selectTool(this.activeToolKey, false);
+      }
     });
 
     // Initial load with URL params support (default collapsed; user drops down manually)
@@ -562,6 +575,8 @@ class AetheraStudio {
     const langPref = document.getElementById('param-lang-select')?.value || 'auto';
 
     let systemInstructionText = '';
+    const isIndonesian = (typeof window !== 'undefined' && window.aetheraI18n && typeof window.aetheraI18n.getLanguage === 'function' && window.aetheraI18n.getLanguage() === 'id');
+
     if (isChatbot) {
       systemInstructionText = `${toolData.systemPrompt}
 Important Persona Guidelines:
@@ -573,6 +588,10 @@ Important Persona Guidelines:
       systemInstructionText = `${toolData.systemPrompt}
 Preference: ${detailPref} explanation. Target Language / Format: ${langPref}.
 Important: If an image is provided, analyze all visual elements, diagrams, formulas, text, handwritten notes, or code accurately. Format all mathematical equations in LaTeX using $$...$$ for display equations and $...$ for inline equations. Use clean Markdown formatting and language-tagged code blocks.`;
+    }
+
+    if (isIndonesian) {
+      systemInstructionText += `\n\nCRITICAL LOCALIZATION REQUIREMENT: Berikan seluruh respons dan penjelasan dalam Bahasa Indonesia yang alami, luwes, santun, dan mudah dipahami.`;
     }
 
     const userParts = [];

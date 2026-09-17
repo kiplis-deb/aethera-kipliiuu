@@ -7,6 +7,11 @@
 server/data/
 server/user_data/
 server/db.json
+Backend/data/
+Backend/user_data/
+Backend/db.json
+Backend/.env
+Backend/.env.*
 *.tmp.*
 
 # Dependencies & Build
