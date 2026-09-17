@@ -101,6 +101,18 @@ function sendJSON(res, status, data) {
 }
 
 function parseBody(req) {
+  // If running in Vercel or middleware where body is already parsed
+  if (req.body && typeof req.body === 'object') {
+    return Promise.resolve(req.body);
+  }
+  if (typeof req.body === 'string') {
+    try {
+      return Promise.resolve(JSON.parse(req.body));
+    } catch (_) {
+      return Promise.resolve({});
+    }
+  }
+
   return new Promise((resolve, reject) => {
     let body = '';
     req.on('data', chunk => {
@@ -1006,9 +1018,14 @@ async function getAggregatedTechNews(forceRefresh = false) {
 /* --------------------------------------------------------------------------
    HTTP SERVER & ROUTER
    -------------------------------------------------------------------------- */
-const server = http.createServer(async (req, res) => {
-  const parsedUrl = url.parse(req.url, true);
-  const pathname = parsedUrl.pathname;
+async function handleRequest(req, res) {
+  const matchedPath = req.headers && (req.headers['x-matched-path'] || req.headers['x-now-route-matches']);
+  let rawUrl = req.url || '/';
+  if (matchedPath && (rawUrl === '/api/index.js' || rawUrl === '/api' || rawUrl.startsWith('/api?'))) {
+    rawUrl = matchedPath;
+  }
+  const parsedUrl = url.parse(rawUrl, true);
+  const pathname = parsedUrl.pathname || '/';
 
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -1437,7 +1454,9 @@ function getDefaultStarterNotes(username) {
     const stream = fs.createReadStream(targetFile);
     stream.pipe(res);
   });
-});
+}
+
+const server = http.createServer(handleRequest);
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
@@ -1466,5 +1485,6 @@ if (require.main === module) {
 }
 
 // Export for Vercel Serverless Function & testing
-module.exports = server;
+handleRequest.server = server;
+module.exports = handleRequest;
 
