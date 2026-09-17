@@ -207,7 +207,12 @@
 
         <div class="topbar-right">
           <!-- Auth Slot (Sign In / Account Profile) -->
-          <div id="navbar-auth-slot"></div>
+          <div id="navbar-auth-slot">
+            <a href="login.html?redirect=notes.html" class="btn btn-secondary nav-auth-btn" id="nav-signin-btn" title="Sign In" data-i18n-title="nav.sign_in" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; height: 32px; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; flex-shrink: 0;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              <span data-i18n="nav.sign_in">Sign In</span>
+            </a>
+          </div>
 
           <!-- Language Selector Slot -->
           <div class="navbar-lang-slot" id="navbar-lang-slot"></div>

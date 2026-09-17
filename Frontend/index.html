@@ -60,7 +60,12 @@
       </ul>
 
       <div class="nav-actions">
-        <div id="navbar-auth-slot"></div>
+        <div id="navbar-auth-slot">
+          <a href="login.html?redirect=index.html" class="btn btn-secondary nav-auth-btn" id="nav-signin-btn" title="Sign In" data-i18n-title="nav.sign_in" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; height: 32px; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap; flex-shrink: 0;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            <span data-i18n="nav.sign_in">Sign In</span>
+          </a>
+        </div>
         <div class="navbar-lang-slot" id="navbar-lang-slot"></div>
         <!-- Dark / Light Mode Toggle Button -->
         <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Dark and Light Theme" title="Toggle Theme">
@@ -120,7 +125,12 @@
           <li><a href="#faq" class="mobile-nav-item" data-i18n="nav.mobile_faq">❓ FAQ &amp; Guides</a></li>
         </ul>
         <div class="mobile-nav-actions" style="display: flex; flex-direction: column; gap: 0.65rem;">
-          <div id="auth-status-slot" class="mobile-auth-status-slot" style="margin-bottom: 0.25rem;"></div>
+          <div id="auth-status-slot" class="mobile-auth-status-slot" style="margin-bottom: 0.25rem;">
+            <a href="login.html?redirect=index.html" class="btn btn-secondary" title="Sign In" data-i18n-title="nav.sign_in" style="width: 100%; justify-content: center; padding: 0.75rem 1rem; font-size: 0.88rem; display: flex; align-items: center; gap: 0.45rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              <span data-i18n="nav.sign_in">Sign In</span>
+            </a>
+          </div>
           <a href="ai.html" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.85rem 1.25rem;">
             <span data-i18n="nav.launch_studio">Launch AI Studio</span>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">

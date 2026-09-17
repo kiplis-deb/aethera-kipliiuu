@@ -15,8 +15,12 @@ class AetheraClientDB {
       localStorage.removeItem('aethera_saved_chats_v1');
     } catch (_) {}
 
-    this.token = typeof localStorage !== 'undefined' ? localStorage.getItem(this.tokenKey) : null;
+    const rawToken = typeof localStorage !== 'undefined' ? localStorage.getItem(this.tokenKey) : null;
+    this.token = (rawToken && rawToken !== 'undefined' && rawToken !== 'null' && rawToken.trim() !== '') ? rawToken.trim() : null;
     this.currentUser = this._loadUser();
+    if (!this.token) {
+      this.currentUser = null;
+    }
     this.isSyncing = false;
 
     if (typeof window !== 'undefined') {
@@ -506,30 +510,54 @@ class AetheraClientDB {
     const signInLabel = isId ? 'Masuk' : 'Sign In';
 
     slots.forEach(slot => {
+      const isMobileSlot = slot.classList.contains('mobile-auth-status-slot') || slot.id === 'auth-status-slot' || slot.closest('.mobile-nav-actions');
       if (this.isLoggedIn() && this.currentUser) {
         const username = this.currentUser.username || 'User';
-        slot.innerHTML = `
-          <div style="display: inline-flex; align-items: center; gap: 0.45rem; flex-shrink: 0;">
-            <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.06); padding: 0.32rem 0.6rem; border-radius: 8px; border: 1px solid var(--border-glass); white-space: nowrap; flex-shrink: 0;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>${username}</span>
-            </span>
-            <button type="button" class="btn btn-secondary" id="btn-logout" title="${signOutLabel}" data-i18n="nav.sign_out" data-i18n-title="nav.sign_out" style="padding: 0.32rem 0.6rem; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; height: 32px;">
-              ${signOutLabel}
-            </button>
-          </div>
-        `;
-        const logoutBtn = slot.querySelector('#btn-logout');
+        if (isMobileSlot) {
+          slot.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; width: 100%;">
+              <div style="font-size: 0.88rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: center; gap: 0.45rem; background: rgba(255,255,255,0.06); padding: 0.65rem 0.9rem; border-radius: 9px; border: 1px solid var(--border-glass);">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>${username}</span>
+              </div>
+              <button type="button" class="btn btn-secondary btn-logout-action" title="${signOutLabel}" data-i18n="nav.sign_out" data-i18n-title="nav.sign_out" style="width: 100%; justify-content: center; padding: 0.65rem; font-size: 0.82rem;">
+                ${signOutLabel}
+              </button>
+            </div>
+          `;
+        } else {
+          slot.innerHTML = `
+            <div style="display: inline-flex; align-items: center; gap: 0.45rem; flex-shrink: 0;">
+              <span style="font-size: 0.82rem; font-weight: 600; color: var(--text-primary); display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(255,255,255,0.06); padding: 0.32rem 0.6rem; border-radius: 8px; border: 1px solid var(--border-glass); white-space: nowrap; flex-shrink: 0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>${username}</span>
+              </span>
+              <button type="button" class="btn btn-secondary btn-logout-action" title="${signOutLabel}" data-i18n="nav.sign_out" data-i18n-title="nav.sign_out" style="padding: 0.32rem 0.6rem; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; height: 32px;">
+                ${signOutLabel}
+              </button>
+            </div>
+          `;
+        }
+        const logoutBtn = slot.querySelector('.btn-logout-action');
         if (logoutBtn) {
           logoutBtn.addEventListener('click', () => this.logout());
         }
       } else {
-        slot.innerHTML = `
-          <a href="login.html?redirect=${encodeURIComponent(currentPath)}" class="btn btn-secondary" title="${signInLabel}" data-i18n-title="nav.sign_in" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; gap: 0.35rem; white-space: nowrap; flex-shrink: 0; height: 32px;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            <span data-i18n="nav.sign_in">${signInLabel}</span>
-          </a>
-        `;
+        if (isMobileSlot) {
+          slot.innerHTML = `
+            <a href="login.html?redirect=${encodeURIComponent(currentPath)}" class="btn btn-secondary" title="${signInLabel}" data-i18n-title="nav.sign_in" style="width: 100%; justify-content: center; padding: 0.75rem 1rem; font-size: 0.88rem; display: flex; align-items: center; gap: 0.45rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              <span data-i18n="nav.sign_in">${signInLabel}</span>
+            </a>
+          `;
+        } else {
+          slot.innerHTML = `
+            <a href="login.html?redirect=${encodeURIComponent(currentPath)}" class="btn btn-secondary" title="${signInLabel}" data-i18n-title="nav.sign_in" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; gap: 0.35rem; white-space: nowrap; flex-shrink: 0; height: 32px; display: inline-flex; align-items: center;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              <span data-i18n="nav.sign_in">${signInLabel}</span>
+            </a>
+          `;
+        }
       }
       if (window.aetheraI18n) {
         window.aetheraI18n.applyTranslations(slot);
