@@ -11,6 +11,54 @@
       "destination": "/api/index.js"
     },
     {
+      "source": "/",
+      "destination": "/Frontend/index.html"
+    },
+    {
+      "source": "/index.html",
+      "destination": "/Frontend/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/Frontend/login.html"
+    },
+    {
+      "source": "/login.html",
+      "destination": "/Frontend/login.html"
+    },
+    {
+      "source": "/ai",
+      "destination": "/Frontend/ai.html"
+    },
+    {
+      "source": "/ai.html",
+      "destination": "/Frontend/ai.html"
+    },
+    {
+      "source": "/calendar",
+      "destination": "/Frontend/calendar.html"
+    },
+    {
+      "source": "/calendar.html",
+      "destination": "/Frontend/calendar.html"
+    },
+    {
+      "source": "/notes",
+      "destination": "/Frontend/notes.html"
+    },
+    {
+      "source": "/notes.html",
+      "destination": "/Frontend/notes.html"
+    },
+    {
+      "source": "/news",
+      "destination": "/Frontend/news.html"
+    },
+    {
+      "source": "/news.html",
+      "destination": "/Frontend/news.html"
+    },
+    {
       "source": "/((?!Frontend|api).*)",
       "destination": "/Frontend/$1"
     }

@@ -22,12 +22,14 @@ class AetheraClientDB {
     if (typeof window !== 'undefined') {
       // Sync on load
       this.syncFromServer();
-      // Render navbar auth widget on DOM load
+      // Render navbar auth widget on DOM load and window load
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => this.renderNavAuth());
       } else {
         this.renderNavAuth();
       }
+      window.addEventListener('load', () => this.renderNavAuth());
+      setTimeout(() => this.renderNavAuth(), 100);
       // Re-render when language changes
       window.addEventListener('aethera:language-change', () => this.renderNavAuth());
     }
